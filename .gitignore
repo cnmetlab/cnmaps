@@ -129,3 +129,4 @@ dmypy.json
 .pyre/
 *.ipynb
 .DS_Store
+shapefile
