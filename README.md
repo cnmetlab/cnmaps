@@ -105,7 +105,7 @@ plt.show()
 
 ### 根据边界裁减填色等值线图
 
-cnmaps可以利用地图边界对等值线图进行裁减，使用的函数是`clip_contours_by_map`
+cnmaps可以利用地图边界对等值线图进行裁减，只需要一个`clip_contours_by_map`函数即可。
 
 ```python
 import cartopy.crs as ccrs
