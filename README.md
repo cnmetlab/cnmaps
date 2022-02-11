@@ -111,7 +111,7 @@ cnmaps可以利用地图边界对等值线图进行裁减，只需要一个`clip
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 lons, lats, dem = load_dem()
 fig = plt.figure(figsize=(10,10))
@@ -134,7 +134,7 @@ draw_map(tp, color='k')
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 lons, lats, dem = load_dem()
 fig = plt.figure(figsize=(12,6))
@@ -162,7 +162,7 @@ plt.show()
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 lons, lats, dem = load_dem()
 fig = plt.figure(figsize=(18, 9))
@@ -191,7 +191,7 @@ cnmaps的`clip_clabels_by_map`函数可以对超出边界的等值线标签进�
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 lons, lats, dem = load_dem()
 fig = plt.figure(figsize=(18, 9))
@@ -216,41 +216,13 @@ plt.show()
 
 ### 变换投影
 
-上述的功能在其他投影下也都适用，比如我们用正交投影画一个剪切中国区域的海拔高度图。
+上述的功能在其他投影下也都适用，我们用四种投影来展示一下变换投影的效果。
 
 ```python
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
-
-lons, lats, dem = load_dem()
-fig = plt.figure(figsize=(18, 9))
-fig.tight_layout()
-
-china = get_map('中国')
-
-ax = fig.add_subplot(111, projection=ccrs.Orthographic(central_longitude=100))
-cs = ax.contourf(lons, lats, dem, cmap=plt.cm.terrain, transform=ccrs.PlateCarree())
-clip_contours_by_map(cs, china)
-
-draw_map(china, color='k')
-ax.set_extent(china.get_extent(buffer=3))
-ax.set_global()
-ax.coastlines()
-
-plt.show()
-```
-
-![中国地形正交投影](static/images/china-clip-orthographic.png)
-
-再试一试其他投影
-
-```python
-import cartopy.crs as ccrs
-import matplotlib.pyplot as plt
-from cnmaps import get_map, draw_map, clip_contours_by_map
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 lons, lats, dem = load_dem()
 

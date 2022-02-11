@@ -10,7 +10,7 @@ import cartopy.crs as ccrs
 
 from cnmaps import get_map, clip_clabels_by_map, clip_contours_by_map, draw_map
 from cnmaps.names import NAMES
-from cnmaps.data import load_dem
+from cnmaps.sample import load_dem
 
 map_args = []
 for map_set, maps in NAMES.items():

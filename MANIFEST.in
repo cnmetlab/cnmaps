@@ -1,0 +1,9 @@
+include *.in
+include *.ini
+include *.rst
+include *.txt
+include LICENSE
+recursive-include cnmaps/data *.geojson *.nc
+
+global-exclude __pycache__ *.py[cod]
+global-exclude *.so *.dylib

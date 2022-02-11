@@ -15,8 +15,10 @@ def test_not_found():
 def test_get_map_by_fp():
     """测试是否可以按文件路径加载地图"""
     fp = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                      '../data/geojson.min/default/Anhui.geojson')
+                      '../cnmaps/data/geojson.min/default/Anhui.geojson')
     get_map(fp)
+    with pytest.raises(MapNotFoundError):
+        get_map('/mnt/foo/geojson')
 
 
 def test_can_get_all_maps():

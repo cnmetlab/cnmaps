@@ -22,7 +22,7 @@ if CARTOPY_DIGIT_VERSION < '0.19.0':
                    '若需要使用clip_clabels_by_polygons函数, '
                    '请将Cartopy的版本升级到0.19.0及以上.'))
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DATA_DIR = os.path.join(BASE_DIR, 'data', 'geojson.min')
 
 

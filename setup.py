@@ -11,10 +11,10 @@ with open(requirements_path) as f:
     required = f.read().splitlines()
 
 setuptools.setup(name='cnmaps',
-                 version='0.1.0',
+                 version='0.1.8',
                  author='Wentao Li',
                  author_email='clarmylee92510@gmail.com',
-                 description='A python package draw china maps',
+                 description='A python package to draw china maps more easily',
                  long_description=long_description,
                  long_description_content_type='text/markdown',
                  url='https://github.com/Clarmy/cnmaps',
@@ -25,4 +25,4 @@ setuptools.setup(name='cnmaps',
                  classifiers=[
                      'Programming Language :: Python :: 3',
                  ],
-                 python_requires='>=3.7')
+                 python_requires='>=3.6')

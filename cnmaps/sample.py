@@ -3,7 +3,7 @@ import os
 import netCDF4 as nc
 import numpy as np
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DATA_DIR = os.path.join(BASE_DIR, 'data', 'sample')
 
 

@@ -134,3 +134,5 @@ dmypy.json
 shapefile
 standard
 amap_raw
+exclude_data
+tmp/
