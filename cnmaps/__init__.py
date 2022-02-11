@@ -26,6 +26,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BASE_DATA_DIR = os.path.join(BASE_DIR, 'data', 'geojson.min')
 
 
+class MapNotFoundError(Exception):
+    pass
+
+
 class MapPolygon(sgeom.MultiPolygon):
     """地图多边形类, 该是基于shapely.geometry.MultiPolygon的自定义类, 并实现了对于加号操作符的支持"""
 
@@ -77,15 +81,11 @@ class MapPolygon(sgeom.MultiPolygon):
         return (left, right, lower, upper)
 
 
-class MapNotFoundError(Exception):
-    pass
-
-
-def get_map(name='中国', map_set='default'):
+def get_map(source='中国', map_set='default'):
     """根据名称读取地图
 
     参数:
-        name (str, 可选): 地图名称. 默认为 '中国'.
+        source (str, 可选): 地图名称. 默认为 '中国'.
         map_set (str, 可选): 地图集名称. 默认为 'default'.
 
     异常:
@@ -95,12 +95,15 @@ def get_map(name='中国', map_set='default'):
         MapPolygon: 地图边界对象
     """
     for _key_set, prov_name in NAMES[map_set].items():
-        if name in _key_set:
+        if source in _key_set:
+            fp = os.path.join(BASE_DATA_DIR, map_set, f'{prov_name}.geojson')
             break
     else:
-        raise MapNotFoundError(f'未找到指定地图: {name}')
+        if os.path.exists(source):
+            fp = source
+        else:
+            raise MapNotFoundError(f'未找到指定地图: {source}')
 
-    fp = os.path.join(BASE_DATA_DIR, map_set, f'{prov_name}.geojson')
     with open(fp) as f:
         map_json = json.load(f)
     polygon_list = []

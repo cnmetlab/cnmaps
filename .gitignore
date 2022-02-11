@@ -128,5 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 *.ipynb
+
+
 .DS_Store
 shapefile
+standard
+amap_raw

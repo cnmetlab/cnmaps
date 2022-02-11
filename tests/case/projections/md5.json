@@ -1,0 +1,19 @@
+{
+    "AlbersEqualArea": "98843b8b86bda4fad3b53f7feca20de7",
+    "AzimuthalEquidistant": "0fef3e3f461bdc83cfb1780da99811ff",
+    "Geostationary": "8cf26bd321799536598cfbd95bb34150",
+    "Gnomonic": "1f0fd476d932faece123f463ec132031",
+    "InterruptedGoodeHomolosine": "314083adc88c687de1fe9487cf514967",
+    "LambertAzimuthalEqualArea": "e9004298e438eff9245ba3a00cb8d4fb",
+    "LambertConformal": "ba3fb0c0ef5d2107ad5424e8ef4cdfa0",
+    "LambertCylindrical": "0dc5db13fb53dba62344ff0c4b2bc3ae",
+    "Mercator": "f59e225131656533b6e825c690773856",
+    "Miller": "1238fcfbe1d1c45e18868cf6f1878d46",
+    "Mollweide": "63ef18a93db40338c0dcd69604efdf55",
+    "NearsidePerspective": "bbde51ddb9ee3125b980b6150c8dc4cd",
+    "NorthPolarStereo": "b958b3e5637fe45eebbd110e2e66a3db",
+    "Orthographic": "79456d819f9c71b9f84cb7da0eaff685",
+    "Robinson": "8f9fbf117b1003cca522e085460eebfc",
+    "Sinusoidal": "59ab8968093d04a3cbfb6d111d5be749",
+    "Stereographic": "6b4feddc15b006b8d7c7c1ca5e83e0ba"
+}
