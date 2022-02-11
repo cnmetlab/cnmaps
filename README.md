@@ -74,11 +74,11 @@ import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 from cnmaps import get_map, draw_map
 
-dong3sheng = get_map('北京') + get_map('天津') + get_map('河北')
+jingjinji = get_map('北京') + get_map('天津') + get_map('河北')
 
 fig = plt.figure(figsize=(10,10))
 ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-draw_map(dong3sheng, color='k')
+draw_map(jingjinji, color='k')
 
 plt.show()
 ```
