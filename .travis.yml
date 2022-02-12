@@ -30,6 +30,7 @@ install:
   # numpy may be automatically upgraded.
 
   - conda install -c conda-forge --yes cartopy>=0.19.0 matplotlib pytest pip
+  - python setup.py install
 
   # You can also install some dependencies with pip if not available in conda
 
