@@ -4,6 +4,7 @@ import json
 import warnings
 from typing import Union
 
+import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
@@ -182,7 +183,16 @@ def clip_contours_by_map(contours, map_polygon: sgeom.MultiPolygon):
             contour.set_clip_path(clip)
 
 
-def clip_clabels_by_map(clabel_text, map_polygon: sgeom.MultiPolygon):
+def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
+                        map_polygon: MapPolygon):
+    """剪切clabel文本, 一般配合contour函数使用
+
+    注意: 该函数仅对于cartopy>=0.19.0版本有效
+
+    参数:
+        clabel_text (matplotlib.text.Text): matplotlib.text.Text对象, 由clabel函数返回
+        map_polygon (MapPolygon): 地图多边形边界对象
+    """
     ax = plt.gca()
 
     for cbt in clabel_text:
