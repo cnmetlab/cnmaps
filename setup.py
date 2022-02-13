@@ -3,8 +3,11 @@ import os
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
-with open(os.path.join(FILE_PATH, 'README.md'), 'r') as fh:
-    long_description = fh.read()
+with open(os.path.join(FILE_PATH, 'README.md'), 'r', encoding='utf-8') as fh:
+    try:
+        long_description = fh.read()
+    except UnicodeDecodeError:
+        pass
 
 requirements_path = os.path.join(FILE_PATH, 'requirements.txt')
 with open(requirements_path) as f:
