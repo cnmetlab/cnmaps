@@ -4,6 +4,10 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+os:
+  - windows
+  - linux
+  - osx
 install:
   # We do this conditionally because it saves us some downloading if the
   # version is the same.
