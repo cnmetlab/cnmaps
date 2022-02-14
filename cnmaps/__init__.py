@@ -183,8 +183,7 @@ def clip_contours_by_map(contours, map_polygon: sgeom.MultiPolygon):
             contour.set_clip_path(clip)
 
 
-def clip_pcolormesh_by_map(mesh: cartopy.mpl.geocollection.GeoQuadMesh,
-                           map_polygon: MapPolygon):
+def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
     """使用地图边界对象对填色网格线对象进行裁剪
 
     参数:
