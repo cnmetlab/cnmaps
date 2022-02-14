@@ -183,6 +183,70 @@ def clip_contours_by_map(contours, map_polygon: sgeom.MultiPolygon):
             contour.set_clip_path(clip)
 
 
+def clip_pcolormesh_by_map(mesh: cartopy.mpl.geocollection.GeoQuadMesh,
+                           map_polygon: MapPolygon):
+    """使用地图边界对象对填色网格线对象进行裁剪
+
+    参数:
+        contours (cartopy.mpl.contour.GeoContourSet): GeoQuadMesh对象, 该对象是调用ax.pcolormesh()方法的返回值
+                                                      注意: 对象须带有投影信息
+        map_polygon (sgeom.MultiPolygon): 地图边界对象, 可以通过get_map()获取
+    """
+    vertices = []
+    codes = []
+    ax = plt.gca()
+
+    for polygon in map_polygon:
+        try:
+            coords = polygon.boundary.coords
+        except NotImplementedError:
+            # 针对图形中出现了洞的情况的处理
+            exterior_coords = polygon.exterior.coords
+            interiors = polygon.interiors
+            exterior_prt = len(exterior_coords)
+            for coord in exterior_coords:
+                try:
+                    trans_coord = ax.projection.transform_point(
+                        *coord, src_crs=ccrs.PlateCarree())
+                except AttributeError:
+                    trans_coord = coord
+                vertices.append(trans_coord)
+            codes += [mpath.Path.MOVETO]
+            codes += [mpath.Path.LINETO] * (exterior_prt - 2)
+            codes += [mpath.Path.CLOSEPOLY]
+            for interior in interiors:
+                interior_coords = interior.coords
+                interior_prt = len(interior_coords)
+                for coord in interior_coords:
+                    try:
+                        trans_coord = ax.projection.transform_point(
+                            *coord, src_crs=ccrs.PlateCarree())
+                    except AttributeError:
+                        trans_coord = coord
+                    vertices.append(trans_coord)
+                codes += [mpath.Path.MOVETO]
+                codes += [mpath.Path.LINETO] * (interior_prt - 2)
+                codes += [mpath.Path.CLOSEPOLY]
+
+            clip = mpath.Path(vertices, codes)
+        else:
+            prt = len(coords)
+            for coord in coords:
+                try:
+                    trans_coord = ax.projection.transform_point(
+                        *coord, src_crs=ccrs.PlateCarree())
+                except AttributeError:
+                    trans_coord = coord
+                vertices.append(trans_coord)
+            codes += [mpath.Path.MOVETO]
+            codes += [mpath.Path.LINETO] * (prt - 2)
+            codes += [mpath.Path.CLOSEPOLY]
+            clip = mpath.Path(vertices, codes)
+        clip = mpatches.PathPatch(clip, transform=ax.transData)
+
+        mesh.set_clip_path(clip)
+
+
 def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
                         map_polygon: MapPolygon):
     """剪切clabel文本, 一般配合contour函数使用

@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 
-from cnmaps import get_map, clip_clabels_by_map, clip_contours_by_map, draw_map
+from cnmaps import (get_map, clip_clabels_by_map, clip_contours_by_map,
+                    draw_map, clip_pcolormesh_by_map)
 from cnmaps.names import NAMES
 from cnmaps.sample import load_dem
 
@@ -64,6 +65,34 @@ def test_clip_contourf():
                          transform=ccrs.PlateCarree())
 
         clip_contours_by_map(cs, map_polygon)
+        draw_map(map_polygon, color='k', linewidth=1)
+        ax.set_extent(map_polygon.get_extent(buffer=1))
+        savefp = os.path.join('./tmp', f'{name}.png')
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches='tight')
+        plt.close()
+
+    shutil.rmtree('./tmp')
+
+
+def test_clip_pcolormesh():
+    lons, lats, data = load_dem()
+
+    for map_arg in map_args:
+        name = map_arg['source']
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_map(**map_arg)
+
+        mesh = ax.pcolormesh(lons,
+                             lats,
+                             data,
+                             cmap=plt.cm.terrain,
+                             levels=np.linspace(-2800, data.max(), 10),
+                             transform=ccrs.PlateCarree())
+
+        clip_pcolormesh_by_map(mesh, map_polygon)
         draw_map(map_polygon, color='k', linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
         savefp = os.path.join('./tmp', f'{name}.png')
