@@ -130,6 +130,30 @@ draw_map(tp, color='k')
 ![青藏高原剪切](static/images/tp-clip.png)
 
 
+### 根据边界裁减填色网格图
+
+同样地，cnmaps也可以对网格图进行裁减，使用`clip_pcolormesh_by_map`函数即可。
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import get_map, draw_map, clip_pcolormesh_by_map
+from cnmaps.sample import load_dem
+
+lons, lats, dem = load_dem()
+fig = plt.figure(figsize=(10, 10))
+
+tp = get_map('青藏高原', map_set='geography')
+
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+mesh = ax.pcolormesh(lons, lats, dem, cmap=plt.cm.terrain)
+clip_pcolormesh_by_map(mesh, tp)
+draw_map(tp, color='k')
+ax.set_extent(tp.get_extent())
+```
+![青藏高原剪切](static/images/tp-clip-pcolormesh.png)
+
+
 ### 调整图片边界位置
 
 我们可以利用`get_extent`方法获取不同缩放等级的边界，例如下图，我们用12个不同等级的缩放来绘制青藏高原的海拔高度图
