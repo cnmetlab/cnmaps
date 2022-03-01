@@ -10,11 +10,11 @@ with open(os.path.join(FILE_PATH, 'README.md'), 'r', encoding='utf-8') as fh:
         pass
 
 requirements_path = os.path.join(FILE_PATH, 'requirements.txt')
-with open(requirements_path) as f:
+with open(requirements_path, 'r', encoding='utf-8') as f:
     required = f.read().splitlines()
 
 setuptools.setup(name='cnmaps',
-                 version='0.2.0',
+                 version='0.2.1',
                  author='Wentao Li',
                  author_email='clarmylee92510@gmail.com',
                  description='A python package to draw china maps more easily',

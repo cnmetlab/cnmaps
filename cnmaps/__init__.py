@@ -105,7 +105,7 @@ def get_map(source='中国', map_set='default'):
         else:
             raise MapNotFoundError(f'未找到指定地图: {source}')
 
-    with open(fp) as f:
+    with open(fp, encoding='utf-8') as f:
         map_json = json.load(f)
     polygon_list = []
     if 'Polygon' in map_json['geometry']['type']:
