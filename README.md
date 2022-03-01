@@ -7,7 +7,7 @@
 
 ## 安装
 
-你可以使用pip进行安装：`$ pip install cnmaps`
+你可以使用pip进行安装：`$ pip install -U cnmaps`
 
 ## 使用
 
