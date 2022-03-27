@@ -1,4 +1,7 @@
 # cnmaps
+
+![logo](static/images/logo.png)
+
 [![Build Status](https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main)](https://app.travis-ci.com/github/Clarmy/cnmaps)
 [![PyPI version](https://badge.fury.io/py/cnmaps.svg)](https://badge.fury.io/py/cnmaps)
 [![Downloads](https://pepy.tech/badge/cnmaps)](https://pepy.tech/project/cnmaps)
