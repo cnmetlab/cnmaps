@@ -1,13 +1,46 @@
 # cnmaps
 
-![logo](static/images/logo.png)
+<h1 align="center" style="margin:1em;">
+  <a href="https://scitools.org.uk/cartopy/docs/latest/">
+    <img src="static/images/logo.png"
+         alt="cnmaps"></a>
+</h1>
 
-[![Build Status](https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main)](https://app.travis-ci.com/github/Clarmy/cnmaps)
-[![PyPI version](https://badge.fury.io/py/cnmaps.svg)](https://badge.fury.io/py/cnmaps)
-[![Downloads](https://pepy.tech/badge/cnmaps)](https://pepy.tech/project/cnmaps)
-[![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Clarmy/cnmaps/issues)
 
-这是一个可以让中国地图画起来更丝滑的python包（基于matplotlib和cartopy）
+<p align="center">
+
+<a href="https://app.travis-ci.com/github/Clarmy/cnmaps">
+<img src="https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main"
+ alt="Build Status" /></a>
+
+<!-- [![Build Status](https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main)](https://app.travis-ci.com/github/Clarmy/cnmaps) -->
+
+<a href="https://badge.fury.io/py/cnmaps">
+<img src="https://badge.fury.io/py/cnmaps.svg"
+ alt="PyPI version" /></a>
+
+<!-- [![PyPI version](https://badge.fury.io/py/cnmaps.svg)](https://badge.fury.io/py/cnmaps) -->
+
+<!-- [![Downloads](https://pepy.tech/badge/cnmaps)](https://pepy.tech/project/cnmaps) -->
+
+<a href="https://pepy.tech/project/cnmaps">
+<img src="https://pepy.tech/badge/cnmaps"
+ alt="Downloads" /></a>
+
+<!-- [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Clarmy/cnmaps/issues) -->
+
+<a href="https://github.com/Clarmy/cnmaps/issues">
+<img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"
+ alt="contributions welcome" /></a>
+
+</p>
+<br>
+
+<h4 align="center">
+    cnmaps是一个可以让中国地图画起来更丝滑的python包（基于matplotlib和cartopy）
+</h4>
+
+
 
 ## 安装
 
