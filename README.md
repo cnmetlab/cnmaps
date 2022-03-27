@@ -1,13 +1,13 @@
 # cnmaps
 
-![logo](static/images/logo.png)
-
 [![Build Status](https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main)](https://app.travis-ci.com/github/Clarmy/cnmaps)
 [![PyPI version](https://badge.fury.io/py/cnmaps.svg)](https://badge.fury.io/py/cnmaps)
 [![Downloads](https://pepy.tech/badge/cnmaps)](https://pepy.tech/project/cnmaps)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/Clarmy/cnmaps/issues)
 
-这一个可以让中国地图画起来更丝滑的python包（基于matplotlib和cartopy）
+![logo](static/images/logo.png)
+
+这是一个可以让中国地图画起来更丝滑的python包（基于matplotlib和cartopy）
 
 ## 安装
 
