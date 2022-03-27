@@ -1,5 +1,3 @@
-# cnmaps
-
 <h1 align="center" style="margin:1em;">
   <a href="https://scitools.org.uk/cartopy/docs/latest/">
     <img src="static/images/logo.png"
@@ -27,9 +25,8 @@
 </p>
 
 <h4 align="center">
-    cnmaps是一个可以让中国地图画起来更丝滑的python包（基于matplotlib和cartopy）
+    cnmaps是一个可以让中国地图画起来更丝滑的地图类python扩展包
 </h4>
-
 
 
 ## 安装
