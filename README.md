@@ -1,5 +1,5 @@
 <h1 align="center" style="margin:1em;">
-  <a href="https://scitools.org.uk/cartopy/docs/latest/">
+  <a href="">
     <img src="static/images/logo.png"
          alt="cnmaps"></a>
 </h1>
