@@ -1,5 +1,5 @@
 <h1 align="center" style="margin:1em;">
-  <a href="">
+  <a href="static/images/logo.png">
     <img src="static/images/logo.png"
          alt="cnmaps"></a>
 </h1>
