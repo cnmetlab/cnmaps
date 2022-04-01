@@ -20,7 +20,7 @@
  alt="Downloads" /></a>
   
 <a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/?badge=0.2.1'>
-    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
+    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=0.2.1' alt='Documentation Status' />
 </a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
