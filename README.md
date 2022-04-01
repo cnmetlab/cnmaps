@@ -19,7 +19,9 @@
 <img src="https://pepy.tech/badge/cnmaps"
  alt="Downloads" /></a>
   
-[![Documentation Status](https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest)](https://cnmaps-doc.readthedocs.io/zh_CN/latest/?badge=0.2.1)
+<a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/?badge=0.2.1'>
+    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
+</a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"
