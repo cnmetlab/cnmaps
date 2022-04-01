@@ -19,7 +19,7 @@
 <img src="https://pepy.tech/badge/cnmaps"
  alt="Downloads" /></a>
   
-<a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/?badge=0.2.1'>
+<a href='https://cnmaps-doc.readthedocs.io/zh_CN/0.2.1/'>
     <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=0.2.1' alt='Documentation Status' />
 </a>
 
