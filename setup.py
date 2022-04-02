@@ -14,7 +14,7 @@ with open(requirements_path, 'r', encoding='utf-8') as f:
     required = f.read().splitlines()
 
 setuptools.setup(name='cnmaps',
-                 version='0.2.1',
+                 version='1.0.0',
                  author='Wentao Li',
                  author_email='clarmylee92510@gmail.com',
                  description='A python package to draw china maps more easily',
@@ -22,7 +22,7 @@ setuptools.setup(name='cnmaps',
                  long_description_content_type='text/markdown',
                  url='https://github.com/Clarmy/cnmaps',
                  include_package_data=True,
-                 package_data={'': ['*.geojson', '*.nc']},
+                 package_data={'': ['*.geojson', '*.nc', '*.db']},
                  packages=setuptools.find_packages(),
                  install_requires=required,
                  classifiers=[

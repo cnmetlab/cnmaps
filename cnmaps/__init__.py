@@ -14,6 +14,9 @@ import cartopy.crs as ccrs
 import shapely.geometry as sgeom
 
 from .names import NAMES
+from .maps import *
+
+__version__ = '1.2.1'
 
 CARTOPY_DIGIT_VERSION = re.match(r'(\d*\.\d*\.\d*)',
                                  cartopy.__version__).group(1)
@@ -25,98 +28,6 @@ if CARTOPY_DIGIT_VERSION < '0.19.0':
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DATA_DIR = os.path.join(BASE_DIR, 'data', 'geojson.min')
-
-
-class MapNotFoundError(Exception):
-    pass
-
-
-class MapPolygon(sgeom.MultiPolygon):
-    """地图多边形类, 该是基于shapely.geometry.MultiPolygon的自定义类, 并实现了对于加号操作符的支持"""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
-    def __add__(self, other):
-        return self.union(other)
-
-    def __and__(self, other):
-        return self.intersection(other)
-
-    def __sub__(self, other):
-        return self.difference(other)
-
-    def union(self, other):
-        union_result = super().union(other)
-        if isinstance(union_result, sgeom.Polygon):
-            return MapPolygon([union_result])
-        elif isinstance(union_result, sgeom.MultiPolygon):
-            return MapPolygon(union_result)
-
-    def difference(self, other):
-        difference_result = super().difference(other)
-        if isinstance(difference_result, sgeom.Polygon):
-            return MapPolygon([difference_result])
-        elif isinstance(difference_result, sgeom.MultiPolygon):
-            return MapPolygon(difference_result)
-
-    def intersection(self, other):
-        intersection_result = super().intersection(other)
-        if isinstance(intersection_result, sgeom.Polygon):
-            return MapPolygon([intersection_result])
-        elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return MapPolygon(intersection_result)
-        else:
-            return MapPolygon()
-
-    def get_extent(self, buffer=2):
-        """获取范围坐标
-
-        参数:
-            buffer (int, 可选): 外扩缓冲边缘, 单位为°, 该值越大, 所取的范围越大. 默认为 2.
-
-        返回值:
-            tuple: 坐标范围点, 该值可直接传入ax.set_extent使用
-        """
-        left, lower, right, upper = self.buffer(buffer).bounds
-        return (left, right, lower, upper)
-
-
-def get_map(source='中国', map_set='default'):
-    """根据名称读取地图
-
-    参数:
-        source (str, 可选): 地图名称. 默认为 '中国'.
-        map_set (str, 可选): 地图集名称. 默认为 'default'.
-
-    异常:
-        MapNotFoundError: 地图未找到
-
-    返回值:
-        MapPolygon: 地图边界对象
-    """
-    for _key_set, prov_name in NAMES[map_set].items():
-        if source in _key_set:
-            fp = os.path.join(BASE_DATA_DIR, map_set, f'{prov_name}.geojson')
-            break
-    else:
-        if os.path.exists(source):
-            fp = source
-        else:
-            raise MapNotFoundError(f'未找到指定地图: {source}')
-
-    with open(fp, encoding='utf-8') as f:
-        map_json = json.load(f)
-    polygon_list = []
-    if 'Polygon' in map_json['geometry']['type']:
-        for _coords in map_json['geometry']['coordinates']:
-            for coords in _coords:
-                polygon_list.append(sgeom.Polygon(coords))
-
-        return MapPolygon(polygon_list)
-
-    elif map_json['geometry']['type'] == 'MultiLineString':
-        return sgeom.MultiLineString(map_json['geometry']['coordinates'])
 
 
 def clip_contours_by_map(contours, map_polygon: sgeom.MultiPolygon):

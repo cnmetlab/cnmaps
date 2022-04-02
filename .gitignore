@@ -137,3 +137,5 @@ exclude_data
 tmp/
 
 scripts
+labdata/
+*.psd
