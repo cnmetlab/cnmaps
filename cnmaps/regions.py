@@ -1,23 +1,54 @@
-from . import get_map
+from . import get_adm_maps
 
-REGION = {
-    '东三省': (get_map('黑龙江') + get_map('吉林') + get_map('辽宁')),
-    '东北': (get_map('黑龙江') + get_map('吉林') + get_map('辽宁')),
-    '华北五省': (get_map('北京') + get_map('天津') + get_map('河北') + get_map('山西') +
-             get_map('内蒙古')),
-    '华北': (get_map('北京') + get_map('天津') + get_map('河北') + get_map('山西') +
-           get_map('内蒙古')),
-    '华东': (get_map('上海') + get_map('江苏') + get_map('浙江') + get_map('安徽') +
-           get_map('江西') + get_map('山东') + get_map('福建') + get_map('台湾')),
-    '华中': (get_map('河南') + get_map('湖北') + get_map('湖南')),
-    '华南': (get_map('广东') + get_map('广西') + get_map('海南') + get_map('香港') +
-           get_map('澳门')),
-    '西南': (get_map('重庆') + get_map('四川') + get_map('云南') + get_map('贵州') +
-           get_map('西藏')),
-    # TODO: 添加西北地区的地图对象
-    # 西北地区的范围是：陕西省、甘肃省、青海省、宁夏回族自治区、新疆维吾尔自治区、内蒙古自治区西部（阿拉善盟、巴彦淖尔市、乌海市、鄂尔多斯市）
-    '川渝': (get_map('四川') + get_map('重庆')),
-    '江浙沪': (get_map('江苏') + get_map('浙江') + get_map('上海')),
-    '长三角': (get_map('上海') + get_map('江苏') + get_map('浙江') + get_map('安徽')),
-    '京津冀': (get_map('北京') + get_map('天津') + get_map('河北'))
+region_polygons = {
+    '东北地区': (get_adm_maps(province='黑龙江省', only_polygon=True, record='first') +
+             get_adm_maps(province='吉林省', only_polygon=True, record='first') +
+             get_adm_maps(province='辽宁省', only_polygon=True, record='first')),
+    '华北地区': (get_adm_maps(province='北京市', only_polygon=True, record='first') +
+             get_adm_maps(province='天津市', only_polygon=True, record='first') +
+             get_adm_maps(province='河北省', only_polygon=True, record='first') +
+             get_adm_maps(province='山西省', only_polygon=True, record='first') +
+             get_adm_maps(province='内蒙古自治区', only_polygon=True, record='first')),
+    '华东地区': (get_adm_maps(province='上海市', only_polygon=True, record='first') +
+             get_adm_maps(province='江苏省', only_polygon=True, record='first') +
+             get_adm_maps(province='浙江省', only_polygon=True, record='first') +
+             get_adm_maps(province='安徽省', only_polygon=True, record='first') +
+             get_adm_maps(province='江西省', only_polygon=True, record='first') +
+             get_adm_maps(province='山东省', only_polygon=True, record='first') +
+             get_adm_maps(province='福建省', only_polygon=True, record='first') +
+             get_adm_maps(province='台湾省', only_polygon=True, record='first')),
+    '华中地区': (get_adm_maps(province='河南省', only_polygon=True, record='first') +
+             get_adm_maps(province='湖北省', only_polygon=True, record='first') +
+             get_adm_maps(province='湖南省', only_polygon=True, record='first')),
+    '华南地区': (get_adm_maps(province='广东省', only_polygon=True, record='first') +
+             get_adm_maps(province='广西壮族自治区', only_polygon=True, record='first') +
+             get_adm_maps(province='海南省', only_polygon=True, record='first') +
+             get_adm_maps(province='香港特别行政区', only_polygon=True, record='first') +
+             get_adm_maps(province='澳门特别行政区', only_polygon=True, record='first')),
+    '西南地区': (get_adm_maps(province='重庆市', only_polygon=True, record='first') +
+             get_adm_maps(province='四川省', only_polygon=True, record='first') +
+             get_adm_maps(province='云南省', only_polygon=True, record='first') +
+             get_adm_maps(province='贵州省', only_polygon=True, record='first') +
+             get_adm_maps(province='西藏自治区', only_polygon=True, record='first')),
+    '西北地区': (get_adm_maps(province='陕西省', only_polygon=True, record='first') +
+             get_adm_maps(province='甘肃省', only_polygon=True, record='first') +
+             get_adm_maps(province='青海省', only_polygon=True, record='first') +
+             get_adm_maps(province='宁夏回族自治区', only_polygon=True, record='first') +
+             get_adm_maps(city='阿拉善盟', only_polygon=True, record='first') +
+             get_adm_maps(city='巴彦淖尔市', only_polygon=True, record='first') +
+             get_adm_maps(city='乌海市', only_polygon=True, record='first') +
+             get_adm_maps(city='鄂尔多斯市', only_polygon=True, record='first') +
+             get_adm_maps(province='新疆维吾尔自治区', only_polygon=True, record='first')),
+    '川渝': (get_adm_maps(province='四川省', only_polygon=True, record='first') +
+           get_adm_maps(province='重庆市', only_polygon=True, record='first')),
+    '江浙沪': (get_adm_maps(province='江苏省', only_polygon=True, record='first') +
+            get_adm_maps(province='浙江省', only_polygon=True, record='first') +
+            get_adm_maps(province='上海市', only_polygon=True, record='first')),
+    '长三角': (get_adm_maps(province='上海市', only_polygon=True, record='first') +
+            get_adm_maps(province='江苏省', only_polygon=True, record='first') +
+            get_adm_maps(province='浙江省', only_polygon=True, record='first') +
+            get_adm_maps(province='安徽省', only_polygon=True, record='first')),
+    '京津冀': (get_adm_maps(province='北京市', only_polygon=True, record='first') +
+            get_adm_maps(province='天津市', only_polygon=True, record='first') +
+            get_adm_maps(province='河北省', only_polygon=True, record='first'))
 }

@@ -26,8 +26,8 @@ def test_map_load():
     """测试各级地图数量是否完整，以及各种规则是否都能加载成功"""
     assert len(get_adm_maps(level='国')) == 2
     assert len(get_adm_maps(level='省')) == 34
-    assert len(get_adm_maps(level='市')) == 367
-    assert len(get_adm_maps(level='区县')) == 2840
+    assert len(get_adm_maps(level='市')) == 370
+    assert len(get_adm_maps(level='区县')) == 2875
 
     beijing = get_adm_maps(province='北京市')[0]
     assert (beijing['省/直辖市'] == '北京市' and
@@ -61,7 +61,7 @@ def test_map_operator():
     assert isinstance(
         get_adm_maps(province='四川省')[0]['geometry'].union(get_adm_maps(province='重庆市')[0]['geometry']) + get_adm_maps(province='贵州省')[0]['geometry'], MapPolygon)
     assert round((get_adm_maps(province='四川省')[0]['geometry'] + get_adm_maps(province='重庆市')[0]['geometry'] + get_adm_maps(province='贵州省')[0]['geometry']).area,
-                 2) == 65.45
+                 2) == 69.49
 
     assert isinstance(get_adm_maps(province='福建省')[0]['geometry'] & get_adm_maps(
         province='广东省')[0]['geometry'], MapPolygon)
@@ -185,7 +185,7 @@ def test_get_adm_names():
              '密云区',
              '延庆区']
     assert sorted(get_adm_names(city='北京市', level='区县')) == sorted(names)
-    assert len(get_adm_names(level='市')) == 367
+    assert len(get_adm_names(level='市')) == 370
     assert sorted(get_adm_names(level='市')[:5]) == sorted([
         '北京市', '天津市', '石家庄市', '唐山市', '秦皇岛市'])
     assert len(get_adm_names(level='省')) == 34
@@ -193,5 +193,23 @@ def test_get_adm_names():
         '北京市', '天津市', '河北省', '山西省', '内蒙古自治区'])
 
 
+def test_regions():
+    """测试区域组合"""
+    AERAS = {'东北地区': 92.0,
+             '华北地区': 168.0,
+             '华东地区': 80.0,
+             '华中地区': 53.0,
+             '华南地区': 41.0,
+             '西南地区': 218.0,
+             '西北地区': 356.0,
+             '川渝': 53.0,
+             '江浙沪': 21.0,
+             '长三角': 34.0,
+             '京津冀': 23.0}
+    from cnmaps.regions import region_polygons
+    for region_name, area in AERAS.items():
+        assert round(region_polygons[region_name].area, 0) == area
+
+
 if __name__ == '__main__':
-    test_city_orthogonality()
+    test_regions()
