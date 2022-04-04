@@ -30,9 +30,10 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file environment.yml --name base
+        python -m pip install --upgrade pip
+        python -m pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
         python setup.py install
-        conda install pytest
-        conda install flake8
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
