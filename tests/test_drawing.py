@@ -20,11 +20,13 @@ sample_districts = [random.choice(districts) for _ in range(100)]
 # map_args = ([{'province': p, 'only_polygon': True, 'record': 'first', 'name': p} for p in provinces] +
 #             [{'city': c, 'only_polygon': True, 'record': 'first', 'name': c} for c in cities] +
 #             [{'district': d, 'only_polygon': True, 'record': 'first', 'name': d} for d in sample_districts])
+
 map_args = [{'province': p, 'only_polygon': True,
              'record': 'first', 'name': p} for p in provinces]
 
 
 def test_clip_pcolormesh():
+    """测试剪切格点图"""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -41,7 +43,7 @@ def test_clip_pcolormesh():
                              transform=ccrs.PlateCarree())
 
         clip_pcolormesh_by_map(mesh, map_polygon)
-        draw_map(map_polygon, color='k', linewidth=1)
+        draw_map(map_polygon, linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
         savefp = os.path.join('./tmp', f'{name}.png')
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
@@ -52,6 +54,7 @@ def test_clip_pcolormesh():
 
 
 def test_clip_contour():
+    """测试剪切等值线"""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -80,6 +83,7 @@ def test_clip_contour():
 
 
 def test_clip_contourf():
+    """测试切割填色等值线"""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -108,6 +112,7 @@ def test_clip_contourf():
 
 
 def test_clip_clabel():
+    """测试切割等值线标签"""
     lons, lats, data = load_dem()
 
     map_polygon = get_adm_maps(
@@ -140,6 +145,7 @@ def test_clip_clabel():
 
 
 def test_projection():
+    """测试不同投影"""
     PROJECTIONS = [
         ccrs.Orthographic(central_longitude=100),
         ccrs.AlbersEqualArea(central_longitude=100),
@@ -187,3 +193,6 @@ def test_projection():
         plt.close()
 
     shutil.rmtree('./tmp')
+
+if __name__ == '__main__':
+    pass
