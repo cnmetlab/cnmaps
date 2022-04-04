@@ -27,7 +27,6 @@ jobs:
     - name: Install dependencies
       run: |
         C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
-        C:\Miniconda\condabin\conda.bat init powershell
         C:\Miniconda\condabin\conda.bat activate base
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
