@@ -1,4 +1,3 @@
-from dis import dis
 import os
 import json
 import sqlite3
@@ -109,11 +108,11 @@ def get_adm_names(province: str = None,
     Args:
          province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
-        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'. 
+        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
         district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
         level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
-                               其中'省'级包括直辖市、特区等; 
+                               其中'省'级包括直辖市、特区等;
                                '市'级为地级市, 若为直辖市, 则名称与'省'级相同, 比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
@@ -147,25 +146,26 @@ def get_adm_maps(province: str = None,
                  db: str = DB_FILE,
                  engine: str = None,
                  record: str = 'all',
-                 only_polygon: bool = False):
+                 only_polygon: bool = False,
+                 *args, **kwargs):
     """获取行政地图的边界对象
 
     Args:
         province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
-        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'. 
+        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
         district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
         level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
-                               其中'省'级包括直辖市、特区等; 
+                               其中'省'级包括直辖市、特区等;
                                '市'级为地级市, 若为直辖市, 则名称与'省'级相同, 比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
         country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
         source (str, optional): 数据源. Defaults to '高德'.
         db (str, optional): sqlite db文件路径. Defaults to DB_FILE.
-        engine (str, optional): 输出引擎, 默认为None, 输出为列表, 
-                                目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象. 
+        engine (str, optional): 输出引擎, 默认为None, 输出为列表,
+                                目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象.
                                 Defaults to None.
 
     Raises:
@@ -186,7 +186,7 @@ def get_adm_maps(province: str = None,
                f" WHERE 1 {country_sql} ;")
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError(f'未找到指定地图的边界文件')
+            raise MapNotFoundError('未找到指定地图的边界文件')
     else:
         country_sql = ''
         country_level = None
@@ -199,7 +199,7 @@ def get_adm_maps(province: str = None,
                f" WHERE 1 {province_sql} ;")
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError(f'未找到指定地图的边界文件')
+            raise MapNotFoundError('未找到指定地图的边界文件')
     else:
         province_sql = ''
         province_level = None
@@ -212,7 +212,7 @@ def get_adm_maps(province: str = None,
                f" WHERE 1 {city_sql} ;")
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError(f'未找到指定地图的边界文件')
+            raise MapNotFoundError('未找到指定地图的边界文件')
     else:
         city_sql = ''
         city_level = None
@@ -225,7 +225,7 @@ def get_adm_maps(province: str = None,
                f" WHERE 1 {district_sql} ;")
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError(f'未找到指定地图的边界文件')
+            raise MapNotFoundError('未找到指定地图的边界文件')
     else:
         district_sql = ''
         district_level = None
@@ -239,30 +239,30 @@ def get_adm_maps(province: str = None,
         level = district_level or city_level or province_level or country_level
 
     if level == '国':
-        level_sql = f"level='国'"
+        level_sql = "level='国'"
         province_sql = ''
         city_sql = ''
         district_sql = ''
     elif level == '省':
-        level_sql = f"level='省'"
+        level_sql = "level='省'"
         city_sql = ''
         district_sql = ''
     elif level == '市':
-        level_sql = f"level='市'"
+        level_sql = "level='市'"
         district_sql = ''
     elif level in ['区', '县', '区县', '区/县']:
-        level_sql = f"level='区县'"
+        level_sql = "level='区县'"
     else:
         raise ValueError(
             f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
 
-    meta_sql = (f"SELECT country, province, city, district, level, source, kind"
-                f" FROM ADMINISTRATIVE"
+    meta_sql = ("SELECT country, province, city, district, level, source, kind"
+                " FROM ADMINISTRATIVE"
                 f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};")
     meta_rows = list(cur.execute(meta_sql))
 
-    geom_sql = (f"SELECT path"
-                f" FROM ADMINISTRATIVE"
+    geom_sql = ("SELECT path"
+                " FROM ADMINISTRATIVE"
                 f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};")
     gemo_rows = list(cur.execute(geom_sql))
     map_polygons = []
@@ -277,7 +277,7 @@ def get_adm_maps(province: str = None,
     gdf['geometry'] = map_polygons
 
     if len(gdf) == 0:
-        raise MapNotFoundError(f'未找到指定地图的边界文件')
+        raise MapNotFoundError('未找到指定地图的边界文件')
 
     if record == 'all':
         if only_polygon:
