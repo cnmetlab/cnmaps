@@ -18,6 +18,10 @@
 <a href="https://pepy.tech/project/cnmaps">
 <img src="https://pepy.tech/badge/cnmaps"
  alt="Downloads" /></a>
+  
+<a href='https://cnmaps-doc.readthedocs.io/zh_CN/0.2.1/'>
+    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=0.2.1' alt='Documentation Status' />
+</a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"
@@ -30,8 +34,9 @@
 
 
 ## 安装
+cnmaps依赖于`cartopy>=0.19.0`，因此在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
 
-你可以使用pip进行安装：`$ pip install -U cnmaps`
+在完成cartopy的安装以后，你可以使用pip来安装cnmaps：`$ pip install -U cnmaps`
 
 ## 使用
 
