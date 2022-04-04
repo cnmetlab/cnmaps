@@ -19,7 +19,8 @@ class MapNotFoundError(Exception):
 class MapPolygon(sgeom.MultiPolygon):
     """地图多边形类
 
-    该是基于shapely.geometry.MultiPolygon的自定义类, 并实现了对于加号操作符的支持
+    该是基于shapely.geometry.MultiPolygon的自定义类, 
+    并实现了对于加号操作符的支持.
     """
 
     def __init__(self, *args, **kwargs):
@@ -107,8 +108,8 @@ def get_adm_names(province: str = None,
                   source: str = '高德'):
     """获取行政名称
 
-    Args:
-         province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
+    参数:
+        province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
         city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
@@ -121,7 +122,7 @@ def get_adm_names(province: str = None,
         country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
         source (str, optional): 数据源. Defaults to '高德'.
 
-    Returns:
+    返回值:
         list: 名称列表
     """
     data = get_adm_maps(province=province, city=city,
@@ -152,7 +153,7 @@ def get_adm_maps(province: str = None,
                  *args, **kwargs):
     """获取行政地图的边界对象
 
-    Args:
+    参数:
         province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
         city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
@@ -169,11 +170,20 @@ def get_adm_maps(province: str = None,
         engine (str, optional): 输出引擎, 默认为None, 输出为列表,
                                 目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象.
                                 Defaults to None.
+        record (str, optional): 返回记录的形式, 选项包括'all'和'first'。
+                                若为'first', 则无论查询结果又几条，仅返回第一条记录,
+                                若为'all', 则返回全部数据, 若engine==None则返回list,
+                                若engine=='geopandas', 则返回GeoDataFrame对象
+                                Defaults to 'all'.
+        only_polygon (bool, optional): 是否仅返回地图边界对象(MapPolygon), 
+                                若为True则返回结果为MapPolygon对象或以MapPolygon对象组合的list,
+                                若为False, 则返回的结果包含元信息, MapPolygon对象存储在'geometry'键中.
+                                Defaults to False.
 
-    Raises:
+    异常:
         ValueError: 当传入的等级
 
-    Returns:
+    返回值:
         gpd.GeoDataFrame | list: 根据输入参数查找到的地图边界的元信息及边界对象
     """
 
