@@ -1,4 +1,4 @@
-name: Python Package using Conda
+name: Python Package using Conda Windows
 
 on: 
   push:
@@ -9,37 +9,41 @@ on:
     branches: [ main ]
 
 jobs:
-  build-test:
-    name: Build test on (${{ matrix.python-version }}, ${{ matrix.os }})
+  build-windows-win:
+  name: Build test on (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: ["macos-latest", "windows-latest"]
+        os: ["windows-latest"]
         python-version: ["3.6", "3.7", "3.8"]
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
       with:
-        python-version: ${{ matrix.python-version }}
-    - name: Add conda to system path
-      run: |
-        # $CONDA is an environment variable pointing to the root of the miniconda directory
-        echo $CONDA/bin >> $GITHUB_PATH
+        python-version: 3.8
     - name: Install dependencies
       run: |
-        conda env update --file environment.yml --name base
+        C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
+        C:\Miniconda\condabin\conda.bat init powershell
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         pip install -r requirements.txt
         python setup.py install
     - name: Lint with flake8
       run: |
+        # Activate the base environment
+        C:\Miniconda\condabin\conda.bat activate base
+        # C:\Miniconda\condabin\conda.bat install flake8
         # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        # Activate the base environment
+        C:\Miniconda\condabin\conda.bat activate base
+        # C:\Miniconda\condabin\conda.bat install pytest
         pytest -p no:warnings --verbose
