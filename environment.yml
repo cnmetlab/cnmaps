@@ -1,7 +1,6 @@
 channels:
   - conda-forge
 dependencies:
-  - cartopy==0.19.0
   - matplotlib==3.4.2
   - Cartopy>=0.19.0
   - Shapely==1.8.0
