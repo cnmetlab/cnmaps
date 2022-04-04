@@ -1,3 +1,5 @@
+"""地图类模块"""
+
 import os
 import json
 import sqlite3

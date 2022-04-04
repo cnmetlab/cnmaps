@@ -1,3 +1,5 @@
+"""绘图类模块"""
+
 from typing import Union
 
 import matplotlib

@@ -1,3 +1,5 @@
+"""区域地图组合"""
+
 from . import get_adm_maps
 
 region_polygons = {

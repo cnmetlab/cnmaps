@@ -1,3 +1,5 @@
+"""样例数据模块"""
+
 import os
 
 import netCDF4 as nc
