@@ -23,11 +23,12 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: 3.8
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
         C:\Miniconda\condabin\conda.bat init powershell
+        C:\Miniconda\condabin\conda.bat activate base
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         pip install -r requirements.txt
