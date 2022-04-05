@@ -1,13 +1,9 @@
 import os
 import re
-
 import warnings
-
 
 import cartopy
 
-
-# from .names import NAMES
 from .maps import *
 from .drawing import *
 
