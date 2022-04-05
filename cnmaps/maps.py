@@ -114,7 +114,7 @@ def read_mapjson(fp):
 def get_adm_names(province: str = None,
                   city: str = None,
                   district: str = None,
-                  level: str = None,
+                  level: str = '省',
                   country: str = '中华人民共和国',
                   source: str = '高德'):
     """获取行政名称
