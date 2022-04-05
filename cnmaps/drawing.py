@@ -13,13 +13,13 @@ from geopandas import GeoDataFrame
 from .maps import MapPolygon
 
 
-def clip_contours_by_map(contours, map_polygon: sgeom.MultiPolygon):
+def clip_contours_by_map(contours, map_polygon: MapPolygon):
     """使用地图边界对象对等值线对象进行裁剪
 
     参数:
         contours (cartopy.mpl.contour.GeoContourSet): 等值线对象, 该对象是调用ax.contour()或ax.contourf()方法的返回值
                                                       注意: 对象须带有投影信息
-        map_polygon (sgeom.MultiPolygon): 地图边界对象, 可以通过get_map()获取
+        map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
 
     示例:
         >>> from cnmaps import get_adm_maps, clip_contours_by_map, draw_map
@@ -101,12 +101,12 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
     """使用地图边界对象对填色网格线对象进行裁剪
 
     参数:
-        mesh (cartopy.mpl.contour.GeoContourSet): GeoQuadMesh对象, 该对象是调用ax.pcolormesh()方法的返回值
+        mesh (cartopy.mpl.geocollection.GeoQuadMesh): GeoQuadMesh对象, 该对象是调用ax.pcolormesh()方法的返回值
                                                       注意: 对象须带有投影信息
-        map_polygon (sgeom.MultiPolygon): 地图边界对象, 可以通过get_map()获取
+        map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
 
     示例:
-    >>> from cnmaps import get_adm_maps, clip_clabels_by_map, clip_contours_by_map, draw_map
+    >>> from cnmaps import get_adm_maps, clip_pcolormesh_by_map, draw_map
     >>> from cnmaps.sample import load_dem
 
     >>> lons, lats, data = load_dem()
@@ -264,12 +264,12 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
                 cbt.set_visible(True)
 
 
-def draw_map(_map: Union[MapPolygon, sgeom.MultiPolygon,
+def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiPolygon,
                          sgeom.MultiLineString], **kwargs):
     """绘制单个地图边界线
 
     参数:
-        _map (Union[MapPolygon, sgeom.MultiPolygon, sgeom.MultiLineString]): 地图边界线对象
+        map_polygon (Union[MapPolygon, sgeom.MultiPolygon, sgeom.MultiLineString]): 地图边界线对象
 
     示例:
         >>> beijing = get_adm_maps(city='北京市', level='市')[0]
@@ -287,8 +287,8 @@ def draw_map(_map: Union[MapPolygon, sgeom.MultiPolygon,
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
     """
     ax = plt.gca()
-    for geomestry in _map:
-        if isinstance(_map, sgeom.MultiPolygon):
+    for geomestry in map_polygon:
+        if isinstance(map_polygon, sgeom.MultiPolygon):
             try:
                 coords = geomestry.boundary.coords
             except NotImplementedError:
@@ -320,7 +320,7 @@ def draw_map(_map: Union[MapPolygon, sgeom.MultiPolygon,
                         ys.append(y)
                     ax.plot(xs, ys, **kwargs)
                 continue
-        elif isinstance(_map, sgeom.MultiLineString):
+        elif isinstance(map_polygon, sgeom.MultiLineString):
             coords = geomestry.coords
         xs = []
         ys = []
