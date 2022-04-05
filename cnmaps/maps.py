@@ -6,6 +6,7 @@ import sqlite3
 
 import geopandas as gpd
 import shapely.geometry as sgeom
+from itertools import product
 
 DATA_DIR = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'data/')
@@ -35,26 +36,36 @@ class MapPolygon(sgeom.MultiPolygon):
     def __sub__(self, other):
         return self.difference(other)
 
+    @staticmethod
+    def drop_inner_duplicate(map_polygon: sgeom.MultiPolygon):
+        polygons = list(map_polygon)
+        couples = [couple for couple in product(polygons, repeat=2)]
+
+        for one, other in couples:
+            if one.contains(other) and one != other:
+                polygons.remove(other)
+        return MapPolygon(polygons)
+
     def union(self, other):
         union_result = super().union(other)
         if isinstance(union_result, sgeom.Polygon):
             return MapPolygon([union_result])
         elif isinstance(union_result, sgeom.MultiPolygon):
-            return MapPolygon(union_result)
+            return self.drop_inner_duplicate(MapPolygon(union_result))
 
     def difference(self, other):
         difference_result = super().difference(other)
         if isinstance(difference_result, sgeom.Polygon):
             return MapPolygon([difference_result])
         elif isinstance(difference_result, sgeom.MultiPolygon):
-            return MapPolygon(difference_result)
+            return self.drop_inner_duplicate(MapPolygon(difference_result))
 
     def intersection(self, other):
         intersection_result = super().intersection(other)
         if isinstance(intersection_result, sgeom.Polygon):
             return MapPolygon([intersection_result])
         elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return MapPolygon(intersection_result)
+            return self.drop_inner_duplicate(MapPolygon(intersection_result))
         else:
             return MapPolygon()
 
