@@ -14,7 +14,7 @@ with open(requirements_path, 'r', encoding='utf-8') as f:
     required = f.read().splitlines()
 
 setuptools.setup(name='cnmaps',
-                 version='1.0.0',
+                 version='1.0.1',
                  author='Wentao Li',
                  author_email='clarmylee92510@gmail.com',
                  description='A python package to draw china maps more easily',

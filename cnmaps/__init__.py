@@ -11,7 +11,7 @@ import cartopy
 from .maps import *
 from .drawing import *
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 CARTOPY_DIGIT_VERSION = re.match(r'(\d*\.\d*\.\d*)',
                                  cartopy.__version__).group(1)
