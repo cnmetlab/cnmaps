@@ -138,6 +138,10 @@ plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
 
 ![logo-base](static/images/logo-base.png)
 
+## 使用指南
+
+针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps-doc.readthedocs.io/zh_CN/latest/index.html)
+
 ## 引用
 
 本项目适用的地图边界的数据源包括：
