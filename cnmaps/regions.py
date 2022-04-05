@@ -36,10 +36,6 @@ region_polygons = {
              get_adm_maps(province='甘肃省', only_polygon=True, record='first') +
              get_adm_maps(province='青海省', only_polygon=True, record='first') +
              get_adm_maps(province='宁夏回族自治区', only_polygon=True, record='first') +
-             get_adm_maps(city='阿拉善盟', only_polygon=True, record='first') +
-             get_adm_maps(city='巴彦淖尔市', only_polygon=True, record='first') +
-             get_adm_maps(city='乌海市', only_polygon=True, record='first') +
-             get_adm_maps(city='鄂尔多斯市', only_polygon=True, record='first') +
              get_adm_maps(province='新疆维吾尔自治区', only_polygon=True, record='first')),
     '川渝': (get_adm_maps(province='四川省', only_polygon=True, record='first') +
            get_adm_maps(province='重庆市', only_polygon=True, record='first')),
