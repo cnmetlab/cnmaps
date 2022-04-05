@@ -211,5 +211,25 @@ def test_regions():
         assert round(region_polygons[region_name].area, 0) == area
 
 
+def test_inner_duplicate():
+    """测试内部多边形重复问题"""
+    union_maps = [
+        get_adm_maps(province='黑龙江省', only_polygon=True, record='first') +
+        get_adm_maps(province='内蒙古自治区', only_polygon=True, record='first'),
+        get_adm_maps(province='天津市', only_polygon=True, record='first') +
+        get_adm_maps(province='河北省', only_polygon=True, record='first'),
+        get_adm_maps(city='北京市', district='朝阳区', only_polygon=True, record='first') +
+        get_adm_maps(district='顺义区', only_polygon=True, record='first')
+    ]
+
+    for map_polygon in union_maps:
+        polygons = list(map_polygon)
+        couples = [couple for couple in product(polygons, repeat=2)]
+
+        for one, other in couples:
+            if one.contains(other) and one != other:
+                assert False
+
+
 if __name__ == '__main__':
     pass
