@@ -26,6 +26,10 @@
 <a href='https://github.com/Clarmy/cnmaps'>
     <img src='https://tokei.rs/b1/github/Clarmy/cnmaps?category=lines' alt='tokei' />
 </a>
+  
+<a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
+  <img src="https://app.codacy.com/project/badge/Grade/ef6ab1893b0b47428b287f2f2875021c"/>
+ </a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"
