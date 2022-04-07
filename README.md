@@ -19,8 +19,12 @@
 <img src="https://pepy.tech/badge/cnmaps"
  alt="Downloads" /></a>
   
-<a href='https://cnmaps-doc.readthedocs.io/zh_CN/0.2.1/'>
-    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=0.2.1' alt='Documentation Status' />
+<a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/'>
+    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
+</a>
+  
+<a href='https://github.com/Clarmy/cnmaps'>
+    <img src='https://tokei.rs/b1/github/Clarmy/cnmaps?category=lines' alt='tokei' />
 </a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
