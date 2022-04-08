@@ -30,7 +30,7 @@ jobs:
         C:\Miniconda\condabin\conda.bat activate base
         C:\Miniconda\condabin\conda.bat install -c conda-forge -y h5py hdf5 netCDF4
         python -m pip install --upgrade pip
-        python -m pip install flake8 pytest
+        python -m pip install flake8 pytest h5py
         pip install -r requirements.txt
         python setup.py install
     - name: Lint with flake8
