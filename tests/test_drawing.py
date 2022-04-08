@@ -116,7 +116,7 @@ def test_clip_clabel():
     lons, lats, data = load_dem()
 
     map_polygon = get_adm_maps(
-        country='中华人民共和国', record='first', only_polygon=True)
+        province='河南省', record='first', only_polygon=True)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(lons,
@@ -172,7 +172,7 @@ def test_projection():
         projection_name = re.search(r"(?<=\.)[A-Za-z]*(?=\ )",
                                     str(projection)).group()
         map_polygon = get_adm_maps(
-            country='中华人民共和国', record='first', only_polygon=True)
+            province='河南省', record='first', only_polygon=True)
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=projection)
         contours = ax.contourf(lons,
