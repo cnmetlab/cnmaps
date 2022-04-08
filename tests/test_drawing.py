@@ -68,7 +68,7 @@ def test_clip_contour():
                         lats,
                         data,
                         colors='b',
-                        levels=np.linspace(-2800, data.max(), 10),
+                        levels=np.linspace(-2800, data.max(), 100),
                         transform=ccrs.PlateCarree())
 
         clip_contours_by_map(cs, map_polygon)
@@ -97,7 +97,7 @@ def test_clip_contourf():
                          lats,
                          data,
                          cmap=plt.cm.terrain,
-                         levels=np.linspace(-2800, data.max(), 10),
+                         levels=np.linspace(-2800, data.max(), 100),
                          transform=ccrs.PlateCarree())
 
         clip_contours_by_map(cs, map_polygon)
@@ -123,7 +123,7 @@ def test_clip_clabel():
                           lats,
                           data,
                           cmap=plt.cm.terrain,
-                          levels=np.linspace(-2500, data.max(), 20),
+                          levels=np.linspace(-2500, data.max(), 100),
                           transform=ccrs.PlateCarree())
     clip_contours_by_map(contours, map_polygon)
     clabels = ax.clabel(contours,
@@ -179,7 +179,7 @@ def test_projection():
                                lats,
                                data,
                                cmap=plt.cm.terrain,
-                               levels=np.linspace(-2500, data.max(), 20),
+                               levels=np.linspace(-2500, data.max(), 100),
                                transform=ccrs.PlateCarree())
         clip_contours_by_map(contours, map_polygon)
         draw_map(map_polygon, color='r')
