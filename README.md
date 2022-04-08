@@ -4,7 +4,6 @@
          alt="cnmaps"></a>
 </h1>
 
-
 <p align="center">
 
 <a href="https://app.travis-ci.com/github/Clarmy/cnmaps">
@@ -39,7 +38,6 @@
 <h4 align="center">
     cnmaps是一个可以让中国地图画起来更丝滑的地图类python扩展包
 </h4>
-
 
 ## 安装
 cnmaps依赖于`cartopy>=0.19.0`，因此在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
@@ -153,6 +151,7 @@ plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
 ## 引用
 
 本项目适用的地图边界的数据源包括：
+
 1. GaryBikini/ChinaAdminDivisonSHP: v2.0, 2021, DOI: 10.5281/zenodo.4167299
 
 海拔高度地形数据来自ASTER数字高程模型，并对原始数据进行了稀释。

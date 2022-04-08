@@ -26,7 +26,7 @@ map_args = [{'province': p, 'only_polygon': True,
 
 
 def test_clip_pcolormesh():
-    """测试剪切格点图"""
+    """测试剪切格点图."""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -54,7 +54,7 @@ def test_clip_pcolormesh():
 
 
 def test_clip_contour():
-    """测试剪切等值线"""
+    """测试剪切等值线."""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -83,7 +83,7 @@ def test_clip_contour():
 
 
 def test_clip_contourf():
-    """测试切割填色等值线"""
+    """测试切割填色等值线."""
     lons, lats, data = load_dem()
 
     for map_arg in map_args:
@@ -112,7 +112,7 @@ def test_clip_contourf():
 
 
 def test_clip_clabel():
-    """测试切割等值线标签"""
+    """测试切割等值线标签."""
     lons, lats, data = load_dem()
 
     map_polygon = get_adm_maps(
@@ -145,7 +145,7 @@ def test_clip_clabel():
 
 
 def test_projection():
-    """测试不同投影"""
+    """测试不同投影."""
     PROJECTIONS = [
         ccrs.Orthographic(central_longitude=100),
         ccrs.AlbersEqualArea(central_longitude=100),
