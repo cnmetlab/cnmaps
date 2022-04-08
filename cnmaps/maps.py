@@ -14,30 +14,45 @@ DB_FILE = os.path.join(DATA_DIR, 'index.db')
 
 
 class MapNotFoundError(Exception):
+    """地图无法找到的错误"""
     pass
 
 
 class MapPolygon(sgeom.MultiPolygon):
-    """地图多边形类
+    """
+    地图多边形类
 
     该是基于shapely.geometry.MultiPolygon的自定义类, 
     并实现了对于加号操作符的支持.
     """
 
     def __init__(self, *args, **kwargs):
+        """实例化MapPolygon"""
         super().__init__(*args, **kwargs)
 
     def __add__(self, other):
+        """+ 支持."""
         return self.union(other)
 
     def __and__(self, other):
+        """& 支持."""
         return self.intersection(other)
 
     def __sub__(self, other):
+        """- 支持."""
         return self.difference(other)
 
     @staticmethod
     def drop_inner_duplicate(map_polygon: sgeom.MultiPolygon):
+        """
+        清理内部重复多边形
+
+        参数:
+            map_polygon (sgeom.MultiPolygon): 地图边界对象
+
+        返回值:
+            MapPolygon: 清理后的地图边界对象
+        """
         polygons = list(map_polygon)
         couples = [couple for couple in product(polygons, repeat=2)]
 
@@ -47,6 +62,7 @@ class MapPolygon(sgeom.MultiPolygon):
         return MapPolygon(polygons)
 
     def union(self, other):
+        """并集."""
         union_result = super().union(other)
         if isinstance(union_result, sgeom.Polygon):
             return MapPolygon([union_result])
@@ -54,6 +70,7 @@ class MapPolygon(sgeom.MultiPolygon):
             return self.drop_inner_duplicate(MapPolygon(union_result))
 
     def difference(self, other):
+        """差集."""
         difference_result = super().difference(other)
         if isinstance(difference_result, sgeom.Polygon):
             return MapPolygon([difference_result])
@@ -61,6 +78,7 @@ class MapPolygon(sgeom.MultiPolygon):
             return self.drop_inner_duplicate(MapPolygon(difference_result))
 
     def intersection(self, other):
+        """交集."""
         intersection_result = super().intersection(other)
         if isinstance(intersection_result, sgeom.Polygon):
             return MapPolygon([intersection_result])
@@ -70,7 +88,8 @@ class MapPolygon(sgeom.MultiPolygon):
             return MapPolygon()
 
     def get_extent(self, buffer=2):
-        """获取范围坐标
+        """
+        获取范围坐标
 
         参数:
             buffer (int, 可选): 外扩缓冲边缘, 单位为°, 该值越大, 所取的范围越大. 默认为 2.
@@ -83,7 +102,8 @@ class MapPolygon(sgeom.MultiPolygon):
 
 
 def read_mapjson(fp):
-    """读取geojson地图边界文件
+    """
+    读取geojson地图边界文件
 
     参数:
         fp (str, 可选): geojson文件名.
@@ -117,7 +137,8 @@ def get_adm_names(province: str = None,
                   level: str = '省',
                   country: str = '中华人民共和国',
                   source: str = '高德'):
-    """获取行政名称
+    """
+    获取行政名称
 
     参数:
         province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
@@ -162,7 +183,8 @@ def get_adm_maps(province: str = None,
                  record: str = 'all',
                  only_polygon: bool = False,
                  *args, **kwargs):
-    """获取行政地图的边界对象
+    """
+    获取行政地图的边界对象
 
     参数:
         province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称

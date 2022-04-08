@@ -8,13 +8,13 @@ from cnmaps import (get_adm_maps, read_mapjson,
 
 
 def test_not_found():
-    """测试未找到预定义地图时是否抛出异常"""
+    """测试未找到预定义地图时是否抛出异常."""
     with pytest.raises(MapNotFoundError):
         get_adm_maps(city='纽约市')
 
 
 def test_get_map_by_fp():
-    """测试是否可以按文件路径加载地图"""
+    """测试是否可以按文件路径加载地图."""
     pattern = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            '../cnmaps/data/geojson.min/*/*/*/*.geojson')
     fps = sorted(glob(pattern))
@@ -23,7 +23,7 @@ def test_get_map_by_fp():
 
 
 def test_map_load():
-    """测试各级地图数量是否完整，以及各种规则是否都能加载成功"""
+    """测试各级地图数量是否完整，以及各种规则是否都能加载成功."""
     assert len(get_adm_maps(level='国')) == 2
     assert len(get_adm_maps(level='省')) == 34
     assert len(get_adm_maps(level='市')) == 370
@@ -53,7 +53,7 @@ def test_map_load():
 
 
 def test_map_operator():
-    """测试地图之间的操作符是否正常"""
+    """测试地图之间的操作符是否正常."""
 
     # 加法操作符(并集)
     assert isinstance(
@@ -73,7 +73,7 @@ def test_map_operator():
 
 
 def test_province_orthogonality():
-    """检验省边界地图的正交性"""
+    """检验省边界地图的正交性."""
     provinces_meta = get_adm_maps(level='省')
     province_names = [pm['省/直辖市'] for pm in provinces_meta]
 
@@ -85,7 +85,7 @@ def test_province_orthogonality():
 
 
 def test_city_orthogonality():
-    """检验市边界地图的正交性"""
+    """检验市边界地图的正交性."""
     provinces_meta = get_adm_maps(level='省')
     province_names = [pm['省/直辖市'] for pm in provinces_meta]
 
@@ -120,38 +120,38 @@ def test_city_orthogonality():
 
 
 def test_province_union():
-    """检验所有省两两相加是否会报错"""
+    """检验所有省两两相加是否会报错."""
     provinces_meta = get_adm_maps(level='省')
     province_names = [pm['省/直辖市'] for pm in provinces_meta]
 
     couples = sorted([couple for couple in combinations(province_names, r=2)])
 
     for (one, another) in couples:
-        get_adm_maps(province=one)[0]['geometry'] + \
+        _ = get_adm_maps(province=one)[0]['geometry'] + \
             get_adm_maps(province=another)[0]['geometry']
 
 
 def test_province_difference():
-    """检验所有省两两相减是否会报错"""
+    """检验所有省两两相减是否会报错."""
     provinces_meta = get_adm_maps(level='省')
     province_names = [pm['省/直辖市'] for pm in provinces_meta]
 
     couples = sorted([couple for couple in product(province_names, repeat=2)])
 
     for (one, another) in couples:
-        get_adm_maps(province=one)[0]['geometry'] - \
+        _ = get_adm_maps(province=one)[0]['geometry'] - \
             get_adm_maps(province=another)[0]['geometry']
 
 
 def test_get_extent():
-    """测试get_extent函数的返回结果是否符合预期"""
+    """测试get_extent函数的返回结果是否符合预期."""
     extent = (113.42394680348974, 119.51379082389037,
               37.44400605531913, 43.060480499941455)
     assert get_adm_maps(province='北京市')[0]['geometry'].get_extent() == extent
 
 
 def test_only_polygon_and_record():
-    """测试only_polygon参数和record参数功能"""
+    """测试only_polygon参数和record参数功能."""
     polygons = get_adm_maps(city='北京市', record='all',
                             level='区县', only_polygon=True)
     assert isinstance(polygons, list)
@@ -168,6 +168,7 @@ def test_only_polygon_and_record():
 
 
 def test_get_adm_names():
+    """测试是否能正确获取地名."""
     names = ['东城区',
              '西城区',
              '朝阳区',
@@ -194,7 +195,7 @@ def test_get_adm_names():
 
 
 def test_regions():
-    """测试区域组合"""
+    """测试区域组合."""
     AERAS = {'东北地区': 92.0,
              '华北地区': 168.0,
              '华东地区': 80.0,
@@ -212,7 +213,7 @@ def test_regions():
 
 
 def test_inner_duplicate():
-    """测试内部多边形重复问题"""
+    """测试内部多边形重复问题."""
     union_maps = [
         get_adm_maps(province='黑龙江省', only_polygon=True, record='first') +
         get_adm_maps(province='内蒙古自治区', only_polygon=True, record='first'),

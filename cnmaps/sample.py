@@ -10,7 +10,8 @@ BASE_DATA_DIR = os.path.join(BASE_DIR, 'data', 'sample')
 
 
 def load_dem(area_name=None):
-    """加载海拔高度样例数据
+    """
+    加载海拔高度样例数据
 
     参数:
         area_name (str, 可选): 区域名称, 若为None则取全国. 默认为 None.

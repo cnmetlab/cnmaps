@@ -1,3 +1,5 @@
+"""cnmaps包入口"""
+
 import os
 import re
 import warnings
