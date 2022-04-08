@@ -28,6 +28,7 @@ jobs:
       run: |
         C:\Miniconda\condabin\conda.bat env update --file environment.yml --name base
         C:\Miniconda\condabin\conda.bat activate base
+        C:\Miniconda\condabin\conda.bat install hdf5 netCDF4
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
         pip install -r requirements.txt
