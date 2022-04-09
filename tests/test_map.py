@@ -2,9 +2,29 @@ import os
 import pytest
 from itertools import (combinations, product)
 from glob import glob
+import shutil
+
+import fiona
 
 from cnmaps import (get_adm_maps, read_mapjson,
                     get_adm_names, MapNotFoundError, MapPolygon)
+
+
+def test_mappolygon_to_file():
+    """测试将MapPolygon保存为文件."""
+    map_polygon = get_adm_maps(
+        province='黑龙江省', only_polygon=True, record='first')
+    os.makedirs('./tmp', exist_ok=True)
+
+    map_polygon.to_file('./tmp/heilongjiang.geojson',
+                        meta={'id': 0, 'name': '黑龙江'})
+    map_polygon.to_file('./tmp/heilongjiang.shp',
+                        engine='ESRI shapefile', meta={'id': 0, 'name': '黑龙江'})
+
+    fiona.open('./tmp/heilongjiang.geojson')
+    fiona.open('./tmp/heilongjiang.shp')
+
+    shutil.rmtree('./tmp')
 
 
 def test_not_found():
