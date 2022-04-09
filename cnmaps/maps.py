@@ -4,7 +4,7 @@ import os
 import json
 import sqlite3
 
-import geopandas as gpd
+
 import shapely.geometry as sgeom
 from itertools import product
 
@@ -99,6 +99,42 @@ class MapPolygon(sgeom.MultiPolygon):
         """
         left, lower, right, upper = self.buffer(buffer).bounds
         return (left, right, lower, upper)
+
+    def to_file(self, savefp: str,
+                engine: str = 'GeoJSON',
+                meta: dict = {'id': None, 'name': None},
+                encoding: str = 'utf-8'):
+        """
+        存储为文件
+
+        参数:
+            savefp (str): 保存路径
+            engine (str, optional): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'. 默认为 'GeoJSON'.
+            meta (dict, optional): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
+            encoding (str, optional): 编码类型. 默认为 'utf-8'.
+        """
+        import fiona
+        from shapely.geometry import mapping
+        import geojson
+
+        if engine.lower() == 'esri shapefile':
+
+            schema = {'geometry': 'MultiPolygon',
+                      'properties': {'id': 'int', 'name': 'str'}}
+
+            with fiona.open(savefp, mode='w', driver='ESRI Shapefile',
+                            schema=schema, encoding=encoding) as layer:
+                geometry = mapping(self)
+                feature = {'geometry': geometry,
+                           'properties': meta}
+                layer.write(feature)
+
+        elif engine.lower() == 'geojson':
+            feature = mapping(self)
+            feature.update({'properties':meta})
+
+            with open(savefp, 'w') as f:
+                geojson.dump(feature, f)
 
 
 def read_mapjson(fp):
@@ -219,6 +255,7 @@ def get_adm_maps(province: str = None,
     返回值:
         gpd.GeoDataFrame | list: 根据输入参数查找到的地图边界的元信息及边界对象
     """
+    import geopandas as gpd
 
     con = sqlite3.connect(db)
     cur = con.cursor()
