@@ -3,10 +3,15 @@
 import os
 import json
 import sqlite3
-
-
-import shapely.geometry as sgeom
+import copy
 from itertools import product
+
+import numpy as np
+import shapely.geometry as sgeom
+from shapely.geometry import Point
+from shapely.geometry import mapping
+import fiona
+import geojson
 
 DATA_DIR = os.path.join(os.path.dirname(
     os.path.abspath(__file__)), 'data/')
@@ -113,9 +118,6 @@ class MapPolygon(sgeom.MultiPolygon):
             meta (dict, optional): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
             encoding (str, optional): 编码类型. 默认为 'utf-8'.
         """
-        import fiona
-        from shapely.geometry import mapping
-        import geojson
 
         if engine.lower() == 'esri shapefile':
 
@@ -131,10 +133,45 @@ class MapPolygon(sgeom.MultiPolygon):
 
         elif engine.lower() == 'geojson':
             feature = mapping(self)
-            feature.update({'properties':meta})
+            feature.update({'properties': meta})
 
             with open(savefp, 'w') as f:
                 geojson.dump(feature, f)
+
+    def maskout(self, lons: np.ndarray, lats: np.ndarray, data: np.ndarray):
+        """
+        对边界以外的数据进行遮罩处理
+
+        Args:
+            lons (np.ndarray): 经度矩阵
+            lats (np.ndarray): 纬度矩阵
+            data (np.ndarray): 数据矩阵
+
+        Returns:
+            np.ndarray: 遮罩后的数据矩阵
+        """
+
+        ndata = copy.deepcopy(data)
+        coords = list(zip(lons.flatten(), lats.flatten()))
+
+        geoms = [Point(x, y) for x, y in coords]
+        geo_points = np.empty(len(geoms), dtype="object")
+        geo_points[:] = geoms
+
+        contains = np.vectorize(lambda x, y: x.contains(y))
+
+        inside = contains(
+            self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
+        for n in range(len(self.geoms[1:])):
+            inside |= contains(
+                self.geoms[n], geo_points[:, np.newaxis]).reshape(data.shape)
+
+        if not isinstance(ndata, np.ma.MaskedArray):
+            ndata = np.ma.MaskedArray(ndata)
+
+        ndata.mask = ~inside
+
+        return ndata
 
 
 def read_mapjson(fp):
