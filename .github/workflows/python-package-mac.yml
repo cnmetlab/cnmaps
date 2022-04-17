@@ -5,6 +5,7 @@ on:
     branches: 
     - main
     - "#*"
+    - ”issue*"
   pull_request:
     branches: [ main ]
 
@@ -42,4 +43,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest -p no:warnings --verbose
+        pytest -p no:warnings --verbose tests/test_map_simple.py
+        pytest -p no:warnings --verbose tests/test_drawing_simple.py
