@@ -1,4 +1,4 @@
-"""绘图类模块"""
+"""绘图类模块."""
 
 from typing import Union
 
@@ -30,8 +30,7 @@ def _make_clip_path(map_polygon):
             for coord in exterior_coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree()
-                    )
+                        *coord, src_crs=ccrs.PlateCarree())
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -44,8 +43,7 @@ def _make_clip_path(map_polygon):
                 for coord in interior_coords:
                     try:
                         trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree()
-                        )
+                            *coord, src_crs=ccrs.PlateCarree())
                     except AttributeError:
                         trans_coord = coord
                     vertices.append(trans_coord)
@@ -59,8 +57,7 @@ def _make_clip_path(map_polygon):
             for coord in coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree()
-                    )
+                        *coord, src_crs=ccrs.PlateCarree())
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -80,8 +77,9 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
     使用地图边界对象对等值线对象进行裁剪
 
     参数:
-        contours (cartopy.mpl.contour.GeoContourSet): 等值线对象, 该对象是调用ax.contour()或ax.contourf()方法的返回值
-                                                      注意: 对象须带有投影信息
+        contours (cartopy.mpl.contour.GeoContourSet): 等值线对象,
+                    该对象是调用ax.contour()或ax.contourf()方法的返回值
+                    注意: 对象须带有投影信息
         map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
 
     示例:
@@ -92,7 +90,8 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
 
         >>> fig = plt.figure(figsize=(10, 10))
         >>> ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        >>> map_polygon = get_adm_maps(country='中华人民共和国', record='first', only_polygon=True)
+        >>> map_polygon = get_adm_maps(country='中华人民共和国', record='first',
+            only_polygon=True)
 
         >>> cs = ax.contourf(lons,
                              lats,
@@ -116,7 +115,8 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
     使用地图边界对象对填色网格线对象进行裁剪
 
     参数:
-        mesh (cartopy.mpl.geocollection.GeoQuadMesh): GeoQuadMesh对象, 该对象是调用ax.pcolormesh()方法的返回值
+        mesh (cartopy.mpl.geocollection.GeoQuadMesh): GeoQuadMesh对象,
+                                                      该对象是调用ax.pcolormesh()方法的返回值
                                                       注意: 对象须带有投影信息
         map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
 
@@ -146,7 +146,8 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
         mesh.set_clip_path(clip)
 
 
-def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
+def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
+                        map_polygon: MapPolygon):
     """
     剪切clabel文本, 一般配合contour函数使用
 
@@ -157,7 +158,11 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
         map_polygon (MapPolygon): 地图多边形边界对象
 
     示例:
-    >>> from cnmaps import get_adm_maps, clip_clabels_by_map, clip_contours_by_map, draw_map
+    >>> from cnmaps import (
+        get_adm_maps,
+        clip_clabels_by_map,
+        clip_contours_by_map,
+        draw_map)
     >>> from cnmaps.sample import load_dem
 
     >>> lons, lats, data = load_dem()
@@ -198,8 +203,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
             for coord in exterior_coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree()
-                    )
+                        *coord, src_crs=ccrs.PlateCarree())
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -209,8 +213,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
                 for coord in interior_coords:
                     try:
                         trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree()
-                        )
+                            *coord, src_crs=ccrs.PlateCarree())
                     except AttributeError:
                         trans_coord = coord
                     hole.append(trans_coord)
@@ -220,8 +223,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
             for coord in coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree()
-                    )
+                        *coord, src_crs=ccrs.PlateCarree())
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -233,14 +235,12 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
                 cbt.set_visible(True)
 
 
-def draw_map(
-    map_polygon: Union[MapPolygon, sgeom.MultiPolygon, sgeom.MultiLineString], **kwargs
-):
+def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
     """
     绘制单个地图边界线
 
     参数:
-        map_polygon (Union[MapPolygon, sgeom.MultiPolygon, sgeom.MultiLineString]): 地图边界线对象
+        map_polygon (Union[MapPolygon,  sgeom.MultiLineString]): 地图边界线对象
 
     示例:
         >>> beijing = get_adm_maps(city='北京市', level='市')[0]
@@ -270,8 +270,7 @@ def draw_map(
                 for coord in exterior_coords:
                     try:
                         x, y = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree()
-                        )
+                            *coord, src_crs=ccrs.PlateCarree())
                     except AttributeError:
                         x, y = coord
                     xs.append(x)
@@ -285,8 +284,7 @@ def draw_map(
                     for coord in interior_coords:
                         try:
                             x, y = ax.projection.transform_point(
-                                *coord, src_crs=ccrs.PlateCarree()
-                            )
+                                *coord, src_crs=ccrs.PlateCarree())
                         except AttributeError:
                             x, y = coord
                         xs.append(x)
@@ -299,7 +297,8 @@ def draw_map(
         ys = []
         for coord in coords:
             try:
-                x, y = ax.projection.transform_point(*coord, src_crs=ccrs.PlateCarree())
+                x, y = ax.projection.transform_point(
+                    *coord, src_crs=ccrs.PlateCarree())
             except AttributeError:
                 x, y = coord
             xs.append(x)

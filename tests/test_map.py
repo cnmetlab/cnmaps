@@ -16,7 +16,8 @@ from cnmaps import (
 )
 from cnmaps.sample import load_dem
 
-MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
+MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                           "mapcase")
 
 
 def test_maskout():
@@ -24,7 +25,9 @@ def test_maskout():
     casefp = os.path.join(MAPCASE_DIR, "maskout.npz")
     mask_array = np.load(casefp)["mask"]
 
-    map_polygon = get_adm_maps(province="宁夏回族自治区", only_polygon=True, record="first")
+    map_polygon = get_adm_maps(province="宁夏回族自治区",
+                               only_polygon=True,
+                               record="first")
 
     lons, lats, data = load_dem()
     data = data[100:150, 150:200]
@@ -40,13 +43,22 @@ def test_maskout():
 
 def test_mappolygon_to_file():
     """测试将MapPolygon保存为文件."""
-    map_polygon = get_adm_maps(province="黑龙江省", only_polygon=True, record="first")
+    map_polygon = get_adm_maps(province="黑龙江省",
+                               only_polygon=True,
+                               record="first")
     os.makedirs("./tmp", exist_ok=True)
 
-    map_polygon.to_file("./tmp/heilongjiang.geojson", meta={"id": 0, "name": "黑龙江"})
-    map_polygon.to_file(
-        "./tmp/heilongjiang.shp", engine="ESRI shapefile", meta={"id": 0, "name": "黑龙江"}
-    )
+    map_polygon.to_file("./tmp/heilongjiang.geojson",
+                        meta={
+                            "id": 0,
+                            "name": "黑龙江"
+                        })
+    map_polygon.to_file("./tmp/heilongjiang.shp",
+                        engine="ESRI shapefile",
+                        meta={
+                            "id": 0,
+                            "name": "黑龙江"
+                        })
 
     fiona.open("./tmp/heilongjiang.geojson")
     fiona.open("./tmp/heilongjiang.shp")
@@ -79,15 +91,12 @@ def test_map_load():
     assert len(get_adm_maps(level="区县")) == 2875
 
     beijing = get_adm_maps(province="北京市")[0]
-    assert (
-        beijing["省/直辖市"] == "北京市"
-        and beijing["市"] is None
-        and beijing["区/县"] is None
-        and beijing["级别"] == "省"
-    )
+    assert (beijing["省/直辖市"] == "北京市" and beijing["市"] is None
+            and beijing["区/县"] is None and beijing["级别"] == "省")
 
     beijing = get_adm_maps(city="北京市")[0]
-    assert beijing["市"] == "北京市" and beijing["区/县"] is None and beijing["级别"] == "市"
+    assert beijing["市"] == "北京市" and beijing["区/县"] is None and beijing[
+        "级别"] == "市"
 
     chaoyang = get_adm_maps(district="朝阳区")
     assert len(chaoyang) == 2
@@ -105,29 +114,23 @@ def test_map_operator():
 
     # 加法操作符(并集)
     assert isinstance(
-        get_adm_maps(province="四川省")[0]["geometry"]
-        + get_adm_maps(province="重庆市")[0]["geometry"]
-        + get_adm_maps(province="贵州省")[0]["geometry"],
+        get_adm_maps(province="四川省")[0]["geometry"] +
+        get_adm_maps(province="重庆市")[0]["geometry"] +
+        get_adm_maps(province="贵州省")[0]["geometry"],
         MapPolygon,
     )
     assert isinstance(
         get_adm_maps(province="四川省")[0]["geometry"].union(
-            get_adm_maps(province="重庆市")[0]["geometry"]
-        )
-        + get_adm_maps(province="贵州省")[0]["geometry"],
+            get_adm_maps(province="重庆市")[0]["geometry"]) +
+        get_adm_maps(province="贵州省")[0]["geometry"],
         MapPolygon,
     )
-    assert (
-        round(
-            (
-                get_adm_maps(province="四川省")[0]["geometry"]
-                + get_adm_maps(province="重庆市")[0]["geometry"]
-                + get_adm_maps(province="贵州省")[0]["geometry"]
-            ).area,
-            2,
-        )
-        == 69.49
-    )
+    assert (round(
+        (get_adm_maps(province="四川省")[0]["geometry"] +
+         get_adm_maps(province="重庆市")[0]["geometry"] +
+         get_adm_maps(province="贵州省")[0]["geometry"]).area,
+        2,
+    ) == 69.49)
 
     assert isinstance(
         get_adm_maps(province="福建省")[0]["geometry"]
@@ -136,21 +139,16 @@ def test_map_operator():
     )
 
     assert isinstance(
-        get_adm_maps(level="国")[0]["geometry"]
-        - get_adm_maps(province="山西省")[0]["geometry"]
-        + get_adm_maps(province="山西省")[0]["geometry"],
+        get_adm_maps(level="国")[0]["geometry"] -
+        get_adm_maps(province="山西省")[0]["geometry"] +
+        get_adm_maps(province="山西省")[0]["geometry"],
         MapPolygon,
     )
-    assert (
-        round(
-            (
-                get_adm_maps(level="国")[0]["geometry"]
-                - get_adm_maps(province="山西省")[0]["geometry"]
-            ).area,
-            2,
-        )
-        == 949.32
-    )
+    assert (round(
+        (get_adm_maps(level="国")[0]["geometry"] -
+         get_adm_maps(province="山西省")[0]["geometry"]).area,
+        2,
+    ) == 949.32)
 
 
 def test_province_orthogonality():
@@ -161,10 +159,8 @@ def test_province_orthogonality():
     couples = sorted([couple for couple in combinations(province_names, r=2)])
 
     for (one, another) in couples:
-        assert (
-            get_adm_maps(province=one)[0]["geometry"]
-            & get_adm_maps(province=another)[0]["geometry"]
-        ).area == 0
+        assert (get_adm_maps(province=one)[0]["geometry"]
+                & get_adm_maps(province=another)[0]["geometry"]).area == 0
 
 
 def test_city_orthogonality():
@@ -197,10 +193,8 @@ def test_city_orthogonality():
         for (one, another) in couples:
             if sorted([one, another]) in problem_set:
                 continue
-            area = (
-                get_adm_maps(city=one)[0]["geometry"]
-                & get_adm_maps(city=another)[0]["geometry"]
-            ).area
+            area = (get_adm_maps(city=one)[0]["geometry"]
+                    & get_adm_maps(city=another)[0]["geometry"]).area
             assert round(area, 4) == 0
 
 
@@ -212,10 +206,8 @@ def test_province_union():
     couples = sorted([couple for couple in combinations(province_names, r=2)])
 
     for (one, another) in couples:
-        _ = (
-            get_adm_maps(province=one)[0]["geometry"]
-            + get_adm_maps(province=another)[0]["geometry"]
-        )
+        _ = (get_adm_maps(province=one)[0]["geometry"] +
+             get_adm_maps(province=another)[0]["geometry"])
 
 
 def test_province_difference():
@@ -226,10 +218,8 @@ def test_province_difference():
     couples = sorted([couple for couple in product(province_names, repeat=2)])
 
     for (one, another) in couples:
-        _ = (
-            get_adm_maps(province=one)[0]["geometry"]
-            - get_adm_maps(province=another)[0]["geometry"]
-        )
+        _ = (get_adm_maps(province=one)[0]["geometry"] -
+             get_adm_maps(province=another)[0]["geometry"])
 
 
 def test_get_extent():
@@ -245,13 +235,19 @@ def test_get_extent():
 
 def test_only_polygon_and_record():
     """测试only_polygon参数和record参数功能."""
-    polygons = get_adm_maps(city="北京市", record="all", level="区县", only_polygon=True)
+    polygons = get_adm_maps(city="北京市",
+                            record="all",
+                            level="区县",
+                            only_polygon=True)
     assert isinstance(polygons, list)
     assert len(polygons) == 16
     for p in polygons:
         assert isinstance(p, MapPolygon)
 
-    polygon = get_adm_maps(city="北京市", record="first", level="区县", only_polygon=True)
+    polygon = get_adm_maps(city="北京市",
+                           record="first",
+                           level="区县",
+                           only_polygon=True)
     assert isinstance(polygon, MapPolygon)
 
     meta = get_adm_maps(city="北京市", record="first", level="市")
@@ -281,12 +277,10 @@ def test_get_adm_names():
     assert sorted(get_adm_names(city="北京市", level="区县")) == sorted(names)
     assert len(get_adm_names(level="市")) == 370
     assert sorted(get_adm_names(level="市")[:5]) == sorted(
-        ["北京市", "天津市", "石家庄市", "唐山市", "秦皇岛市"]
-    )
+        ["北京市", "天津市", "石家庄市", "唐山市", "秦皇岛市"])
     assert len(get_adm_names(level="省")) == 34
     assert sorted(get_adm_names(level="省")[:5]) == sorted(
-        ["北京市", "天津市", "河北省", "山西省", "内蒙古自治区"]
-    )
+        ["北京市", "天津市", "河北省", "山西省", "内蒙古自治区"])
 
 
 def test_regions():
@@ -313,12 +307,13 @@ def test_regions():
 def test_inner_duplicate():
     """测试内部多边形重复问题."""
     union_maps = [
-        get_adm_maps(province="黑龙江省", only_polygon=True, record="first")
-        + get_adm_maps(province="内蒙古自治区", only_polygon=True, record="first"),
-        get_adm_maps(province="天津市", only_polygon=True, record="first")
-        + get_adm_maps(province="河北省", only_polygon=True, record="first"),
-        get_adm_maps(city="北京市", district="朝阳区", only_polygon=True, record="first")
-        + get_adm_maps(district="顺义区", only_polygon=True, record="first"),
+        get_adm_maps(province="黑龙江省", only_polygon=True, record="first") +
+        get_adm_maps(province="内蒙古自治区", only_polygon=True, record="first"),
+        get_adm_maps(province="天津市", only_polygon=True, record="first") +
+        get_adm_maps(province="河北省", only_polygon=True, record="first"),
+        get_adm_maps(
+            city="北京市", district="朝阳区", only_polygon=True, record="first") +
+        get_adm_maps(district="顺义区", only_polygon=True, record="first"),
     ]
 
     for map_polygon in union_maps:

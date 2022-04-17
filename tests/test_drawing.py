@@ -17,23 +17,27 @@ from cnmaps import (
 )
 from cnmaps.sample import load_dem
 
-
 provinces = get_adm_names(level="省")
 cities = get_adm_names(level="市")
 districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
-map_args = (
-    [
-        {"province": p, "only_polygon": True, "record": "first", "name": p}
-        for p in provinces
-    ]
-    + [{"city": c, "only_polygon": True, "record": "first", "name": c} for c in cities]
-    + [
-        {"district": d, "only_polygon": True, "record": "first", "name": d}
-        for d in sample_districts
-    ]
-)
+map_args = ([{
+    "province": p,
+    "only_polygon": True,
+    "record": "first",
+    "name": p
+} for p in provinces] + [{
+    "city": c,
+    "only_polygon": True,
+    "record": "first",
+    "name": c
+} for c in cities] + [{
+    "district": d,
+    "only_polygon": True,
+    "record": "first",
+    "name": d
+} for d in sample_districts])
 
 
 def test_clip_pcolormesh():
@@ -47,9 +51,11 @@ def test_clip_pcolormesh():
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         map_polygon = get_adm_maps(**map_arg)
 
-        mesh = ax.pcolormesh(
-            lons, lats, data, cmap=plt.cm.terrain, transform=ccrs.PlateCarree()
-        )
+        mesh = ax.pcolormesh(lons,
+                             lats,
+                             data,
+                             cmap=plt.cm.terrain,
+                             transform=ccrs.PlateCarree())
 
         clip_pcolormesh_by_map(mesh, map_polygon)
         draw_map(map_polygon, linewidth=1)
@@ -128,7 +134,9 @@ def test_clip_clabel():
     """测试切割等值线标签."""
     lons, lats, data = load_dem()
 
-    map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
+    map_polygon = get_adm_maps(province="河南省",
+                               record="first",
+                               only_polygon=True)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(
@@ -140,14 +148,16 @@ def test_clip_clabel():
         transform=ccrs.PlateCarree(),
     )
     clip_contours_by_map(contours, map_polygon)
-    clabels = ax.clabel(
-        contours, levels=contours.levels, colors="k", fmt="%i", inline=True
-    )
+    clabels = ax.clabel(contours,
+                        levels=contours.levels,
+                        colors="k",
+                        fmt="%i",
+                        inline=True)
     clip_clabels_by_map(clabels, map_polygon)
     draw_map(map_polygon, color="k")
     ax.coastlines()
 
-    savefp = os.path.join("./tmp", f"clipped_clabels.png")
+    savefp = os.path.join("./tmp", "clipped_clabels.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
 
     plt.savefig(savefp, bbox_inches="tight")
@@ -181,8 +191,11 @@ def test_projection():
     lons, lats, data = load_dem()
 
     for projection in PROJECTIONS:
-        projection_name = re.search(r"(?<=\.)[A-Za-z]*(?=\ )", str(projection)).group()
-        map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
+        projection_name = re.search(r"(?<=\.)[A-Za-z]*(?=\ )",
+                                    str(projection)).group()
+        map_polygon = get_adm_maps(province="河南省",
+                                   record="first",
+                                   only_polygon=True)
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=projection)
         contours = ax.contourf(

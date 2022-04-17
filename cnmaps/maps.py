@@ -1,4 +1,4 @@
-"""地图类模块"""
+"""地图类模块."""
 
 import os
 import json
@@ -109,7 +109,10 @@ class MapPolygon(sgeom.MultiPolygon):
         self,
         savefp: str,
         engine: str = "GeoJSON",
-        meta: dict = {"id": None, "name": None},
+        meta: dict = {
+            "id": None,
+            "name": None
+        },
         encoding: str = "utf-8",
     ):
         """
@@ -117,7 +120,8 @@ class MapPolygon(sgeom.MultiPolygon):
 
         参数:
             savefp (str): 保存路径
-            engine (str, optional): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'. 默认为 'GeoJSON'.
+            engine (str, optional): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'.
+                                    默认为 'GeoJSON'.
             meta (dict, optional): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
             encoding (str, optional): 编码类型. 默认为 'utf-8'.
         """
@@ -126,15 +130,18 @@ class MapPolygon(sgeom.MultiPolygon):
 
             schema = {
                 "geometry": "MultiPolygon",
-                "properties": {"id": "int", "name": "str"},
+                "properties": {
+                    "id": "int",
+                    "name": "str"
+                },
             }
 
             with fiona.open(
-                savefp,
-                mode="w",
-                driver="ESRI Shapefile",
-                schema=schema,
-                encoding=encoding,
+                    savefp,
+                    mode="w",
+                    driver="ESRI Shapefile",
+                    schema=schema,
+                    encoding=encoding,
             ) as layer:
                 geometry = mapping(self)
                 feature = {"geometry": geometry, "properties": meta}
@@ -169,11 +176,11 @@ class MapPolygon(sgeom.MultiPolygon):
 
         contains = np.vectorize(lambda x, y: x.contains(y))
 
-        inside = contains(self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
+        inside = contains(self.geoms[0],
+                          geo_points[:, np.newaxis]).reshape(data.shape)
         for n in range(len(self.geoms[1:])):
-            inside |= contains(self.geoms[n], geo_points[:, np.newaxis]).reshape(
-                data.shape
-            )
+            inside |= contains(self.geoms[n],
+                               geo_points[:, np.newaxis]).reshape(data.shape)
 
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
@@ -232,7 +239,8 @@ def get_adm_names(
         district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
         level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
                                其中'省'级包括直辖市、特区等;
-                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同, 比如北京市的省级和市级都是'北京市';
+                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
+                               比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
         country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
@@ -286,14 +294,16 @@ def get_adm_maps(
         district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
         level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
                                其中'省'级包括直辖市、特区等;
-                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同, 比如北京市的省级和市级都是'北京市';
+                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
+                               比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
         country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
         source (str, optional): 数据源. Defaults to '高德'.
         db (str, optional): sqlite db文件路径. Defaults to DB_FILE.
         engine (str, optional): 输出引擎, 默认为None, 输出为列表,
-                                目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象.
+                                目前支持'geopandas', 若为geopandas,
+                                则返回GeoDataFrame对象.
                                 Defaults to None.
         record (str, optional): 返回记录的形式, 选项包括'all'和'first'。
                                 若为'first', 则无论查询结果又几条，仅返回第一条记录,
@@ -302,7 +312,8 @@ def get_adm_maps(
                                 Defaults to 'all'.
         only_polygon (bool, optional): 是否仅返回地图边界对象(MapPolygon),
                                 若为True则返回结果为MapPolygon对象或以MapPolygon对象组合的list,
-                                若为False, 则返回的结果包含元信息, MapPolygon对象存储在'geometry'键中.
+                                若为False, 则返回的结果包含元信息, MapPolygon对象存储在
+                                'geometry'键中.
                                 Defaults to False.
 
     异常:
@@ -383,20 +394,19 @@ def get_adm_maps(
     elif level in ["区", "县", "区县", "区/县"]:
         level_sql = "level='区县'"
     else:
-        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+        raise ValueError(
+            f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
 
-    meta_sql = (
-        "SELECT country, province, city, district, level, source, kind"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};"
-    )
+    meta_sql = ("SELECT country, province, city, district, level, source, kind"
+                " FROM ADMINISTRATIVE"
+                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+                f" {district_sql} {source_sql};")
     meta_rows = list(cur.execute(meta_sql))
 
-    geom_sql = (
-        "SELECT path"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};"
-    )
+    geom_sql = ("SELECT path"
+                " FROM ADMINISTRATIVE"
+                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+                f" {district_sql} {source_sql};")
     gemo_rows = list(cur.execute(geom_sql))
     map_polygons = []
     for path in gemo_rows:
@@ -405,8 +415,7 @@ def get_adm_maps(
         map_polygons.append(mapjson)
 
     gdf = gpd.GeoDataFrame(
-        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
-    )
+        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"])
     gdf["geometry"] = map_polygons
 
     if len(gdf) == 0:
