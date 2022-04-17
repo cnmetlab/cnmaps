@@ -5,9 +5,34 @@ from glob import glob
 import shutil
 
 import fiona
+import numpy as np
 
 from cnmaps import (get_adm_maps, read_mapjson,
                     get_adm_names, MapNotFoundError, MapPolygon)
+from cnmaps.sample import load_dem
+
+MAPCASE_DIR = os.path.join(os.path.dirname(
+    os.path.abspath(__file__)), 'mapcase')
+
+
+def test_maskout():
+    """测试maskout方法"""
+    casefp = os.path.join(MAPCASE_DIR, 'maskout.npz')
+    mask_array = np.load(casefp)['mask']
+
+    map_polygon = get_adm_maps(
+        province='宁夏回族自治区', only_polygon=True, record='first')
+
+    lons, lats, data = load_dem()
+    data = data[100:150, 150:200]
+    lons = lons[100:150, 150:200]
+    lats = lats[100:150, 150:200]
+
+    ndata = map_polygon.maskout(lons, lats, data)
+    assert (ndata.mask == mask_array).all()
+
+    ndata = map_polygon.maskout(lons, lats, data.data)
+    assert (ndata.mask == mask_array).all()
 
 
 def test_mappolygon_to_file():

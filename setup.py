@@ -24,12 +24,7 @@ setuptools.setup(name='cnmaps',
                  include_package_data=True,
                  package_data={'': ['*.geojson', '*.nc', '*.db']},
                  packages=setuptools.find_packages(),
-                 install_requires=[
-                     'matplotlib',
-                     'numpy',
-                     'Shapely',
-                     'netCDF4',
-                     'geopandas'],
+                 install_requires=required,
                  classifiers=[
                      'Programming Language :: Python :: 3',
                  ],
