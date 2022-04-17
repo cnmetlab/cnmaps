@@ -1,4 +1,4 @@
-"""绘图类模块"""
+"""绘图类模块."""
 
 from typing import Union
 
@@ -30,7 +30,8 @@ def _make_clip_path(map_polygon):
             for coord in exterior_coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                        *coord, src_crs=ccrs.PlateCarree()
+                    )
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -43,7 +44,8 @@ def _make_clip_path(map_polygon):
                 for coord in interior_coords:
                     try:
                         trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                            *coord, src_crs=ccrs.PlateCarree()
+                        )
                     except AttributeError:
                         trans_coord = coord
                     vertices.append(trans_coord)
@@ -57,7 +59,8 @@ def _make_clip_path(map_polygon):
             for coord in coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                        *coord, src_crs=ccrs.PlateCarree()
+                    )
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -77,7 +80,9 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
     使用地图边界对象对等值线对象进行裁剪
 
     参数:
-        contours (cartopy.mpl.contour.GeoContourSet): 等值线对象, 该对象是调用ax.contour()或ax.contourf()方法的返回值
+        contours (cartopy.mpl.contour.GeoContourSet): 等值线对象, 该对象是调用
+                                                      ax.contour()或
+                                                      ax.contourf()方法的返回值
                                                       注意: 对象须带有投影信息
         map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
 
@@ -89,7 +94,8 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
 
         >>> fig = plt.figure(figsize=(10, 10))
         >>> ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        >>> map_polygon = get_adm_maps(country='中华人民共和国', record='first', only_polygon=True)
+        >>> map_polygon = get_adm_maps(country='中华人民共和国', 
+            record='first', only_polygon=True)
 
         >>> cs = ax.contourf(lons,
                              lats,
@@ -143,8 +149,7 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
         mesh.set_clip_path(clip)
 
 
-def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
-                        map_polygon: MapPolygon):
+def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
     """
     剪切clabel文本, 一般配合contour函数使用
 
@@ -196,7 +201,8 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
             for coord in exterior_coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                        *coord, src_crs=ccrs.PlateCarree()
+                    )
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -206,7 +212,8 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
                 for coord in interior_coords:
                     try:
                         trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                            *coord, src_crs=ccrs.PlateCarree()
+                        )
                     except AttributeError:
                         trans_coord = coord
                     hole.append(trans_coord)
@@ -216,7 +223,8 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
             for coord in coords:
                 try:
                     trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                        *coord, src_crs=ccrs.PlateCarree()
+                    )
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -228,8 +236,9 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
                 cbt.set_visible(True)
 
 
-def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiPolygon,
-                                sgeom.MultiLineString], **kwargs):
+def draw_map(
+    map_polygon: Union[MapPolygon, sgeom.MultiPolygon, sgeom.MultiLineString], **kwargs
+):
     """
     绘制单个地图边界线
 
@@ -264,7 +273,8 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiPolygon,
                 for coord in exterior_coords:
                     try:
                         x, y = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                            *coord, src_crs=ccrs.PlateCarree()
+                        )
                     except AttributeError:
                         x, y = coord
                     xs.append(x)
@@ -278,7 +288,8 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiPolygon,
                     for coord in interior_coords:
                         try:
                             x, y = ax.projection.transform_point(
-                                *coord, src_crs=ccrs.PlateCarree())
+                                *coord, src_crs=ccrs.PlateCarree()
+                            )
                         except AttributeError:
                             x, y = coord
                         xs.append(x)
@@ -297,10 +308,10 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiPolygon,
                 x, y = coord
             xs.append(x)
             ys.append(y)
-        if kwargs.get('color'):
+        if kwargs.get("color"):
             ax.plot(xs, ys, **kwargs)
         else:
-            ax.plot(xs, ys, color='k', **kwargs)
+            ax.plot(xs, ys, color="k", **kwargs)
 
 
 def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
@@ -315,7 +326,7 @@ def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
         >>> maps = get_adm_maps(city='北京市', level='区县')
         >>> maps[:3]
         [{'国家': '中华人民共和国', '省/直辖市': '北京市', '市': '北京市', '区/县': '东城区', '级别': '区县', '来源': '高德', '类型': '陆地', 'geometry': <cnmaps.maps.MapPolygon object at 0x7f92fe4676d0>}, {'国家': '中华人民共和国', '省/直辖市': '北京市', '市': '北京市', '区/县': '西城区', '级别': '区县', '来源': '高德', '类型': '陆地', 'geometry': <cnmaps.maps.MapPolygon object at 0x7f92fe467a50>}, {'国家': '中华人民共和国', '省/直辖市': '北京市', '市': '北京市', '区/县': '朝阳区', '级别': '区县', '来源': '高德', '类型': '陆地', 'geometry': <cnmaps.maps.MapPolygon object at 0x7f92fe467750>}]
-        >>> draw_maps(map) 
+        >>> draw_maps(map)
 
         >>> from cnmaps import get_adm_maps, draw_maps
         >>> maps = get_adm_maps(city='北京市', level='区县', engine='geopandas')
@@ -326,13 +337,13 @@ def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
         2  中华人民共和国   北京市  北京市  朝阳区  区县  高德  陆地  MULTIPOLYGON (((116.55172 40.05812, 116.55132 ...
     """
     if isinstance(maps, list):
-        geometries = [m['geometry'] for m in maps]
+        geometries = [m["geometry"] for m in maps]
     elif isinstance(maps, GeoDataFrame):
-        geometries = [m['geometry'] for _, m in maps.iterrows()]
+        geometries = [m["geometry"] for _, m in maps.iterrows()]
 
     for gm in geometries:
         draw_map(gm, **kwargs)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     pass
