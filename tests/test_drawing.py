@@ -17,13 +17,9 @@ cities = get_adm_names(level='市')
 districts = get_adm_names(level='区县')
 sample_districts = [random.choice(districts) for _ in range(100)]
 
-# map_args = ([{'province': p, 'only_polygon': True, 'record': 'first', 'name': p} for p in provinces] +
-#             [{'city': c, 'only_polygon': True, 'record': 'first', 'name': c} for c in cities] +
-#             [{'district': d, 'only_polygon': True, 'record': 'first', 'name': d} for d in sample_districts])
-
-map_args = [{'province': p, 'only_polygon': True,
-             'record': 'first', 'name': p} for p in provinces]
-
+map_args = ([{'province': p, 'only_polygon': True, 'record': 'first', 'name': p} for p in provinces] +
+            [{'city': c, 'only_polygon': True, 'record': 'first', 'name': c} for c in cities] +
+            [{'district': d, 'only_polygon': True, 'record': 'first', 'name': d} for d in sample_districts])
 
 def test_clip_pcolormesh():
     """测试剪切格点图."""
