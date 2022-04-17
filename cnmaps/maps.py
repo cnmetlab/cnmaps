@@ -13,13 +13,13 @@ from shapely.geometry import mapping
 import fiona
 import geojson
 
-DATA_DIR = os.path.join(os.path.dirname(
-    os.path.abspath(__file__)), 'data/')
-DB_FILE = os.path.join(DATA_DIR, 'index.db')
+DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
+DB_FILE = os.path.join(DATA_DIR, "index.db")
 
 
 class MapNotFoundError(Exception):
     """地图无法找到的错误"""
+
     pass
 
 
@@ -27,7 +27,7 @@ class MapPolygon(sgeom.MultiPolygon):
     """
     地图多边形类
 
-    该是基于shapely.geometry.MultiPolygon的自定义类, 
+    该是基于shapely.geometry.MultiPolygon的自定义类,
     并实现了对于加号操作符的支持.
     """
 
@@ -105,10 +105,13 @@ class MapPolygon(sgeom.MultiPolygon):
         left, lower, right, upper = self.buffer(buffer).bounds
         return (left, right, lower, upper)
 
-    def to_file(self, savefp: str,
-                engine: str = 'GeoJSON',
-                meta: dict = {'id': None, 'name': None},
-                encoding: str = 'utf-8'):
+    def to_file(
+        self,
+        savefp: str,
+        engine: str = "GeoJSON",
+        meta: dict = {"id": None, "name": None},
+        encoding: str = "utf-8",
+    ):
         """
         存储为文件
 
@@ -119,23 +122,29 @@ class MapPolygon(sgeom.MultiPolygon):
             encoding (str, optional): 编码类型. 默认为 'utf-8'.
         """
 
-        if engine.lower() == 'esri shapefile':
+        if engine.lower() == "esri shapefile":
 
-            schema = {'geometry': 'MultiPolygon',
-                      'properties': {'id': 'int', 'name': 'str'}}
+            schema = {
+                "geometry": "MultiPolygon",
+                "properties": {"id": "int", "name": "str"},
+            }
 
-            with fiona.open(savefp, mode='w', driver='ESRI Shapefile',
-                            schema=schema, encoding=encoding) as layer:
+            with fiona.open(
+                savefp,
+                mode="w",
+                driver="ESRI Shapefile",
+                schema=schema,
+                encoding=encoding,
+            ) as layer:
                 geometry = mapping(self)
-                feature = {'geometry': geometry,
-                           'properties': meta}
+                feature = {"geometry": geometry, "properties": meta}
                 layer.write(feature)
 
-        elif engine.lower() == 'geojson':
+        elif engine.lower() == "geojson":
             feature = mapping(self)
-            feature.update({'properties': meta})
+            feature.update({"properties": meta})
 
-            with open(savefp, 'w') as f:
+            with open(savefp, "w") as f:
                 geojson.dump(feature, f)
 
     def maskout(self, lons: np.ndarray, lats: np.ndarray, data: np.ndarray):
@@ -160,11 +169,11 @@ class MapPolygon(sgeom.MultiPolygon):
 
         contains = np.vectorize(lambda x, y: x.contains(y))
 
-        inside = contains(
-            self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
+        inside = contains(self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
         for n in range(len(self.geoms[1:])):
-            inside |= contains(
-                self.geoms[n], geo_points[:, np.newaxis]).reshape(data.shape)
+            inside |= contains(self.geoms[n], geo_points[:, np.newaxis]).reshape(
+                data.shape
+            )
 
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
@@ -184,32 +193,34 @@ def read_mapjson(fp):
     返回值:
         MapPolygon: 地图边界对象
     """
-    with open(fp, encoding='utf-8') as f:
+    with open(fp, encoding="utf-8") as f:
         map_json = json.load(f)
 
-    if 'geometry' in map_json:
-        geometry = map_json['geometry']
+    if "geometry" in map_json:
+        geometry = map_json["geometry"]
     else:
         geometry = map_json
 
     polygon_list = []
-    if 'Polygon' in geometry['type']:
-        for _coords in geometry['coordinates']:
+    if "Polygon" in geometry["type"]:
+        for _coords in geometry["coordinates"]:
             for coords in _coords:
                 polygon_list.append(sgeom.Polygon(coords))
 
         return MapPolygon(polygon_list)
 
-    elif geometry['type'] == 'MultiLineString':
-        return sgeom.MultiLineString(geometry['coordinates'])
+    elif geometry["type"] == "MultiLineString":
+        return sgeom.MultiLineString(geometry["coordinates"])
 
 
-def get_adm_names(province: str = None,
-                  city: str = None,
-                  district: str = None,
-                  level: str = '省',
-                  country: str = '中华人民共和国',
-                  source: str = '高德'):
+def get_adm_names(
+    province: str = None,
+    city: str = None,
+    district: str = None,
+    level: str = "省",
+    country: str = "中华人民共和国",
+    source: str = "高德",
+):
     """
     获取行政名称
 
@@ -230,32 +241,40 @@ def get_adm_names(province: str = None,
     返回值:
         list: 名称列表
     """
-    data = get_adm_maps(province=province, city=city,
-                        district=district, level=level,
-                        country=country, source=source)
-    if level == '国':
-        names = [d['国'] for d in data]
-    elif level == '省':
-        names = [d['省/直辖市'] for d in data]
-    elif level == '市':
-        names = [d['市'] for d in data]
-    elif level == '区县':
-        names = [d['区/县'] for d in data]
+    data = get_adm_maps(
+        province=province,
+        city=city,
+        district=district,
+        level=level,
+        country=country,
+        source=source,
+    )
+    if level == "国":
+        names = [d["国"] for d in data]
+    elif level == "省":
+        names = [d["省/直辖市"] for d in data]
+    elif level == "市":
+        names = [d["市"] for d in data]
+    elif level == "区县":
+        names = [d["区/县"] for d in data]
 
     return names
 
 
-def get_adm_maps(province: str = None,
-                 city: str = None,
-                 district: str = None,
-                 level: str = None,
-                 country: str = '中华人民共和国',
-                 source: str = '高德',
-                 db: str = DB_FILE,
-                 engine: str = None,
-                 record: str = 'all',
-                 only_polygon: bool = False,
-                 *args, **kwargs):
+def get_adm_maps(
+    province: str = None,
+    city: str = None,
+    district: str = None,
+    level: str = None,
+    country: str = "中华人民共和国",
+    source: str = "高德",
+    db: str = DB_FILE,
+    engine: str = None,
+    record: str = "all",
+    only_polygon: bool = False,
+    *args,
+    **kwargs,
+):
     """
     获取行政地图的边界对象
 
@@ -281,7 +300,7 @@ def get_adm_maps(province: str = None,
                                 若为'all', 则返回全部数据, 若engine==None则返回list,
                                 若engine=='geopandas', 则返回GeoDataFrame对象
                                 Defaults to 'all'.
-        only_polygon (bool, optional): 是否仅返回地图边界对象(MapPolygon), 
+        only_polygon (bool, optional): 是否仅返回地图边界对象(MapPolygon),
                                 若为True则返回结果为MapPolygon对象或以MapPolygon对象组合的list,
                                 若为False, 则返回的结果包含元信息, MapPolygon对象存储在'geometry'键中.
                                 Defaults to False.
@@ -298,119 +317,114 @@ def get_adm_maps(province: str = None,
     cur = con.cursor()
 
     if country:
-        country_level = '国'
+        country_level = "国"
         country_sql = f"AND country='{country}'"
-        sql = (f"SELECT id"
-               f" FROM ADMINISTRATIVE"
-               f" WHERE 1 {country_sql} ;")
+        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {country_sql} ;"
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError('未找到指定地图的边界文件')
+            raise MapNotFoundError("未找到指定地图的边界文件")
     else:
-        country_sql = ''
+        country_sql = ""
         country_level = None
 
     if province:
-        province_level = '省'
+        province_level = "省"
         province_sql = f"AND province='{province}'"
-        sql = (f"SELECT id"
-               f" FROM ADMINISTRATIVE"
-               f" WHERE 1 {province_sql} ;")
+        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {province_sql} ;"
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError('未找到指定地图的边界文件')
+            raise MapNotFoundError("未找到指定地图的边界文件")
     else:
-        province_sql = ''
+        province_sql = ""
         province_level = None
 
     if city:
-        city_level = '市'
+        city_level = "市"
         city_sql = f"AND city='{city}'"
-        sql = (f"SELECT id"
-               f" FROM ADMINISTRATIVE"
-               f" WHERE 1 {city_sql} ;")
+        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {city_sql} ;"
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError('未找到指定地图的边界文件')
+            raise MapNotFoundError("未找到指定地图的边界文件")
     else:
-        city_sql = ''
+        city_sql = ""
         city_level = None
 
     if district:
-        district_level = '区县'
+        district_level = "区县"
         district_sql = f"AND district='{district}'"
-        sql = (f"SELECT id"
-               f" FROM ADMINISTRATIVE"
-               f" WHERE 1 {district_sql} ;")
+        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {district_sql} ;"
         count = len(list(cur.execute(sql)))
         if count == 0:
-            raise MapNotFoundError('未找到指定地图的边界文件')
+            raise MapNotFoundError("未找到指定地图的边界文件")
     else:
-        district_sql = ''
+        district_sql = ""
         district_level = None
 
     if source:
         source_sql = f"AND source='{source}'"
     else:
-        source_sql = ''
+        source_sql = ""
 
     if not level:
         level = district_level or city_level or province_level or country_level
 
-    if level == '国':
+    if level == "国":
         level_sql = "level='国'"
-        province_sql = ''
-        city_sql = ''
-        district_sql = ''
-    elif level == '省':
+        province_sql = ""
+        city_sql = ""
+        district_sql = ""
+    elif level == "省":
         level_sql = "level='省'"
-        city_sql = ''
-        district_sql = ''
-    elif level == '市':
+        city_sql = ""
+        district_sql = ""
+    elif level == "市":
         level_sql = "level='市'"
-        district_sql = ''
-    elif level in ['区', '县', '区县', '区/县']:
+        district_sql = ""
+    elif level in ["区", "县", "区县", "区/县"]:
         level_sql = "level='区县'"
     else:
-        raise ValueError(
-            f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
 
-    meta_sql = ("SELECT country, province, city, district, level, source, kind"
-                " FROM ADMINISTRATIVE"
-                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};")
+    meta_sql = (
+        "SELECT country, province, city, district, level, source, kind"
+        " FROM ADMINISTRATIVE"
+        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};"
+    )
     meta_rows = list(cur.execute(meta_sql))
 
-    geom_sql = ("SELECT path"
-                " FROM ADMINISTRATIVE"
-                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};")
+    geom_sql = (
+        "SELECT path"
+        " FROM ADMINISTRATIVE"
+        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql} {district_sql} {source_sql};"
+    )
     gemo_rows = list(cur.execute(geom_sql))
     map_polygons = []
     for path in gemo_rows:
-        mapjson = read_mapjson(os.path.join(DATA_DIR, 'geojson.min/',
-                                            path[0]))
+        mapjson = read_mapjson(os.path.join(DATA_DIR, "geojson.min/", path[0]))
 
         map_polygons.append(mapjson)
 
-    gdf = gpd.GeoDataFrame(data=meta_rows, columns=[
-        '国家', '省/直辖市', '市', '区/县', '级别', '来源', '类型'])
-    gdf['geometry'] = map_polygons
+    gdf = gpd.GeoDataFrame(
+        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
+    )
+    gdf["geometry"] = map_polygons
 
     if len(gdf) == 0:
-        raise MapNotFoundError('未找到指定地图的边界文件')
+        raise MapNotFoundError("未找到指定地图的边界文件")
 
-    if record == 'all':
+    if record == "all":
         if only_polygon:
-            return [row.to_dict()['geometry'] for _, row in gdf.iterrows()]
+            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()]
         else:
-            if engine == 'geopandas':
+            if engine == "geopandas":
                 return gdf
             elif engine is None:
                 return [row.to_dict() for _, row in gdf.iterrows()]
-    elif record == 'first':
+    elif record == "first":
         if only_polygon:
-            return [row.to_dict()['geometry'] for _, row in gdf.iterrows()][0]
+            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()][0]
         else:
-            if engine == 'geopandas':
+            if engine == "geopandas":
                 return gdf.iloc[0]
             elif engine is None:
                 return [row.to_dict() for _, row in gdf.iterrows()][0]
