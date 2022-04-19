@@ -12,7 +12,8 @@ on:
 jobs:
   build-test-unix:
     name: Build test on (${{ matrix.python-version }}, ${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    # runs-on: ${{ matrix.os }}
+    runs-on: self-hosted-local
     strategy:
       fail-fast: false
       matrix:

@@ -6,8 +6,8 @@ import warnings
 
 import cartopy
 
-from .maps import *
-from .drawing import *
+from .maps import *  # noqa: F403, F401
+from .drawing import *  # noqa: F403, F401
 
 __version__ = "1.0.1"
 
