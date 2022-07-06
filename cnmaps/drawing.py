@@ -18,8 +18,9 @@ def _make_clip_path(map_polygon):
     codes = []
     ax = plt.gca()
     clips = []
+    crs = ccrs.PlateCarree()
 
-    for polygon in map_polygon:
+    for polygon in map_polygon.geoms:
         try:
             coords = polygon.boundary.coords
         except NotImplementedError:
@@ -29,8 +30,7 @@ def _make_clip_path(map_polygon):
             exterior_prt = len(exterior_coords)
             for coord in exterior_coords:
                 try:
-                    trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                    trans_coord = ax.projection.transform_point(*coord, crs)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -42,8 +42,7 @@ def _make_clip_path(map_polygon):
                 interior_prt = len(interior_coords)
                 for coord in interior_coords:
                     try:
-                        trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                        trans_coord = ax.projection.transform_point(*coord, crs)
                     except AttributeError:
                         trans_coord = coord
                     vertices.append(trans_coord)
@@ -56,8 +55,7 @@ def _make_clip_path(map_polygon):
             prt = len(coords)
             for coord in coords:
                 try:
-                    trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                    trans_coord = ax.projection.transform_point(*coord, crs)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -187,11 +185,12 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
     >>> draw_map(map_polygon, color='k')
     """
     ax = plt.gca()
+    crs = ccrs.PlateCarree()
 
     for cbt in clabel_text:
         cbt.set_visible(False)
 
-    for polygon in map_polygon:
+    for polygon in map_polygon.geoms:
         vertices = []
         try:
             coords = polygon.boundary.coords
@@ -202,8 +201,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
             interiors = polygon.interiors
             for coord in exterior_coords:
                 try:
-                    trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                    trans_coord = ax.projection.transform_point(*coord, crs)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -212,8 +210,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
                 interior_coords = interior.coords
                 for coord in interior_coords:
                     try:
-                        trans_coord = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                        trans_coord = ax.projection.transform_point(*coord, crs)
                     except AttributeError:
                         trans_coord = coord
                     hole.append(trans_coord)
@@ -222,8 +219,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
         else:
             for coord in coords:
                 try:
-                    trans_coord = ax.projection.transform_point(
-                        *coord, src_crs=ccrs.PlateCarree())
+                    trans_coord = ax.projection.transform_point(*coord, crs)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -258,13 +254,14 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
     """
     ax = plt.gca()
-    for geomestry in map_polygon:
+    crs = ccrs.PlateCarree()
+    for geometry in map_polygon.geoms:
         if isinstance(map_polygon, sgeom.MultiPolygon):
             try:
-                coords = geomestry.boundary.coords
+                coords = geometry.boundary.coords
             except NotImplementedError:
-                exterior_coords = geomestry.exterior.coords
-                interiors = geomestry.interiors
+                exterior_coords = geometry.exterior.coords
+                interiors = geometry.interiors
                 xs = []
                 ys = []
                 for coord in exterior_coords:
@@ -283,8 +280,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
                     ys = []
                     for coord in interior_coords:
                         try:
-                            x, y = ax.projection.transform_point(
-                                *coord, src_crs=ccrs.PlateCarree())
+                            x, y = ax.projection.transform_point(*coord, crs)
                         except AttributeError:
                             x, y = coord
                         xs.append(x)
@@ -292,13 +288,12 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
                     ax.plot(xs, ys, **kwargs)
                 continue
         elif isinstance(map_polygon, sgeom.MultiLineString):
-            coords = geomestry.coords
+            coords = geometry.coords
         xs = []
         ys = []
         for coord in coords:
             try:
-                x, y = ax.projection.transform_point(
-                    *coord, src_crs=ccrs.PlateCarree())
+                x, y = ax.projection.transform_point(*coord, src_crs=crs)
             except AttributeError:
                 x, y = coord
             xs.append(x)
