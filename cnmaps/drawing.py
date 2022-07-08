@@ -144,8 +144,7 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
         mesh.set_clip_path(clip)
 
 
-def clip_clabels_by_map(clabel_text: matplotlib.text.Text,
-                        map_polygon: MapPolygon):
+def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
     """
     剪切clabel文本, 一般配合contour函数使用
 
@@ -267,7 +266,8 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
                 for coord in exterior_coords:
                     try:
                         x, y = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree())
+                            *coord, src_crs=ccrs.PlateCarree()
+                        )
                     except AttributeError:
                         x, y = coord
                     xs.append(x)

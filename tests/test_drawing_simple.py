@@ -16,12 +16,10 @@ from cnmaps.sample import load_dem
 
 provinces = get_adm_names(level="省")
 
-map_args = [{
-    "province": p,
-    "only_polygon": True,
-    "record": "first",
-    "name": p
-} for p in provinces[:1]]
+map_args = [
+    {"province": p, "only_polygon": True, "record": "first", "name": p}
+    for p in provinces[:1]
+]
 
 
 def test_clip_pcolormesh():
@@ -35,11 +33,9 @@ def test_clip_pcolormesh():
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         map_polygon = get_adm_maps(**map_arg)
 
-        mesh = ax.pcolormesh(lons,
-                             lats,
-                             data,
-                             cmap=plt.cm.terrain,
-                             transform=ccrs.PlateCarree())
+        mesh = ax.pcolormesh(
+            lons, lats, data, cmap=plt.cm.terrain, transform=ccrs.PlateCarree()
+        )
 
         clip_pcolormesh_by_map(mesh, map_polygon)
         draw_map(map_polygon, linewidth=1)

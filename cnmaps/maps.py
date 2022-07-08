@@ -109,10 +109,7 @@ class MapPolygon(sgeom.MultiPolygon):
         self,
         savefp: str,
         engine: str = "GeoJSON",
-        meta: dict = {
-            "id": None,
-            "name": None
-        },
+        meta: dict = {"id": None, "name": None},
         encoding: str = "utf-8",
     ):
         """
@@ -130,18 +127,15 @@ class MapPolygon(sgeom.MultiPolygon):
 
             schema = {
                 "geometry": "MultiPolygon",
-                "properties": {
-                    "id": "int",
-                    "name": "str"
-                },
+                "properties": {"id": "int", "name": "str"},
             }
 
             with fiona.open(
-                    savefp,
-                    mode="w",
-                    driver="ESRI Shapefile",
-                    schema=schema,
-                    encoding=encoding,
+                savefp,
+                mode="w",
+                driver="ESRI Shapefile",
+                schema=schema,
+                encoding=encoding,
             ) as layer:
                 geometry = mapping(self)
                 feature = {"geometry": geometry, "properties": meta}
@@ -176,11 +170,11 @@ class MapPolygon(sgeom.MultiPolygon):
 
         contains = np.vectorize(lambda x, y: x.contains(y))
 
-        inside = contains(self.geoms[0],
-                          geo_points[:, np.newaxis]).reshape(data.shape)
+        inside = contains(self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
         for n in range(len(self.geoms[1:])):
-            inside |= contains(self.geoms[n],
-                               geo_points[:, np.newaxis]).reshape(data.shape)
+            inside |= contains(self.geoms[n], geo_points[:, np.newaxis]).reshape(
+                data.shape
+            )
 
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
@@ -394,19 +388,22 @@ def get_adm_maps(
     elif level in ["区", "县", "区县", "区/县"]:
         level_sql = "level='区县'"
     else:
-        raise ValueError(
-            f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
 
-    meta_sql = ("SELECT country, province, city, district, level, source, kind"
-                " FROM ADMINISTRATIVE"
-                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-                f" {district_sql} {source_sql};")
+    meta_sql = (
+        "SELECT country, province, city, district, level, source, kind"
+        " FROM ADMINISTRATIVE"
+        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+        f" {district_sql} {source_sql};"
+    )
     meta_rows = list(cur.execute(meta_sql))
 
-    geom_sql = ("SELECT path"
-                " FROM ADMINISTRATIVE"
-                f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-                f" {district_sql} {source_sql};")
+    geom_sql = (
+        "SELECT path"
+        " FROM ADMINISTRATIVE"
+        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+        f" {district_sql} {source_sql};"
+    )
     gemo_rows = list(cur.execute(geom_sql))
     map_polygons = []
     for path in gemo_rows:
@@ -415,7 +412,8 @@ def get_adm_maps(
         map_polygons.append(mapjson)
 
     gdf = gpd.GeoDataFrame(
-        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"])
+        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
+    )
     gdf["geometry"] = map_polygons
 
     if len(gdf) == 0:
