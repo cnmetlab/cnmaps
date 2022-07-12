@@ -31,6 +31,7 @@ jobs:
     - name: Install dependencies
       run: |
         conda env update --file environment.yml --name base
+        conda init bash
         conda activate base
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
