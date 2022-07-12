@@ -32,7 +32,7 @@ with open(requirements_path, "r", encoding="utf-8") as f:
 
 setuptools.setup(
     name="cnmaps",
-    version=get_version("cyeva/__init__.py"),
+    version=get_version("cnmaps/__init__.py"),
     author="Wentao Li",
     author_email="clarmylee92510@gmail.com",
     description="A python package to draw china maps more easily",
