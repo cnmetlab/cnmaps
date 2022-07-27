@@ -9,6 +9,7 @@ import matplotlib.path as mpath
 import cartopy.crs as ccrs
 import shapely.geometry as sgeom
 from geopandas import GeoDataFrame
+from pyproj import Transformer
 
 from .maps import MapPolygon
 
@@ -19,6 +20,7 @@ def _make_clip_path(map_polygon):
     ax = plt.gca()
     clips = []
     crs = ccrs.PlateCarree()
+    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
 
     for polygon in map_polygon.geoms:
         try:
@@ -30,7 +32,7 @@ def _make_clip_path(map_polygon):
             exterior_prt = len(exterior_coords)
             for coord in exterior_coords:
                 try:
-                    trans_coord = ax.projection.transform_point(*coord, crs)
+                    trans_coord = transformer.transform(*coord)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -42,7 +44,7 @@ def _make_clip_path(map_polygon):
                 interior_prt = len(interior_coords)
                 for coord in interior_coords:
                     try:
-                        trans_coord = ax.projection.transform_point(*coord, crs)
+                        trans_coord = transformer.transform(*coord)
                     except AttributeError:
                         trans_coord = coord
                     vertices.append(trans_coord)
@@ -55,7 +57,7 @@ def _make_clip_path(map_polygon):
             prt = len(coords)
             for coord in coords:
                 try:
-                    trans_coord = ax.projection.transform_point(*coord, crs)
+                    trans_coord = transformer.transform(*coord)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -185,6 +187,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
     """
     ax = plt.gca()
     crs = ccrs.PlateCarree()
+    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
 
     for cbt in clabel_text:
         cbt.set_visible(False)
@@ -200,7 +203,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
             interiors = polygon.interiors
             for coord in exterior_coords:
                 try:
-                    trans_coord = ax.projection.transform_point(*coord, crs)
+                    trans_coord = transformer.transform(*coord)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -209,7 +212,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
                 interior_coords = interior.coords
                 for coord in interior_coords:
                     try:
-                        trans_coord = ax.projection.transform_point(*coord, crs)
+                        trans_coord = transformer.transform(*coord)
                     except AttributeError:
                         trans_coord = coord
                     hole.append(trans_coord)
@@ -218,7 +221,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
         else:
             for coord in coords:
                 try:
-                    trans_coord = ax.projection.transform_point(*coord, crs)
+                    trans_coord = transformer.transform(*coord)
                 except AttributeError:
                     trans_coord = coord
                 vertices.append(trans_coord)
@@ -254,6 +257,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
     """
     ax = plt.gca()
     crs = ccrs.PlateCarree()
+    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
     for geometry in map_polygon.geoms:
         if isinstance(map_polygon, sgeom.MultiPolygon):
             try:
@@ -265,9 +269,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
                 ys = []
                 for coord in exterior_coords:
                     try:
-                        x, y = ax.projection.transform_point(
-                            *coord, src_crs=ccrs.PlateCarree()
-                        )
+                        x, y = transformer.transform(*coord)
                     except AttributeError:
                         x, y = coord
                     xs.append(x)
@@ -280,7 +282,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
                     ys = []
                     for coord in interior_coords:
                         try:
-                            x, y = ax.projection.transform_point(*coord, crs)
+                            x, y = transformer.transform(*coord)
                         except AttributeError:
                             x, y = coord
                         xs.append(x)
@@ -293,7 +295,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
         ys = []
         for coord in coords:
             try:
-                x, y = ax.projection.transform_point(*coord, src_crs=crs)
+                x, y = transformer.transform(*coord)
             except AttributeError:
                 x, y = coord
             xs.append(x)

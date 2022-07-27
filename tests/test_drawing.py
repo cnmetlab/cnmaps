@@ -1,7 +1,7 @@
 import os
-import re
 import shutil
 import random
+import uuid
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -180,7 +180,6 @@ def test_projection():
     lons, lats, data = load_dem()
 
     for projection in PROJECTIONS:
-        projection_name = re.search(r"(?<=\.)[A-Za-z]*(?=\ )", str(projection)).group()
         map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=projection)
@@ -197,7 +196,7 @@ def test_projection():
         ax.coastlines()
         ax.set_global()
 
-        savefp = os.path.join("./tmp", f"{projection_name}.png")
+        savefp = os.path.join("./tmp", f"{uuid.uuid4().hex}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
 
         plt.savefig(savefp, bbox_inches="tight")
