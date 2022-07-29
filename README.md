@@ -6,9 +6,13 @@
 
 <p align="center">
 
-<a href="https://app.travis-ci.com/github/Clarmy/cnmaps">
-<img src="https://app.travis-ci.com/Clarmy/cnmaps.svg?branch=main"
- alt="Build Status" /></a>
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/version.svg"
+ alt="Anaconda" /></a>
+
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/installer/conda.svg"
+ alt="Install with conda" /></a>
 
 <a href="https://badge.fury.io/py/cnmaps">
 <img src="https://badge.fury.io/py/cnmaps.svg"
@@ -40,7 +44,12 @@
 </h4>
 
 ## 安装
-cnmaps依赖于`cartopy>=0.19.0`，因此在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
+
+### 使用conda安装
+你可以使用conda进行安装cnmaps：`$ conda install -c conda-forge -y cnmaps`
+
+### 使用pip安装
+cnmaps依赖于`cartopy>=0.19.0`，因此如果使用pip安装，在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
 
 在完成cartopy的安装以后，你可以使用pip来安装cnmaps：`$ pip install -U cnmaps`
 
