@@ -32,7 +32,7 @@ jobs:
       run: |
         conda env update --file environment.yml --name base
         conda init bash
-        source ~/.bashrc
+        source /Users/runner/.bash_profile
         conda activate base
         python -m pip install --upgrade pip
         python -m pip install flake8 pytest
@@ -46,6 +46,8 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
+        conda init bash
+        source /Users/runner/.bash_profile
         conda activate base
         pytest -p no:warnings --verbose tests/test_map_simple.py
         pytest -p no:warnings --verbose tests/test_drawing_simple.py
