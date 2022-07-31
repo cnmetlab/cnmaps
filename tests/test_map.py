@@ -38,6 +38,21 @@ def test_maskout():
     assert (ndata.mask == mask_array).all()
 
 
+def test_make_maskout_array():
+    """测试make_maskout_array方法"""
+    casefp = os.path.join(MAPCASE_DIR, "china-maskout.npy")
+    mask_array = np.load(casefp)
+
+    lon = np.linspace(60, 150, 1000)
+    lat = np.linspace(0, 60, 1000)
+    lons, lats = np.meshgrid(lon, lat)
+
+    china = get_adm_maps(level="国", record="first", only_polygon=True)
+    china_maskout_array = china.make_mask_array(lons, lats)
+
+    assert (china_maskout_array == mask_array).all()
+
+
 def test_mappolygon_to_file():
     """测试将MapPolygon保存为文件."""
     map_polygon = get_adm_maps(province="黑龙江省", only_polygon=True, record="first")
