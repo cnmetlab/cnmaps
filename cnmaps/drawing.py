@@ -2,12 +2,14 @@
 
 from typing import Union
 
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
 import shapely.geometry as sgeom
+import shapely.ops as sops
 from geopandas import GeoDataFrame
 from pyproj import Transformer
 
@@ -256,54 +258,25 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
     """
     ax = plt.gca()
-    crs = ccrs.PlateCarree()
-    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
-    for geometry in map_polygon.geoms:
-        if isinstance(map_polygon, sgeom.MultiPolygon):
-            try:
-                coords = geometry.boundary.coords
-            except NotImplementedError:
-                exterior_coords = geometry.exterior.coords
-                interiors = geometry.interiors
-                xs = []
-                ys = []
-                for coord in exterior_coords:
-                    try:
-                        x, y = transformer.transform(*coord)
-                    except AttributeError:
-                        x, y = coord
-                    xs.append(x)
-                    ys.append(y)
+    crs_from = ccrs.PlateCarree()
+    crs_to = ax.projection
+    if crs_from != crs_to:
+        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
+        map_polygon = sops.transform(transformer.transform, map_polygon)
 
-                ax.plot(xs, ys, **kwargs)
-                for interior in interiors:
-                    interior_coords = interior.coords
-                    xs = []
-                    ys = []
-                    for coord in interior_coords:
-                        try:
-                            x, y = transformer.transform(*coord)
-                        except AttributeError:
-                            x, y = coord
-                        xs.append(x)
-                        ys.append(y)
-                    ax.plot(xs, ys, **kwargs)
-                continue
-        elif isinstance(map_polygon, sgeom.MultiLineString):
-            coords = geometry.coords
-        xs = []
-        ys = []
-        for coord in coords:
-            try:
-                x, y = transformer.transform(*coord)
-            except AttributeError:
-                x, y = coord
-            xs.append(x)
-            ys.append(y)
-        if kwargs.get("color"):
-            ax.plot(xs, ys, **kwargs)
-        else:
-            ax.plot(xs, ys, color="k", **kwargs)
+    if "color" not in kwargs and "c" not in kwargs:
+        kwargs["color"] = "k"
+
+    if isinstance(map_polygon, sgeom.MultiPolygon):
+        for polygon in map_polygon.geoms:
+            for ring in [polygon.exterior] + polygon.interiors[:]:
+                coords = np.array(ring.coords)
+                ax.plot(coords[:, 0], coords[:, 1], **kwargs)
+
+    elif isinstance(map_polygon, sgeom.MultiLineString):
+        for line in map_polygon.geoms:
+            coords = np.array(line.coords)
+            ax.plot(coords[:, 0], coords[:, 1], **kwargs)
 
 
 def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
