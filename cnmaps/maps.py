@@ -188,7 +188,7 @@ class MapPolygon(sgeom.MultiPolygon):
         y = np.atleast_1d(lats)
         if x.shape != y.shape:
             raise ValueError("x和y的形状不匹配")
-        prepared = prep(sgeom.MultiPolygon(self.geoms))
+        prepared = prep(self)
 
         def recursion(x, y):
             """递归判断数组x和y的点是否落入多边形中."""
