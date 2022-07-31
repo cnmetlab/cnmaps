@@ -10,6 +10,8 @@ import numpy as np
 import shapely.geometry as sgeom
 from shapely.geometry import Point
 from shapely.geometry import mapping
+from shapely.prepared import prep
+
 import fiona
 import geojson
 
@@ -162,26 +164,95 @@ class MapPolygon(sgeom.MultiPolygon):
         """
 
         ndata = copy.deepcopy(data)
-        coords = list(zip(lons.flatten(), lats.flatten()))
-
-        geoms = [Point(x, y) for x, y in coords]
-        geo_points = np.empty(len(geoms), dtype="object")
-        geo_points[:] = geoms
-
-        contains = np.vectorize(lambda x, y: x.contains(y))
-
-        inside = contains(self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
-        for n in range(len(self.geoms[1:])):
-            inside |= contains(self.geoms[n], geo_points[:, np.newaxis]).reshape(
-                data.shape
-            )
 
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
 
-        ndata.mask = ~inside
+        ndata.mask = self.make_mask_array(lons, lats)
 
         return ndata
+
+    def make_mask_array(self, lons: np.ndarray, lats: np.ndarray):
+        """
+        生成边界以外的遮罩（掩膜）数组
+
+        Args:
+            lons (np.ndarray): 经度矩阵
+            lats (np.ndarray): 纬度矩阵
+            data (np.ndarray): 数据矩阵
+
+        Returns:
+            np.ndarray: 遮罩（掩膜）数组
+        """
+        x = np.atleast_1d(lons)
+        y = np.atleast_1d(lats)
+        if x.shape != y.shape:
+            raise ValueError("x和y的形状不匹配")
+        prepared = prep(self)
+
+        def recursion(x, y):
+            """递归判断数组x和y的点是否落入多边形中."""
+            xmin, xmax = x.min(), x.max()
+            ymin, ymax = y.min(), y.max()
+            xflag = np.isclose(xmin, xmax)
+            yflag = np.isclose(ymin, ymax)
+            mask = np.zeros(x.shape, dtype=bool)
+
+            # 散点重合为单点的情况.
+            if xflag and yflag:
+                point = sgeom.Point(xmin, ymin)
+                if prepared.contains(point):
+                    mask[:] = True
+                else:
+                    mask[:] = False
+                return mask
+
+            xmid = (xmin + xmax) / 2
+            ymid = (ymin + ymax) / 2
+
+            # 散点落在水平和垂直直线上的情况.
+            if xflag or yflag:
+                line = sgeom.LineString([(xmin, ymin), (xmax, ymax)])
+                if prepared.contains(line):
+                    mask[:] = True
+                elif prepared.intersects(line):
+                    if xflag:
+                        m1 = (y >= ymin) & (y <= ymid)
+                        m2 = (y >= ymid) & (y <= ymax)
+                    if yflag:
+                        m1 = (x >= xmin) & (x <= xmid)
+                        m2 = (x >= xmid) & (x <= xmax)
+                    if m1.any():
+                        mask[m1] = recursion(x[m1], y[m1])
+                    if m2.any():
+                        mask[m2] = recursion(x[m2], y[m2])
+                else:
+                    mask[:] = False
+                return mask
+
+            # 散点可以张成矩形的情况.
+            box = sgeom.box(xmin, ymin, xmax, ymax)
+            if prepared.contains(box):
+                mask[:] = True
+            elif prepared.intersects(box):
+                m1 = (x >= xmid) & (x <= xmax) & (y >= ymid) & (y <= ymax)
+                m2 = (x >= xmin) & (x <= xmid) & (y >= ymid) & (y <= ymax)
+                m3 = (x >= xmin) & (x <= xmid) & (y >= ymin) & (y <= ymid)
+                m4 = (x >= xmid) & (x <= xmax) & (y >= ymin) & (y <= ymid)
+                if m1.any():
+                    mask[m1] = recursion(x[m1], y[m1])
+                if m2.any():
+                    mask[m2] = recursion(x[m2], y[m2])
+                if m3.any():
+                    mask[m3] = recursion(x[m3], y[m3])
+                if m4.any():
+                    mask[m4] = recursion(x[m4], y[m4])
+            else:
+                mask[:] = False
+
+            return mask
+
+        return ~recursion(x, y)
 
 
 def read_mapjson(fp):
