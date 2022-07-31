@@ -172,15 +172,10 @@ class MapPolygon(sgeom.MultiPolygon):
 
         contains = np.vectorize(lambda x, y: x.contains(y))
 
-        prepared_polygon = prep(self.geoms[0])
+        prepared_polygon = prep(sgeom.MultiPolygon(self.geoms))
         inside = contains(prepared_polygon, geo_points[:, np.newaxis]).reshape(
             data.shape
         )
-        for n in range(len(self.geoms[1:])):
-            prepared_polygon = prep(self.geoms[n])
-            inside |= contains(prepared_polygon, geo_points[:, np.newaxis]).reshape(
-                data.shape
-            )
 
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
