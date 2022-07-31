@@ -10,6 +10,8 @@ import numpy as np
 import shapely.geometry as sgeom
 from shapely.geometry import Point
 from shapely.geometry import mapping
+from shapely.prepared import prep
+
 import fiona
 import geojson
 
@@ -170,9 +172,13 @@ class MapPolygon(sgeom.MultiPolygon):
 
         contains = np.vectorize(lambda x, y: x.contains(y))
 
-        inside = contains(self.geoms[0], geo_points[:, np.newaxis]).reshape(data.shape)
+        prepared_polygon = prep(self.geoms[0])
+        inside = contains(prepared_polygon, geo_points[:, np.newaxis]).reshape(
+            data.shape
+        )
         for n in range(len(self.geoms[1:])):
-            inside |= contains(self.geoms[n], geo_points[:, np.newaxis]).reshape(
+            prepared_polygon = prep(self.geoms[n])
+            inside |= contains(prepared_polygon, geo_points[:, np.newaxis]).reshape(
                 data.shape
             )
 
