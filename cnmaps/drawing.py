@@ -148,6 +148,44 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
         mesh.set_clip_path(clip)
 
 
+def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
+    """
+    使用地图边界对象对箭矢簇对象进行裁剪
+
+    参数:
+        quiver (matplotlib.quiver.Quiver): Quiver对象,
+                                           该对象是调用ax.quiver()方法的返回值
+                                           注意: 对象须带有投影信息
+        map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
+
+    示例:
+    >>> from cnmaps import get_adm_maps, clip_quiver_by_map, draw_map
+    >>> from cnmaps.sample import load_dem
+
+    >>> lons, lats, data = load_dem()
+    >>> u = np.full(data.shape, 1)
+    >>> v = np.full(data.shape, 1)
+
+    >>> fig = plt.figure(figsize=(10, 10))
+    >>> ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    >>> map_polygon = get_adm_maps(
+        country='中华人民共和国', record='first', only_polygon=True)
+
+    >>> quiver = ax.quiver(lons,
+                           lats,
+                           u, v,
+                           transform=ccrs.PlateCarree(),
+                           units="inches", scale=10)
+
+    >>> clip_quiver_by_map(quiver, map_polygon)
+    >>> draw_map(map_polygon, linewidth=1)
+    """
+    clips = _make_clip_path(map_polygon)
+
+    for clip in clips:
+        quiver.set_clip_path(clip)
+
+
 def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
     """
     剪切clabel文本, 一般配合contour函数使用
