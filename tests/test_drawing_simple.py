@@ -141,4 +141,4 @@ def test_clip_quiver():
 
 
 if __name__ == "__main__":
-    test_clip_quiver()
+    pass
