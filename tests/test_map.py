@@ -21,10 +21,30 @@ MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase"
 
 def test_maskout():
     """测试maskout方法"""
-    casefp = os.path.join(MAPCASE_DIR, "maskout.npz")
-    mask_array = np.load(casefp)["mask"]
+    casefp = os.path.join(MAPCASE_DIR, "ningxia-maskout-gcj02.npy")
+    mask_array = np.load(casefp)
 
-    map_polygon = get_adm_maps(province="宁夏回族自治区", only_polygon=True, record="first")
+    map_polygon = get_adm_maps(
+        province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
+    )
+
+    lons, lats, data = load_dem()
+    data = data[100:150, 150:200]
+    lons = lons[100:150, 150:200]
+    lats = lats[100:150, 150:200]
+
+    ndata = map_polygon.maskout(lons, lats, data)
+    assert (ndata.mask == mask_array).all()
+
+    ndata = map_polygon.maskout(lons, lats, data.data)
+    assert (ndata.mask == mask_array).all()
+
+    casefp = os.path.join(MAPCASE_DIR, "ningxia-maskout-wgs84.npy")
+    mask_array = np.load(casefp)
+
+    map_polygon = get_adm_maps(
+        province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
+    )
 
     lons, lats, data = load_dem()
     data = data[100:150, 150:200]
@@ -40,14 +60,26 @@ def test_maskout():
 
 def test_make_maskout_array():
     """测试make_maskout_array方法"""
-    casefp = os.path.join(MAPCASE_DIR, "china-maskout.npy")
+    casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02.npy")
     mask_array = np.load(casefp)
 
     lon = np.linspace(60, 150, 1000)
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True)
+    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+    china_maskout_array = china.make_mask_array(lons, lats)
+
+    assert (china_maskout_array == mask_array).all()
+
+    casefp = os.path.join(MAPCASE_DIR, "china-maskout-wgs84.npy")
+    mask_array = np.load(casefp)
+
+    lon = np.linspace(60, 150, 1000)
+    lat = np.linspace(0, 60, 1000)
+    lons, lats = np.meshgrid(lon, lat)
+
+    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -135,13 +167,25 @@ def test_map_operator():
     assert (
         round(
             (
-                get_adm_maps(province="四川省")[0]["geometry"]
-                + get_adm_maps(province="重庆市")[0]["geometry"]
-                + get_adm_maps(province="贵州省")[0]["geometry"]
+                get_adm_maps(province="四川省", wgs84=False)[0]["geometry"]
+                + get_adm_maps(province="重庆市", wgs84=False)[0]["geometry"]
+                + get_adm_maps(province="贵州省", wgs84=False)[0]["geometry"]
             ).area,
             2,
         )
         == 69.49
+    )
+
+    assert (
+        round(
+            (
+                get_adm_maps(province="四川省", wgs84=True)[0]["geometry"]
+                + get_adm_maps(province="重庆市", wgs84=True)[0]["geometry"]
+                + get_adm_maps(province="贵州省", wgs84=True)[0]["geometry"]
+            ).area,
+            2,
+        )
+        == 69.45
     )
 
     assert isinstance(
@@ -159,8 +203,18 @@ def test_map_operator():
     assert (
         round(
             (
-                get_adm_maps(level="国")[0]["geometry"]
-                - get_adm_maps(province="山西省")[0]["geometry"]
+                get_adm_maps(level="国", wgs84=True)[0]["geometry"]
+                - get_adm_maps(province="山西省", wgs84=True)[0]["geometry"]
+            ).area,
+            2,
+        )
+        == 949.08
+    )
+    assert (
+        round(
+            (
+                get_adm_maps(level="国", wgs84=False)[0]["geometry"]
+                - get_adm_maps(province="山西省", wgs84=False)[0]["geometry"]
             ).area,
             2,
         )
@@ -249,13 +303,27 @@ def test_province_difference():
 
 def test_get_extent():
     """测试get_extent函数的返回结果是否符合预期."""
-    extent = (
+    gcj02_extent = (
         113.42394680348974,
         119.51379082389037,
         37.44400605531913,
         43.060480499941455,
     )
-    assert get_adm_maps(province="北京市")[0]["geometry"].get_extent() == extent
+
+    wgs84_extent = (
+        113.41739858502812,
+        119.50730212806607,
+        37.44275317420805,
+        43.05884396835136,
+    )
+    assert (
+        get_adm_maps(province="北京市", wgs84=False)[0]["geometry"].get_extent()
+        == gcj02_extent
+    )
+    assert (
+        get_adm_maps(province="北京市", wgs84=True)[0]["geometry"].get_extent()
+        == wgs84_extent
+    )
 
 
 def test_only_polygon_and_record():
