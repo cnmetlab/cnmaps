@@ -20,9 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-import math
+from math import sqrt, fabs, sin, atan2, cos
 
 import numpy as np
+from numba import jit
+
 
 X_PI = np.pi * 3000.0 / 180.0
 PI = np.pi  # π
@@ -30,6 +32,7 @@ SMA = 6378245.0  # 长半轴
 EER = 0.00669342162296594323  # 偏心率平方
 
 
+@jit
 def transform(lon: float, lat: float):
     lon -= 105
     lat -= 35
@@ -40,17 +43,11 @@ def transform(lon: float, lat: float):
         + 3.0 * lat
         + 0.2 * lat * lat
         + 0.1 * lon * lat
-        + 0.2 * math.sqrt(math.fabs(lon))
+        + 0.2 * sqrt(fabs(lon))
     )
-    nlat += (
-        (20.0 * math.sin(6.0 * lon * PI) + 20.0 * math.sin(2.0 * lon * PI)) * 2.0 / 3.0
-    )
-    nlat += (20.0 * math.sin(lat * PI) + 40.0 * math.sin(lat / 3.0 * PI)) * 2.0 / 3.0
-    nlat += (
-        (160.0 * math.sin(lat / 12.0 * PI) + 320 * math.sin(lat * PI / 30.0))
-        * 2.0
-        / 3.0
-    )
+    nlat += (20.0 * sin(6.0 * lon * PI) + 20.0 * sin(2.0 * lon * PI)) * 2.0 / 3.0
+    nlat += (20.0 * sin(lat * PI) + 40.0 * sin(lat / 3.0 * PI)) * 2.0 / 3.0
+    nlat += (160.0 * sin(lat / 12.0 * PI) + 320 * sin(lat * PI / 30.0)) * 2.0 / 3.0
 
     nlon = (
         300.0
@@ -58,21 +55,16 @@ def transform(lon: float, lat: float):
         + 2.0 * lat
         + 0.1 * lon * lon
         + 0.1 * lon * lat
-        + 0.1 * math.sqrt(math.fabs(lon))
+        + 0.1 * sqrt(fabs(lon))
     )
-    nlon += (
-        (20.0 * math.sin(6.0 * lon * PI) + 20.0 * math.sin(2.0 * lon * PI)) * 2.0 / 3.0
-    )
-    nlon += (20.0 * math.sin(lon * PI) + 40.0 * math.sin(lon / 3.0 * PI)) * 2.0 / 3.0
-    nlon += (
-        (150.0 * math.sin(lon / 12.0 * PI) + 300.0 * math.sin(lon / 30.0 * PI))
-        * 2.0
-        / 3.0
-    )
+    nlon += (20.0 * sin(6.0 * lon * PI) + 20.0 * sin(2.0 * lon * PI)) * 2.0 / 3.0
+    nlon += (20.0 * sin(lon * PI) + 40.0 * sin(lon / 3.0 * PI)) * 2.0 / 3.0
+    nlon += (150.0 * sin(lon / 12.0 * PI) + 300.0 * sin(lon / 30.0 * PI)) * 2.0 / 3.0
 
     return nlon, nlat
 
 
+@jit
 def gcj02_to_bd09(lon: float, lat: float) -> tuple:
     """火星坐标系(GCJ-02)转百度坐标系(BD-09)
 
@@ -83,13 +75,14 @@ def gcj02_to_bd09(lon: float, lat: float) -> tuple:
     Returns:
         tuple: 百度坐标 (经度, 纬度)
     """
-    z = math.sqrt(lon * lon + lat * lat) + 0.00002 * math.sin(lat * X_PI)
-    theta = math.atan2(lat, lon) + 0.000003 * math.cos(lon * X_PI)
-    bd_lon = z * math.cos(theta) + 0.0065
-    bd_lat = z * math.sin(theta) + 0.006
+    z = sqrt(lon * lon + lat * lat) + 0.00002 * sin(lat * X_PI)
+    theta = atan2(lat, lon) + 0.000003 * cos(lon * X_PI)
+    bd_lon = z * cos(theta) + 0.0065
+    bd_lat = z * sin(theta) + 0.006
     return bd_lon, bd_lat
 
 
+@jit
 def bd09_to_gcj02(lon: float, lat: float) -> tuple:
     """百度坐标系(BD-09)转火星坐标系(GCJ-02)
 
@@ -102,13 +95,14 @@ def bd09_to_gcj02(lon: float, lat: float) -> tuple:
     """
     x = lon - 0.0065
     y = lat - 0.006
-    z = math.sqrt(x * x + y * y) - 0.00002 * math.sin(y * X_PI)
-    theta = math.atan2(y, x) - 0.000003 * math.cos(x * X_PI)
-    gcj_lon = z * math.cos(theta)
-    gcj_lat = z * math.sin(theta)
+    z = sqrt(x * x + y * y) - 0.00002 * sin(y * X_PI)
+    theta = atan2(y, x) - 0.000003 * cos(x * X_PI)
+    gcj_lon = z * cos(theta)
+    gcj_lat = z * sin(theta)
     return gcj_lon, gcj_lat
 
 
+@jit
 def wgs84_to_gcj02(lon: float, lat: float) -> tuple:
     """WGS84转GCJ02(火星坐标系)
 
@@ -121,11 +115,11 @@ def wgs84_to_gcj02(lon: float, lat: float) -> tuple:
     """
     dlon, dlat = transform(lon, lat)
     radlat = lat / 180.0 * PI
-    magic = math.sin(radlat)
+    magic = sin(radlat)
     magic = 1 - EER * magic * magic
-    sqrtmagic = math.sqrt(magic)
+    sqrtmagic = sqrt(magic)
     dlat = (dlat * 180.0) / ((SMA * (1 - EER)) / (magic * sqrtmagic) * PI)
-    dlon = (dlon * 180.0) / (SMA / sqrtmagic * math.cos(radlat) * PI)
+    dlon = (dlon * 180.0) / (SMA / sqrtmagic * cos(radlat) * PI)
 
     gcj_lat = lat + dlat
     gcj_lon = lon + dlon
@@ -133,6 +127,7 @@ def wgs84_to_gcj02(lon: float, lat: float) -> tuple:
     return gcj_lon, gcj_lat
 
 
+@jit
 def gcj02_to_wgs84(lon: float, lat: float) -> tuple:
     """GCJ02(火星坐标系)转 WGS84
 
@@ -146,11 +141,11 @@ def gcj02_to_wgs84(lon: float, lat: float) -> tuple:
 
     dlon, dlat = transform(lon, lat)
     radlat = lat / 180.0 * PI
-    magic = math.sin(radlat)
+    magic = sin(radlat)
     magic = 1 - EER * magic * magic
-    sqrtmagic = math.sqrt(magic)
+    sqrtmagic = sqrt(magic)
     dlat = (dlat * 180.0) / ((SMA * (1 - EER)) / (magic * sqrtmagic) * PI)
-    dlon = (dlon * 180.0) / (SMA / sqrtmagic * math.cos(radlat) * PI)
+    dlon = (dlon * 180.0) / (SMA / sqrtmagic * cos(radlat) * PI)
     mglat = lat + dlat
     mglon = lon + dlon
 
@@ -160,6 +155,7 @@ def gcj02_to_wgs84(lon: float, lat: float) -> tuple:
     return new_lon, new_lat
 
 
+@jit
 def bd09_to_wgs84(lon: float, lat: float) -> tuple:
     """百度坐标转 WGS84
 
@@ -174,6 +170,7 @@ def bd09_to_wgs84(lon: float, lat: float) -> tuple:
     return gcj02_to_wgs84(lon, lat)
 
 
+@jit
 def wgs84_to_bd09(lon: float, lat: float) -> tuple:
     """WGS84 转百度坐标
 
