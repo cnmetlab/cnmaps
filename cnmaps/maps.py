@@ -8,12 +8,12 @@ from itertools import product
 
 import numpy as np
 import shapely.geometry as sgeom
-from shapely.geometry import Point
 from shapely.geometry import mapping
 from shapely.prepared import prep
-
 import fiona
 import geojson
+
+from .geo import gcj02_to_wgs84
 
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
 DB_FILE = os.path.join(DATA_DIR, "index.db")
@@ -33,9 +33,10 @@ class MapPolygon(sgeom.MultiPolygon):
     并实现了对于加号操作符的支持.
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, wgs84=True, **kwargs):
         """实例化MapPolygon"""
         super().__init__(*args, **kwargs)
+        self.wgs84 = wgs84
 
     def __add__(self, other):
         """+ 支持."""
@@ -66,33 +67,40 @@ class MapPolygon(sgeom.MultiPolygon):
         for one, other in couples:
             if one.contains(other) and one != other:
                 polygons.remove(other)
-        return MapPolygon(polygons)
+        try:
+            return MapPolygon(polygons, wgs84=map_polygon.wgs84)
+        except:
+            return MapPolygon(polygons)
 
     def union(self, other):
         """并集."""
         union_result = super().union(other)
         if isinstance(union_result, sgeom.Polygon):
-            return MapPolygon([union_result])
+            return MapPolygon([union_result], wgs84=self.wgs84)
         elif isinstance(union_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(union_result))
+            return self.drop_inner_duplicate(MapPolygon(union_result, wgs84=self.wgs84))
 
     def difference(self, other):
         """差集."""
         difference_result = super().difference(other)
         if isinstance(difference_result, sgeom.Polygon):
-            return MapPolygon([difference_result])
+            return MapPolygon([difference_result], wgs84=self.wgs84)
         elif isinstance(difference_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(difference_result))
+            return self.drop_inner_duplicate(
+                MapPolygon(difference_result, wgs84=self.wgs84)
+            )
 
     def intersection(self, other):
         """交集."""
         intersection_result = super().intersection(other)
         if isinstance(intersection_result, sgeom.Polygon):
-            return MapPolygon([intersection_result])
+            return MapPolygon([intersection_result], wgs84=self.wgs84)
         elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(intersection_result))
+            return self.drop_inner_duplicate(
+                MapPolygon(intersection_result, wgs84=self.wgs84)
+            )
         else:
-            return MapPolygon()
+            return MapPolygon(wgs84=self.wgs84)
 
     def get_extent(self, buffer=2):
         """
@@ -119,10 +127,10 @@ class MapPolygon(sgeom.MultiPolygon):
 
         参数:
             savefp (str): 保存路径
-            engine (str, optional): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'.
+            engine (str, 可选): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'.
                                     默认为 'GeoJSON'.
-            meta (dict, optional): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
-            encoding (str, optional): 编码类型. 默认为 'utf-8'.
+            meta (dict, 可选): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
+            encoding (str, 可选): 编码类型. 默认为 'utf-8'.
         """
 
         if engine.lower() == "esri shapefile":
@@ -255,12 +263,13 @@ class MapPolygon(sgeom.MultiPolygon):
         return ~recursion(x, y)
 
 
-def read_mapjson(fp):
+def read_mapjson(fp, wgs84=True):
     """
     读取geojson地图边界文件
 
     参数:
         fp (str, 可选): geojson文件名.
+        wgs84 (bool, 可选): 是否使用 WGS84 坐标
 
     返回值:
         MapPolygon: 地图边界对象
@@ -277,9 +286,15 @@ def read_mapjson(fp):
     if "Polygon" in geometry["type"]:
         for _coords in geometry["coordinates"]:
             for coords in _coords:
-                polygon_list.append(sgeom.Polygon(coords))
+                if wgs84:
+                    single_coords = []
+                    for coord in coords:
+                        single_coords.append(gcj02_to_wgs84(*coord))
+                    polygon_list.append(sgeom.Polygon(single_coords))
+                else:
+                    polygon_list.append(sgeom.Polygon(coords))
 
-        return MapPolygon(polygon_list)
+        return MapPolygon(polygon_list, wgs84=wgs84)
 
     elif geometry["type"] == "MultiLineString":
         return sgeom.MultiLineString(geometry["coordinates"])
@@ -297,19 +312,19 @@ def get_adm_names(
     获取行政名称
 
     参数:
-        province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
+        province (str, 可选): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
-        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
+        city (str, 可选): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
-        district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
-        level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
+        district (str, 可选): 区/县中文名, 必须为全称. Defaults to None.
+        level (str, 可选): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
                                其中'省'级包括直辖市、特区等;
                                '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
                                比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
-        country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
-        source (str, optional): 数据源. Defaults to '高德'.
+        country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
+        source (str, 可选): 数据源. Defaults to '高德'.
 
     返回值:
         list: 名称列表
@@ -345,6 +360,7 @@ def get_adm_maps(
     engine: str = None,
     record: str = "all",
     only_polygon: bool = False,
+    wgs84=True,
     *args,
     **kwargs,
 ):
@@ -352,34 +368,36 @@ def get_adm_maps(
     获取行政地图的边界对象
 
     参数:
-        province (str, optional): 省/自治区/直辖市/行政特区中文名, 必须为全称
+        province (str, 可选): 省/自治区/直辖市/行政特区中文名, 必须为全称
                                   例如查找河北省应收入'河北省'而非'河北'. Defaults to None.
-        city (str, optional): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
+        city (str, 可选): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
-        district (str, optional): 区/县中文名, 必须为全称. Defaults to None.
-        level (str, optional): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
+        district (str, 可选): 区/县中文名, 必须为全称. Defaults to None.
+        level (str, 可选): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
                                其中'省'级包括直辖市、特区等;
                                '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
                                比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
-        country (str, optional): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
-        source (str, optional): 数据源. Defaults to '高德'.
-        db (str, optional): sqlite db文件路径. Defaults to DB_FILE.
-        engine (str, optional): 输出引擎, 默认为None, 输出为列表,
+        country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
+        source (str, 可选): 数据源. Defaults to '高德'.
+        db (str, 可选): sqlite db文件路径. Defaults to DB_FILE.
+        engine (str, 可选): 输出引擎, 默认为None, 输出为列表,
                                 目前支持'geopandas', 若为geopandas,
                                 则返回GeoDataFrame对象.
                                 Defaults to None.
-        record (str, optional): 返回记录的形式, 选项包括'all'和'first'。
+        record (str, 可选): 返回记录的形式, 选项包括'all'和'first'。
                                 若为'first', 则无论查询结果又几条，仅返回第一条记录,
                                 若为'all', 则返回全部数据, 若engine==None则返回list,
                                 若engine=='geopandas', 则返回GeoDataFrame对象
                                 Defaults to 'all'.
-        only_polygon (bool, optional): 是否仅返回地图边界对象(MapPolygon),
+        only_polygon (bool, 可选): 是否仅返回地图边界对象(MapPolygon),
                                 若为True则返回结果为MapPolygon对象或以MapPolygon对象组合的list,
                                 若为False, 则返回的结果包含元信息, MapPolygon对象存储在
                                 'geometry'键中.
                                 Defaults to False.
+        wgs84 (bool, 可选): 是否使用 WGS84 坐标系, 若为 True 则转为 WGS84 坐标,
+                                若为 False 则使用高德默认的 GCJ02 火星坐标。Defaults to True.
 
     异常:
         ValueError: 当传入的等级
@@ -478,7 +496,9 @@ def get_adm_maps(
     gemo_rows = list(cur.execute(geom_sql))
     map_polygons = []
     for path in gemo_rows:
-        mapjson = read_mapjson(os.path.join(DATA_DIR, "geojson.min/", path[0]))
+        mapjson = read_mapjson(
+            os.path.join(DATA_DIR, "geojson.min/", path[0]), wgs84=wgs84
+        )
 
         map_polygons.append(mapjson)
 
