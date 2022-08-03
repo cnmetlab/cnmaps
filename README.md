@@ -20,6 +20,10 @@
 <a href="https://anaconda.org/conda-forge/cnmaps">
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/latest_release_relative_date.svg" /> </a>
 
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/downloads.svg" 
+ alt="Conda downloads"/> </a>
+
 <a href="https://badge.fury.io/py/cnmaps">
 <img src="https://badge.fury.io/py/cnmaps.svg"
  alt="PyPI version" /></a>
