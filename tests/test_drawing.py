@@ -14,6 +14,7 @@ from cnmaps import (
     clip_contours_by_map,
     draw_map,
     clip_pcolormesh_by_map,
+    clip_quiver_by_map,
 )
 from cnmaps.sample import load_dem
 
@@ -47,7 +48,12 @@ def test_clip_pcolormesh():
         map_polygon = get_adm_maps(**map_arg)
 
         mesh = ax.pcolormesh(
-            lons, lats, data, cmap=plt.cm.terrain, transform=ccrs.PlateCarree()
+            lons,
+            lats,
+            data,
+            cmap=plt.cm.terrain,
+            transform=ccrs.PlateCarree(),
+            shading="auto",
         )
 
         clip_pcolormesh_by_map(mesh, map_polygon)
@@ -113,6 +119,35 @@ def test_clip_contourf():
         )
 
         clip_contours_by_map(cs, map_polygon)
+        draw_map(map_polygon, color="k", linewidth=1)
+        ax.set_extent(map_polygon.get_extent(buffer=1))
+        savefp = os.path.join("./tmp", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+    shutil.rmtree("./tmp")
+
+
+def test_clip_quiver():
+    """测试切割箭矢簇."""
+    lons, lats, data = load_dem()
+
+    u = np.full(data.shape, 1)
+    v = np.full(data.shape, 1)
+
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        quiver = ax.quiver(
+            lons, lats, u, v, transform=ccrs.PlateCarree(), units="inches", scale=10
+        )
+
+        clip_quiver_by_map(quiver, map_polygon)
         draw_map(map_polygon, color="k", linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
         savefp = os.path.join("./tmp", f"{name}.png")
