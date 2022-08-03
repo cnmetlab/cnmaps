@@ -1,7 +1,6 @@
 """地图类模块."""
 
 import os
-import json
 import sqlite3
 import copy
 from itertools import product
@@ -12,6 +11,8 @@ from shapely.geometry import mapping
 from shapely.prepared import prep
 import fiona
 import geojson
+import orjson
+
 
 from .geo import gcj02_to_wgs84
 
@@ -82,9 +83,7 @@ class MapPolygon(sgeom.MultiPolygon):
         if isinstance(difference_result, sgeom.Polygon):
             return MapPolygon([difference_result])
         elif isinstance(difference_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(
-                MapPolygon(difference_result)
-            )
+            return self.drop_inner_duplicate(MapPolygon(difference_result))
 
     def intersection(self, other):
         """交集."""
@@ -92,9 +91,7 @@ class MapPolygon(sgeom.MultiPolygon):
         if isinstance(intersection_result, sgeom.Polygon):
             return MapPolygon([intersection_result])
         elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(
-                MapPolygon(intersection_result)
-            )
+            return self.drop_inner_duplicate(MapPolygon(intersection_result))
         else:
             return MapPolygon()
 
@@ -271,7 +268,7 @@ def read_mapjson(fp, wgs84=True):
         MapPolygon: 地图边界对象
     """
     with open(fp, encoding="utf-8") as f:
-        map_json = json.load(f)
+        map_json = orjson.loads(f.read())
 
     if "geometry" in map_json:
         geometry = map_json["geometry"]
@@ -283,10 +280,8 @@ def read_mapjson(fp, wgs84=True):
         for _coords in geometry["coordinates"]:
             for coords in _coords:
                 if wgs84:
-                    single_coords = []
-                    for coord in coords:
-                        single_coords.append(gcj02_to_wgs84(*coord))
-                    polygon_list.append(sgeom.Polygon(single_coords))
+                    wgs84_coords = [gcj02_to_wgs84(*coord) for coord in coords]
+                    polygon_list.append(sgeom.Polygon(wgs84_coords))
                 else:
                     polygon_list.append(sgeom.Polygon(coords))
 

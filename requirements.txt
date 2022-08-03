@@ -6,3 +6,5 @@ geopandas>=0.10.2
 geojson>=2.5.0
 cartopy>=0.20.0
 fiona>=1.8.20
+numba>=0.56.0
+orjson>=3.7.11
