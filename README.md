@@ -14,6 +14,16 @@
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/installer/conda.svg"
  alt="Install with conda" /></a>
 
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/platforms.svg" /> </a>
+
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/latest_release_relative_date.svg" /> </a>
+
+<a href="https://anaconda.org/conda-forge/cnmaps">
+<img src="https://anaconda.org/conda-forge/cnmaps/badges/downloads.svg" 
+ alt="Conda downloads"/> </a>
+
 <a href="https://badge.fury.io/py/cnmaps">
 <img src="https://badge.fury.io/py/cnmaps.svg"
  alt="PyPI version" /></a>
@@ -24,10 +34,6 @@
   
 <a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/'>
     <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
-</a>
-  
-<a href='https://github.com/Clarmy/cnmaps'>
-    <img src='https://tokei.rs/b1/github/Clarmy/cnmaps?category=lines' alt='tokei' />
 </a>
   
 <a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
