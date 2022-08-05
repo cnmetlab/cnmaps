@@ -38,8 +38,8 @@
  alt="PyPI version" /></a>
 
 <a href="https://pepy.tech/project/cnmaps">
-<img src="https://pepy.tech/badge/cnmaps"
- alt="Downloads" /></a>
+<img src="https://static.pepy.tech/personalized-badge/cnmaps?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Pypi%20Downloads"
+ alt="Pypi Downloads" /></a>
   
 <a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/'>
     <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
@@ -47,6 +47,10 @@
   
 <a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
   <img src="https://app.codacy.com/project/badge/Grade/ef6ab1893b0b47428b287f2f2875021c"/>
+ </a>
+
+<a href="https://codecov.io/gh/cnmetlab/cnmaps" > 
+ <img src="https://codecov.io/gh/cnmetlab/cnmaps/branch/main/graph/badge.svg?token=CF80D3CSR9"/> 
  </a>
 
 <a href="https://github.com/Clarmy/cnmaps/issues">
