@@ -6,6 +6,10 @@
 
 <p align="center">
 
+<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml">
+<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml/badge.svg?branch=main"
+ alt="Pytest" /></a>
+
 <a href="https://anaconda.org/conda-forge/cnmaps">
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/version.svg"
  alt="Anaconda" /></a>
