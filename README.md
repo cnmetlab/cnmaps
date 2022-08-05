@@ -10,6 +10,11 @@
 <img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml/badge.svg?branch=main"
  alt="Pytest" /></a>
 
+<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml">
+<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml/badge.svg" 
+ alt="Pypi publish"/> </a>
+
+
 <a href="https://anaconda.org/conda-forge/cnmaps">
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/version.svg"
  alt="Anaconda" /></a>
@@ -47,6 +52,10 @@
 <a href="https://github.com/Clarmy/cnmaps/issues">
 <img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"
  alt="contributions welcome" /></a>
+
+<a href="https://github.com/psf/black">
+<img src="https://img.shields.io/badge/code%20style-black-000000.svg"
+ alt="style" /></a>
 </p>
 
 <h4 align="center">
