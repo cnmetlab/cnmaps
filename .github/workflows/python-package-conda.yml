@@ -28,7 +28,7 @@ jobs:
           black --verbose --check .
       - name: Test with pytest and collect converage
         run: |
-          pytest --verbose -p no:warnings --cov ./tests
+          pytest --verbose -p no:warnings --cov .
 
       - name: Upload coverage reports to Codecov
         run: |
