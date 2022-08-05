@@ -14,7 +14,6 @@
 <img src="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml/badge.svg" 
  alt="Pypi publish"/> </a>
 
-
 <a href="https://anaconda.org/conda-forge/cnmaps">
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/version.svg"
  alt="Anaconda" /></a>
@@ -72,7 +71,7 @@
 你可以使用conda进行安装cnmaps：`$ conda install -c conda-forge -y cnmaps`
 
 ### 使用pip安装
-cnmaps依赖于`cartopy>=0.19.0`，因此如果使用pip安装，在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
+cnmaps依赖于`cartopy>=0.20.0`，因此如果使用pip安装，在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
 
 在完成cartopy的安装以后，你可以使用pip来安装cnmaps：`$ pip install -U cnmaps`
 
