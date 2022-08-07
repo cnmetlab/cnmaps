@@ -8,7 +8,6 @@ from itertools import product
 
 import numpy as np
 import shapely.geometry as sgeom
-from shapely.geometry import Point
 from shapely.geometry import mapping
 from shapely.prepared import prep
 
@@ -155,12 +154,12 @@ class MapPolygon(sgeom.MultiPolygon):
         对边界以外的数据进行遮罩处理
 
         Args:
-            lons (np.ndarray): 经度矩阵
-            lats (np.ndarray): 纬度矩阵
+            lons (np.ndarray): 经度矩阵（2维）
+            lats (np.ndarray): 纬度矩阵（2维）
             data (np.ndarray): 数据矩阵
 
         Returns:
-            np.ndarray: 遮罩后的数据矩阵
+            np.ma.MaskedArray: 遮罩后的数据矩阵
         """
 
         ndata = copy.deepcopy(data)
@@ -177,9 +176,8 @@ class MapPolygon(sgeom.MultiPolygon):
         生成边界以外的遮罩（掩膜）数组
 
         Args:
-            lons (np.ndarray): 经度矩阵
-            lats (np.ndarray): 纬度矩阵
-            data (np.ndarray): 数据矩阵
+            lons (np.ndarray): 经度矩阵（2维）
+            lats (np.ndarray): 纬度矩阵（2维）
 
         Returns:
             np.ndarray: 遮罩（掩膜）数组

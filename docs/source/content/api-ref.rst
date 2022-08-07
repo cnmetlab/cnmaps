@@ -39,6 +39,45 @@ maps模块主要存放与地图边界对象相关的类和函数。
             坐标范围点, 该值可直接传入 ``ax.set_extent()`` 使用
 
         :rtype: tuple
+
+    .. py:method:: to_file(savefp, engine = "GeoJSON", meta = {"id": None, "name": None}, encoding = "utf-8")
+
+        存储为文件
+
+        :param str savefp: 
+            保存路径
+
+        :param str engine: 
+            存储引擎，支持的选项为 ``'ESRI Shapefile'`` 和 ``'GeoJSON'``.默认为 ``'GeoJSON'`` .
+
+        :param dict meta: 
+            元信息. 默认为 ``{'id': 0, 'name': 'unknown'}`` .
+
+        :param str encoding: 编码类型. 默认为 ``'utf-8'`` .
+
+    .. py:method:: make_mask_array(lons, lats)
+
+        生成边界以外的遮罩（掩膜）数组
+
+        :param numpy.ndarray lons: 经度矩阵（2维）
+        :param numpy.ndarray lats: 纬度矩阵（2维）
+
+        :return:
+            由 ``True`` 和 ``False`` 组成的遮罩（掩膜）数组
+        :rtype: numpy.ndarray
+
+    .. py:method:: maskout(lons, lats, data)
+
+        对边界以外的数据进行遮罩处理
+
+        :param numpy.ndarray lons: 经度矩阵（2维）
+        :param numpy.ndarray lats: 纬度矩阵（2维）
+        :param numpy.ndarray data: 数据矩阵（2维）
+
+        :return:
+            遮罩后的数据矩阵
+        :rtype: numpy.ma.MaskedArray
+
         
 .. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德')
     :module: cnmaps.maps
@@ -83,11 +122,11 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :param str db:
         sqlite db文件路径. 默认从配置文件中取.
     :param str engine:
-        输出引擎, 默认为None, 输出为list列表, 目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象. 默认为 None.
+        输出引擎, 默认为 ``None`` , 输出为 ``list`` 列表, 目前支持 ``'geopandas'`` , 若为 ``'geopandas'``, 则返回 ``GeoDataFrame`` 对象. 默认为 ``None`` .
     :param str record:
-        返回记录的形式, 选项包括 ``'all'`` 和 ``'first'`` ; 若为 ``'first'`` , 则无论查询结果又几条，仅返回第一条记录, 若为 ``'all'`` , 则返回全部数据, 若 ``engine==None`` 则返回list, 若 ``engine=='geopandas'`` , 则返回GeoDataFrame对象. 默认为 ``'all'`` .
+        返回记录的形式, 选项包括 ``'all'`` 和 ``'first'`` ; 若为 ``'first'`` , 则无论查询结果又几条，仅返回第一条记录, 若为 ``'all'`` , 则返回全部数据, 若 ``engine==None`` 则返回 ``list``, 若 ``engine=='geopandas'`` , 则返回 ``GeoDataFrame`` 对象. 默认为 ``'all'`` .
     :param bool only_polygon:
-        是否仅返回地图边界对象(MapPolygon), 若为 ``True`` 则返回结果为MapPolygon对象或以MapPolygon对象组合的list, 若为 ``False`` , 则返回的结果包含元信息, MapPolygon对象存储在 ``'geometry'`` 键中. 默认为 ``False`` .
+        是否仅返回地图边界对象( ``MapPolygon`` ), 若为 ``True`` 则返回结果为 ``MapPolygon`` 对象或以 ``MapPolygon`` 对象组合的 ``list`` , 若为 ``False`` , 则返回的结果包含元信息, ``MapPolygon`` 对象存储在 ``'geometry'`` 键中. 默认为 ``False`` .
 
     :return:
         根据输入参数查找到的地图边界的元信息及边界对象
@@ -172,7 +211,7 @@ sample模块主要存放示例数据
     :module: cnmaps.sample
 
     :param str area_name:
-        区域名称, 目前仅支持 ``'京津冀'``, 若为None则取全国. 默认为 None.
+        区域名称, 目前仅支持 ``'京津冀'``, 若为 ``None`` 则取全国. 默认为 None.
 
     :return:
         (lons, lats, data)
