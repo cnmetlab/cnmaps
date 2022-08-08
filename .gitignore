@@ -139,3 +139,5 @@ tmp/
 scripts
 labdata/
 *.psd
+
+*.lprof
