@@ -21,20 +21,16 @@ jobs:
       - name: Install dependencies
         run: |
           conda env update --file environment.yml --name base
-          pip install -r requirements-dev.txt
+          pip install -r requirements/requirements-dev.txt
           python setup.py install
       - name: Lint with black
         run: |
           black --verbose --check .
-      - name: Collect converage
+      - name: Test with pytest and collect converage
         run: |
-          pytest --cov .
+          pytest --verbose -p no:warnings --cov .
       - name: Upload coverage reports to Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
           ./codecov -t ${{ secrets.CODECOV_TOKEN }}
-      - name: Test with pytest
-        run: |
-          pytest --verbose -p no:warnings .
-
