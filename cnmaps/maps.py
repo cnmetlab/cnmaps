@@ -1,7 +1,6 @@
 """地图类模块."""
 
 import os
-import json
 import sqlite3
 import copy
 from itertools import product
@@ -12,6 +11,8 @@ from shapely.geometry import mapping
 from shapely.prepared import prep
 import fiona
 import geojson
+import orjson
+
 
 from .geo import gcj02_to_wgs84
 
@@ -33,10 +34,9 @@ class MapPolygon(sgeom.MultiPolygon):
     并实现了对于加号操作符的支持.
     """
 
-    def __init__(self, *args, wgs84=True, **kwargs):
+    def __init__(self, *args, **kwargs):
         """实例化MapPolygon"""
         super().__init__(*args, **kwargs)
-        self.wgs84 = wgs84
 
     def __add__(self, other):
         """+ 支持."""
@@ -67,40 +67,33 @@ class MapPolygon(sgeom.MultiPolygon):
         for one, other in couples:
             if one.contains(other) and one != other:
                 polygons.remove(other)
-        try:
-            return MapPolygon(polygons, wgs84=map_polygon.wgs84)
-        except:
-            return MapPolygon(polygons)
+        return MapPolygon(polygons)
 
     def union(self, other):
         """并集."""
         union_result = super().union(other)
         if isinstance(union_result, sgeom.Polygon):
-            return MapPolygon([union_result], wgs84=self.wgs84)
+            return MapPolygon([union_result])
         elif isinstance(union_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(union_result, wgs84=self.wgs84))
+            return self.drop_inner_duplicate(MapPolygon(union_result))
 
     def difference(self, other):
         """差集."""
         difference_result = super().difference(other)
         if isinstance(difference_result, sgeom.Polygon):
-            return MapPolygon([difference_result], wgs84=self.wgs84)
+            return MapPolygon([difference_result])
         elif isinstance(difference_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(
-                MapPolygon(difference_result, wgs84=self.wgs84)
-            )
+            return self.drop_inner_duplicate(MapPolygon(difference_result))
 
     def intersection(self, other):
         """交集."""
         intersection_result = super().intersection(other)
         if isinstance(intersection_result, sgeom.Polygon):
-            return MapPolygon([intersection_result], wgs84=self.wgs84)
+            return MapPolygon([intersection_result])
         elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(
-                MapPolygon(intersection_result, wgs84=self.wgs84)
-            )
+            return self.drop_inner_duplicate(MapPolygon(intersection_result))
         else:
-            return MapPolygon(wgs84=self.wgs84)
+            return MapPolygon()
 
     def get_extent(self, buffer=2):
         """
@@ -275,7 +268,7 @@ def read_mapjson(fp, wgs84=True):
         MapPolygon: 地图边界对象
     """
     with open(fp, encoding="utf-8") as f:
-        map_json = json.load(f)
+        map_json = orjson.loads(f.read())
 
     if "geometry" in map_json:
         geometry = map_json["geometry"]
@@ -287,14 +280,12 @@ def read_mapjson(fp, wgs84=True):
         for _coords in geometry["coordinates"]:
             for coords in _coords:
                 if wgs84:
-                    single_coords = []
-                    for coord in coords:
-                        single_coords.append(gcj02_to_wgs84(*coord))
-                    polygon_list.append(sgeom.Polygon(single_coords))
+                    wgs84_coords = [gcj02_to_wgs84(*coord) for coord in coords]
+                    polygon_list.append(sgeom.Polygon(wgs84_coords))
                 else:
                     polygon_list.append(sgeom.Polygon(coords))
 
-        return MapPolygon(polygon_list, wgs84=wgs84)
+        return MapPolygon(polygon_list)
 
     elif geometry["type"] == "MultiLineString":
         return sgeom.MultiLineString(geometry["coordinates"])
