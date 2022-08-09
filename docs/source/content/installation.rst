@@ -1,9 +1,17 @@
 安装
 =====
-cnmaps依赖于 ``cartopy>=0.19.0`` ，因此在安装cnmaps之前请确保cartopy已安装，`cartopy的安装方法 <https://scitools.org.uk/cartopy/docs/latest/installing.html>`_ 。
+安装cnmaps建议使用Python的解释器在3.8版本及以上。
 
-在完成cartopy的安装以后，你可以使用pip来安装cnmaps： ``$ pip install cnmaps==1.0.1``
+使用conda安装
+--------------
+最简单的方法是使用conda安装： ``$ conda install -c conda-forge cnmaps``
 
-.. warning:: 由于cnmaps目前为探索和实验阶段，有些功能可能会随着版本的更新而发生巨大的变化，为了避免由于版本更新而导致代码不可用，请在安装时指定版本号。本文档是以 ``cnmaps==1.0.1`` 版本进行说明的，其他版本可能并不适用。
 
+使用pip安装
+-------------
+若要使用pip安装，则需要手动安装一些依赖：
 
+* cartopy: ``$ conda install -c conda-forge "cartopy>=0.20.0"``
+* fiona: ``$ conda install -c conda-forge "fiona>=1.8.21"``
+
+在完成上述依赖的安装以后，你可以使用pip来安装cnmaps： ``$ pip install -U cnmaps``
