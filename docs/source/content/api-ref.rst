@@ -39,7 +39,62 @@ maps模块主要存放与地图边界对象相关的类和函数。
             坐标范围点, 该值可直接传入 ``ax.set_extent()`` 使用
 
         :rtype: tuple
+
+    .. py:method:: to_file(savefp, engine = "GeoJSON", meta = {"id": None, "name": None}, encoding = "utf-8")
+
+        存储为文件
+
+        :param str savefp: 
+            保存路径
+
+        :param str engine: 
+            存储引擎，支持的选项为 ``'ESRI Shapefile'`` 和 ``'GeoJSON'``.默认为 ``'GeoJSON'`` .
+
+        :param dict meta: 
+            元信息. 默认为 ``{'id': 0, 'name': 'unknown'}`` .
+
+        :param str encoding: 编码类型. 默认为 ``'utf-8'`` .
+
+    .. py:method:: make_mask_array(lons, lats)
+
+        生成边界以外的遮罩（掩膜）数组
+
+        :param numpy.ndarray lons: 经度矩阵（2维）
+        :param numpy.ndarray lats: 纬度矩阵（2维）
+
+        :return:
+            由 ``True`` 和 ``False`` 组成的遮罩（掩膜）数组
+        :rtype: numpy.ndarray
+
+    .. py:method:: maskout(lons, lats, data)
+
+        对边界以外的数据进行遮罩处理
+
+        :param numpy.ndarray lons: 经度矩阵（2维）
+        :param numpy.ndarray lats: 纬度矩阵（2维）
+        :param numpy.ndarray data: 数据矩阵（2维）
+
+        :return:
+            遮罩后的数据矩阵
+        :rtype: numpy.ma.MaskedArray
         
+
+.. py:function:: read_mapjson(fp: str, wgs84=True)
+    :module: cnmaps.maps
+
+    读取geojson地图边界文件（仅对符合特定格式要求的geojson有效）
+
+    :param str fp:
+        geojson文件路径.
+    :param bool wgs84:
+        是否使用 WGS84 坐标，若为 True 则转为 WGS84 坐标，若为 False 则为原始的 GCJ02 坐标（火星坐标）
+
+    :return:
+        地图边界对象
+    :rtype:
+        cnmaps.maps.MapPolygon
+
+
 .. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德')
     :module: cnmaps.maps
 
@@ -63,7 +118,8 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
     :rtype: list
 
-.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德',db: str = DB_FILE, engine: str = None, record: str = 'all', only_polygon: bool = False, *args, **kwargs)
+
+.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德',db: str = DB_FILE, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool=True, *args, **kwargs)
     :module: cnmaps.maps
 
     获取行政地图的边界对象
@@ -88,6 +144,8 @@ maps模块主要存放与地图边界对象相关的类和函数。
         返回记录的形式, 选项包括 ``'all'`` 和 ``'first'`` ; 若为 ``'first'`` , 则无论查询结果又几条，仅返回第一条记录, 若为 ``'all'`` , 则返回全部数据, 若 ``engine==None`` 则返回list, 若 ``engine=='geopandas'`` , 则返回GeoDataFrame对象. 默认为 ``'all'`` .
     :param bool only_polygon:
         是否仅返回地图边界对象(MapPolygon), 若为 ``True`` 则返回结果为MapPolygon对象或以MapPolygon对象组合的list, 若为 ``False`` , 则返回的结果包含元信息, MapPolygon对象存储在 ``'geometry'`` 键中. 默认为 ``False`` .
+    :param bool wgs84:
+        是否使用 WGS84 坐标，若为 True 则转为 WGS84 坐标，若为 False 则为原始的 GCJ02 坐标（火星坐标）. 默认为 ``True``
 
     :return:
         根据输入参数查找到的地图边界的元信息及边界对象
