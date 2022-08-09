@@ -23,7 +23,7 @@ cnmaps使用指南
    :maxdepth: 3
 
    content/installation
-   content/quick-start
+   content/usage
    content/examples
    content/api-ref
    content/contributor-guide
