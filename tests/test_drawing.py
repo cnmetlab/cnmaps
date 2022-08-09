@@ -277,4 +277,4 @@ def test_projection():
 
 
 if __name__ == "__main__":
-    test_clip_scatter()
+    pass
