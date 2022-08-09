@@ -27,7 +27,7 @@
 
 文档编写
 -----------
-cnmaps的文档（也就是当前你正在阅读的这个文档）是使用Python语言的sphinx框架托管于GitHub并与Readthedocs.org集成实现的，若你想要完善文档，则可以fork本文档的代码仓库： `cnmaps-doc <https://github.com/Clarmy/cnmaps-doc>`_ ，在你本地进行修改和测试后向主仓库提交Pull Request，在我（们）审核之后会自动合并到主分支并进行构建发布。
+cnmaps的文档（也就是当前你正在阅读的这个文档）是使用Python语言的sphinx框架托管于GitHub并与Readthedocs.org集成实现的，若你想要完善文档，则可以fork本文档的代码仓库： `cnmaps <https://github.com/Clarmy/cnmaps>`_ ，在你本地进行修改和测试后向主仓库提交Pull Request，在我（们）审核之后会自动合并到主分支并进行构建发布。
 
 测试
 -----------

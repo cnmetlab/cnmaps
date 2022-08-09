@@ -40,8 +40,8 @@
 <img src="https://static.pepy.tech/personalized-badge/cnmaps?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Pypi%20Downloads"
  alt="Pypi Downloads" /></a>
   
-<a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/'>
-    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
+<a href='https://cnmaps.readthedocs.io/zh_CN/latest/'>
+    <img src='https://readthedocs.org/projects/cnmaps/badge/?version=latest' alt='Documentation Status' />
 </a>
   
 <a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
@@ -182,7 +182,7 @@ plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
 
 ## 使用指南
 
-针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps-doc.readthedocs.io/zh_CN/latest/index.html)
+针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)
 
 ## 引用
 
