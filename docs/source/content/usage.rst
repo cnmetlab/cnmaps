@@ -371,6 +371,8 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
 ------------------
 cnmaps 可以基于地图矢量数据对栅格格点数据进行遮罩（掩膜）操作，生成遮罩层对数据进行遮罩。
 
+下面的例子可以生成中国国界的遮罩数组。
+
 .. code:: python
 
     import numpy as np
@@ -388,3 +390,49 @@ cnmaps 可以基于地图矢量数据对栅格格点数据进行遮罩（掩膜�
     
 
 .. image:: ../_static/china-maskout-array.png
+
+我们也可以直接对栅格数据进行遮罩。
+
+.. code:: python
+
+    import numpy as np
+    from cnmaps import get_adm_maps
+    import matplotlib.pyplot as plt
+
+    lon = np.linspace(60, 150, 1000)
+    lat = np.linspace(0, 60, 1000)
+
+    lons, lats = np.meshgrid(lon, lat)
+    data = np.random.random(lons.shape)
+
+    china = get_adm_maps(level="国", record= "first", only_polygon=True, wgs84=True)
+
+    maskout_data = china.maskout(lons, lats, data)
+
+    plt.figure(figsize=(20,8))
+
+    plt.subplot(121)
+    plt.pcolormesh(lons, lats, data)
+    plt.title("no maskout")
+
+    plt.subplot(122)
+    plt.pcolormesh(lons, lats, maskout_data)
+    plt.title("maskout")
+    plt.show()
+
+.. image:: ../_static/china-maskout-data-compare.png
+
+
+
+输出矢量文件
+--------------
+cnmaps 支持将查询到的矢量边界输出为 GeoJSON 或 ESRI Shapefile 文件。
+
+.. code:: python
+
+    from cnmaps import get_adm_maps
+
+    china = get_adm_maps(level="国", record= "first", only_polygon=True, wgs84=True)
+
+    china.to_file('./china.geojson')  # 默认为 geojson 格式文件
+    china.to_file('./china.shp', engine='ESRI Shapefile')  # 也可以指定 shapefile 格式文件
