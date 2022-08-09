@@ -180,6 +180,18 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象, 可以通过 ``get_adm_maps()`` 获取
 
 
+.. py:function:: clip_quiver_by_map(quiver, map_polygon)
+    :module: cnmaps.drawing
+
+    使用地图边界对象对箭矢簇对象进行裁剪
+
+    :param matplotlib.quiver.Quiver quiver:
+        Quiver对象, 该对象是调用 ``ax.quiver()`` 方法的返回值，注意: 对象须带有投影信息
+                
+    :param cnmaps.maps.MapPolygon map_polygon:
+        地图边界对象, 可以通过 ``get_adm_maps()`` 获取
+
+
 .. py:function:: clip_clabels_by_map(clabel_text, map_polygon)
     :module: cnmaps.drawing
 
