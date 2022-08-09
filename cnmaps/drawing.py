@@ -185,6 +185,7 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
     for clip in clips:
         quiver.set_clip_path(clip)
 
+
 def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
     """
     使用地图边界对象对散点对象进行裁剪
