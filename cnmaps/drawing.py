@@ -186,6 +186,53 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
         quiver.set_clip_path(clip)
 
 
+def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
+    """
+    使用地图边界对象对散点对象进行裁剪
+
+    参数:
+        scatter (matplotlib.collections.PathCollection): PathCollection,
+                                           该对象是调用ax.scatter()方法的返回值
+                                           注意: 对象须带有投影信息
+        map_polygon (MapPolygon): 地图边界对象, 可以通过get_map()获取
+
+    示例:
+    >>> from cnmaps import get_adm_maps, clip_scatter_by_map, draw_map
+    >>> from cnmaps.sample import load_dem
+
+    >>> lons, lats, data = load_dem()
+    >>> u = np.full(data.shape, 1)
+    >>> v = np.full(data.shape, 1)
+
+    >>> fig = plt.figure(figsize=(10, 10))
+    >>> ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+
+    >>> map_polygon = get_adm_maps(
+        country='中华人民共和国', record='first', only_polygon=True)
+
+    >>> left, lower, right, upper = map_polygon.bounds
+
+    >>> lon = np.linspace(left, right, 50)
+    >>> lat = np.linspace(lower, upper, 50)
+
+    >>> _lons, _lats = np.meshgrid(lon, lat)
+
+    >>> lons = _lons.flatten()
+    >>> lats = _lats.flatten()
+
+    >>> data = np.random.random(lons.shape) * 10
+
+    >>> scatter = ax.scatter(lons, lats, s=data, transform=ccrs.PlateCarree())
+
+    >>> clip_scatter_by_map(scatter, map_polygon)
+    >>> draw_map(map_polygon, linewidth=1)
+    """
+    clips = _make_clip_path(map_polygon)
+
+    for clip in clips:
+        scatter.set_clip_path(clip)
+
+
 def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
     """
     剪切clabel文本, 一般配合contour函数使用

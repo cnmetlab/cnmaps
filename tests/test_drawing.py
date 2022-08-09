@@ -15,6 +15,7 @@ from cnmaps import (
     draw_map,
     clip_pcolormesh_by_map,
     clip_quiver_by_map,
+    clip_scatter_by_map,
 )
 from cnmaps.sample import load_dem
 
@@ -34,6 +35,41 @@ map_args = (
         for d in sample_districts
     ]
 )
+
+
+def test_clip_scatter():
+    """测试剪切散点图."""
+
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        left, lower, right, upper = map_polygon.bounds
+
+        lon = np.linspace(left, right, 50)
+        lat = np.linspace(lower, upper, 50)
+
+        _lons, _lats = np.meshgrid(lon, lat)
+
+        lons = _lons.flatten()
+        lats = _lats.flatten()
+
+        data = np.random.random(lons.shape) * 10
+
+        scatter = ax.scatter(lons, lats, s=data, transform=ccrs.PlateCarree())
+
+        clip_scatter_by_map(scatter, map_polygon)
+        draw_map(map_polygon, linewidth=1)
+        ax.set_extent(map_polygon.get_extent(buffer=1))
+        savefp = os.path.join("./tmp", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+    shutil.rmtree("./tmp")
 
 
 def test_clip_pcolormesh():
