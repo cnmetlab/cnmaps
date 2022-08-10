@@ -22,7 +22,6 @@ jobs:
         run: |
           conda env update --file environment.yml --name base
           pip install -r requirements/requirements-dev.txt
-          python setup.py install
       - name: Lint with black
         run: |
           black --verbose --check .
