@@ -30,7 +30,7 @@ class MapPolygon(sgeom.MultiPolygon):
     """
     地图多边形类
 
-    该是基于shapely.geometry.MultiPolygon的自定义类,
+    该类是基于shapely.geometry.MultiPolygon的自定义类,
     并实现了对于加号操作符的支持.
     """
 

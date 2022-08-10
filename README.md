@@ -40,8 +40,8 @@
 <img src="https://static.pepy.tech/personalized-badge/cnmaps?period=total&units=international_system&left_color=grey&right_color=orange&left_text=Pypi%20Downloads"
  alt="Pypi Downloads" /></a>
   
-<a href='https://cnmaps-doc.readthedocs.io/zh_CN/latest/'>
-    <img src='https://readthedocs.org/projects/cnmaps-doc/badge/?version=latest' alt='Documentation Status' />
+<a href='https://cnmaps.readthedocs.io/zh_CN/latest/'>
+    <img src='https://readthedocs.org/projects/cnmaps/badge/?version=latest' alt='Documentation Status' />
 </a>
   
 <a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
@@ -66,14 +66,19 @@
 </h4>
 
 ## 安装
+安装cnmaps建议使用Python的解释器在3.8版本及以上。
 
 ### 使用conda安装
-你可以使用conda进行安装cnmaps：`$ conda install -c conda-forge -y cnmaps`
+cnmaps最简单的安装方法是使用conda安装： ``$ conda install -c conda-forge cnmaps``
 
 ### 使用pip安装
-cnmaps依赖于`cartopy>=0.20.0`，因此如果使用pip安装，在安装cnmaps之前请确保cartopy已安装，[cartopy的安装方法](https://scitools.org.uk/cartopy/docs/latest/installing.html)。
+若要使用pip安装，则需要手动安装一些依赖：
 
-在完成cartopy的安装以后，你可以使用pip来安装cnmaps：`$ pip install -U cnmaps`
+* cartopy: `$ conda install -c conda-forge "cartopy>=0.20.0"`
+* fiona: `$ conda install -c conda-forge "fiona>=1.8.21"`
+
+在完成上述依赖的安装以后，你可以使用pip来安装cnmaps： `$ pip install -U cnmaps`
+
 
 ## 快速开始
 
@@ -177,7 +182,7 @@ plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
 
 ## 使用指南
 
-针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps-doc.readthedocs.io/zh_CN/latest/index.html)
+针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)
 
 ## 引用
 
