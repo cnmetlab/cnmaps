@@ -304,6 +304,8 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
 .. code:: python
 
     import numpy as np
+    import cartopy.crs as ccrs
+    import matplotlib.pyplot as plt
     from cnmaps import get_adm_maps, clip_quiver_by_map, clip_contours_by_map, draw_map
     from cnmaps.sample import load_wind
 
@@ -316,8 +318,8 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
     spd = (u ** 2 + v ** 2) ** 0.5
 
     qv = ax.quiver(lons, lats, u, v,transform=ccrs.PlateCarree(), zorder=2)
-    cs = ax.contourf(lons, lats, spd, cmap=plt.cm.RdYlBu_r, 
-                    levels=np.linspace(spd.min(), spd.max(), 50), 
+    cs = ax.contourf(lons, lats, spd, cmap=plt.cm.RdYlBu_r,
+                    levels=np.linspace(spd.min(), spd.max(), 50),
                     transform=ccrs.PlateCarree(), zorder=1)
 
     clip_contours_by_map(cs, map_polygon)
