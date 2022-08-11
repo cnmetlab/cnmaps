@@ -6,6 +6,7 @@ import shutil
 
 import fiona
 import numpy as np
+from geopandas import GeoDataFrame
 
 from cnmaps import (
     get_adm_maps,
@@ -84,6 +85,12 @@ def test_make_maskout_array():
 
     assert (china_maskout_array == mask_array).all()
 
+    with pytest.raises(ValueError):
+        china.make_mask_array(lon, lat)
+
+    with pytest.raises(ValueError):
+        china.make_mask_array(lons, lats[:-1])
+
 
 def test_mappolygon_to_file():
     """测试将MapPolygon保存为文件."""
@@ -125,6 +132,16 @@ def test_map_load():
     assert len(get_adm_maps(level="市")) == 370
     assert len(get_adm_maps(level="区县")) == 2875
 
+    assert isinstance(get_adm_maps(level="国", engine="geopandas"), GeoDataFrame)
+    assert isinstance(get_adm_maps(level="省", engine="geopandas"), GeoDataFrame)
+    assert isinstance(get_adm_maps(level="市", engine="geopandas"), GeoDataFrame)
+    assert isinstance(get_adm_maps(level="区县", engine="geopandas"), GeoDataFrame)
+
+    assert len(get_adm_maps(level="国", engine="geopandas")) == 2
+    assert len(get_adm_maps(level="省", engine="geopandas")) == 34
+    assert len(get_adm_maps(level="市", engine="geopandas")) == 370
+    assert len(get_adm_maps(level="区县", engine="geopandas")) == 2875
+
     beijing = get_adm_maps(province="北京市")[0]
     assert (
         beijing["省/直辖市"] == "北京市"
@@ -145,6 +162,28 @@ def test_map_load():
     assert len(get_adm_maps(city="北京市", level="区县")) == 16
     assert len(get_adm_maps(province="河南省", level="市")) == 18
     assert len(get_adm_maps(city="郑州市", level="区县")) == 12
+
+    assert len(get_adm_maps(city="北京市", district="朝阳区", engine="geopandas")) == 1
+    assert len(get_adm_maps(city="北京市", level="区县", engine="geopandas")) == 16
+    assert len(get_adm_maps(province="河南省", level="市", engine="geopandas")) == 18
+    assert len(get_adm_maps(city="郑州市", level="区县", engine="geopandas")) == 12
+
+    with pytest.raises(MapNotFoundError):
+        get_adm_maps(country="法国")
+
+    with pytest.raises(MapNotFoundError):
+        get_adm_maps(province="麻省")
+
+    with pytest.raises(MapNotFoundError):
+        get_adm_maps(city="纽约市")
+
+    with pytest.raises(MapNotFoundError):
+        get_adm_maps(district="曼哈顿")
+
+    with pytest.raises(ValueError):
+        get_adm_maps(level="郡")
+
+    get_adm_maps(only_polygon=True, engine="geopandas")
 
 
 def test_map_operator():
