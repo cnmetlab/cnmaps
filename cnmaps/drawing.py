@@ -19,55 +19,25 @@ from .maps import MapPolygon
 def _make_clip_path(map_polygon):
     vertices = []
     codes = []
-    ax = plt.gca()
     clips = []
-    crs = ccrs.PlateCarree()
-    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
+
+    ax = plt.gca()
+    crs_from = ccrs.PlateCarree()
+    crs_to = ax.projection
+    if crs_from != crs_to:
+        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
+        map_polygon = sops.transform(transformer.transform, map_polygon)
 
     for polygon in map_polygon.geoms:
-        try:
-            coords = polygon.boundary.coords
-        except NotImplementedError:
-            # 针对图形中出现了洞的情况的处理
-            exterior_coords = polygon.exterior.coords
-            interiors = polygon.interiors
-            exterior_prt = len(exterior_coords)
-            for coord in exterior_coords:
-                try:
-                    trans_coord = transformer.transform(*coord)
-                except AttributeError:
-                    trans_coord = coord
-                vertices.append(trans_coord)
-            codes += [mpath.Path.MOVETO]
-            codes += [mpath.Path.LINETO] * (exterior_prt - 2)
-            codes += [mpath.Path.CLOSEPOLY]
-            for interior in interiors:
-                interior_coords = interior.coords
-                interior_prt = len(interior_coords)
-                for coord in interior_coords:
-                    try:
-                        trans_coord = transformer.transform(*coord)
-                    except AttributeError:
-                        trans_coord = coord
-                    vertices.append(trans_coord)
-                codes += [mpath.Path.MOVETO]
-                codes += [mpath.Path.LINETO] * (interior_prt - 2)
-                codes += [mpath.Path.CLOSEPOLY]
-
-            clip = mpath.Path(vertices, codes)
-        else:
-            prt = len(coords)
-            for coord in coords:
-                try:
-                    trans_coord = transformer.transform(*coord)
-                except AttributeError:
-                    trans_coord = coord
-                vertices.append(trans_coord)
-            codes += [mpath.Path.MOVETO]
-            codes += [mpath.Path.LINETO] * (prt - 2)
-            codes += [mpath.Path.CLOSEPOLY]
-            clip = mpath.Path(vertices, codes)
-        clip = mpatches.PathPatch(clip, transform=ax.transData)
+        coords = polygon.boundary.coords
+        prt = len(coords)
+        for coord in coords:
+            vertices.append(coord)
+        codes += [mpath.Path.MOVETO]
+        codes += [mpath.Path.LINETO] * (prt - 2)
+        codes += [mpath.Path.CLOSEPOLY]
+        _clip = mpath.Path(vertices, codes)
+        clip = mpatches.PathPatch(_clip, transform=ax.transData)
 
         clips.append(clip)
 
@@ -273,47 +243,22 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
     >>> draw_map(map_polygon, color='k')
     """
     ax = plt.gca()
-    crs = ccrs.PlateCarree()
-    transformer = Transformer.from_crs(crs, ax.projection, always_xy=True)
+    crs_from = ccrs.PlateCarree()
+    crs_to = ax.projection
+    if crs_from != crs_to:
+        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
+        map_polygon = sops.transform(transformer.transform, map_polygon)
 
     for cbt in clabel_text:
         cbt.set_visible(False)
 
     for polygon in map_polygon.geoms:
         vertices = []
-        try:
-            coords = polygon.boundary.coords
-        except NotImplementedError:
-            holes = []
-            # 针对图形中出现了洞的情况的处理
-            exterior_coords = polygon.exterior.coords
-            interiors = polygon.interiors
-            for coord in exterior_coords:
-                try:
-                    trans_coord = transformer.transform(*coord)
-                except AttributeError:
-                    trans_coord = coord
-                vertices.append(trans_coord)
-            for interior in interiors:
-                hole = []
-                interior_coords = interior.coords
-                for coord in interior_coords:
-                    try:
-                        trans_coord = transformer.transform(*coord)
-                    except AttributeError:
-                        trans_coord = coord
-                    hole.append(trans_coord)
-                holes.append(hole)
-            _polygon = sgeom.Polygon(vertices, holes=holes)
-        else:
-            for coord in coords:
-                try:
-                    trans_coord = transformer.transform(*coord)
-                except AttributeError:
-                    trans_coord = coord
-                vertices.append(trans_coord)
+        coords = polygon.boundary.coords
+        for coord in coords:
+            vertices.append(coord)
 
-            _polygon = sgeom.Polygon(vertices)
+        _polygon = sgeom.Polygon(vertices)
 
         for cbt in clabel_text:
             if _polygon.contains(sgeom.Point(cbt.get_position())):
