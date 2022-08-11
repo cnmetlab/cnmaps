@@ -13,11 +13,12 @@ from cnmaps import (
     clip_clabels_by_map,
     clip_contours_by_map,
     draw_map,
+    draw_maps,
     clip_pcolormesh_by_map,
     clip_quiver_by_map,
     clip_scatter_by_map,
 )
-from cnmaps.sample import load_dem
+from cnmaps.sample import load_dem, load_temp, load_wind
 
 provinces = get_adm_names(level="省")
 cities = get_adm_names(level="市")
@@ -25,7 +26,8 @@ districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
 map_args = (
-    [
+    [{"only_polygon": True, "record": "first", "name": "中华人民共和国"}]
+    + [
         {"province": p, "only_polygon": True, "record": "first", "name": p}
         for p in provinces
     ]
@@ -35,6 +37,54 @@ map_args = (
         for d in sample_districts
     ]
 )
+
+
+def test_draw_maps():
+    """测试多地图绘制功能"""
+    map_args = (
+        [{"level": "国", "name": "中华人民共和国"}]
+        + [{"level": "省", "name": "中华人民共和国-分省"}]
+        + [{"province": p, "level": "市", "name": p} for p in provinces]
+        + [{"city": c, "level": "区县", "name": c} for c in cities]
+    )
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        draw_maps(map_polygon, linewidth=1)
+        savefp = os.path.join("./tmp", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+    shutil.rmtree("./tmp")
+
+    map_args = (
+        [{"level": "国", "engine": "geopandas", "name": "中华人民共和国"}]
+        + [{"level": "省", "engine": "geopandas", "name": "中华人民共和国-分省"}]
+        + [
+            {"province": p, "level": "市", "engine": "geopandas", "name": p}
+            for p in provinces
+        ]
+        + [{"city": c, "level": "区县", "engine": "geopandas", "name": c} for c in cities]
+    )
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        draw_maps(map_polygon, linewidth=1)
+        savefp = os.path.join("./tmp", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+    shutil.rmtree("./tmp")
 
 
 def test_clip_scatter():
@@ -105,7 +155,7 @@ def test_clip_pcolormesh():
 
 def test_clip_contour():
     """测试剪切等值线."""
-    lons, lats, data = load_dem()
+    lons, lats, data = load_temp()
 
     for map_arg in map_args:
         name = map_arg["name"]
@@ -119,7 +169,7 @@ def test_clip_contour():
             lats,
             data,
             colors="b",
-            levels=np.linspace(-2800, data.max(), 5),
+            levels=np.linspace(-30, 40, 10),
             transform=ccrs.PlateCarree(),
         )
 
@@ -136,7 +186,7 @@ def test_clip_contour():
 
 def test_clip_contourf():
     """测试切割填色等值线."""
-    lons, lats, data = load_dem()
+    lons, lats, data = load_temp()
 
     for map_arg in map_args:
         name = map_arg["name"]
@@ -150,7 +200,7 @@ def test_clip_contourf():
             lats,
             data,
             cmap=plt.cm.terrain,
-            levels=np.linspace(-2800, data.max(), 5),
+            levels=np.linspace(-30, 40, 10),
             transform=ccrs.PlateCarree(),
         )
 
@@ -167,10 +217,7 @@ def test_clip_contourf():
 
 def test_clip_quiver():
     """测试切割箭矢簇."""
-    lons, lats, data = load_dem()
-
-    u = np.full(data.shape, 1)
-    v = np.full(data.shape, 1)
+    lons, lats, u, v = load_wind()
 
     for map_arg in map_args:
         name = map_arg["name"]
@@ -198,7 +245,7 @@ def test_clip_clabel():
     """测试切割等值线标签."""
     lons, lats, data = load_dem()
 
-    map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
+    map_polygon = get_adm_maps(record="first", only_polygon=True)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(
