@@ -61,7 +61,7 @@ class MapPolygon(sgeom.MultiPolygon):
         返回值:
             MapPolygon: 清理后的地图边界对象
         """
-        polygons = list(map_polygon)
+        polygons = list(map_polygon.geoms)
         couples = [couple for couple in product(polygons, repeat=2)]
 
         for one, other in couples:
@@ -178,15 +178,18 @@ class MapPolygon(sgeom.MultiPolygon):
         生成边界以外的遮罩（掩膜）数组
 
         Args:
-            lons (np.ndarray): 经度矩阵
-            lats (np.ndarray): 纬度矩阵
-            data (np.ndarray): 数据矩阵
+            lons (np.ndarray): 经度矩阵（2维）
+            lats (np.ndarray): 纬度矩阵（2维）
 
         Returns:
             np.ndarray: 遮罩（掩膜）数组
         """
         x = np.atleast_1d(lons)
         y = np.atleast_1d(lats)
+
+        if len(x.shape) != 2 or len(y.shape) != 2:
+            raise ValueError("x或y不是2维数组")
+
         if x.shape != y.shape:
             raise ValueError("x和y的形状不匹配")
         prepared = prep(self)

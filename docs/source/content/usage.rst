@@ -251,6 +251,9 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
 
 .. code:: python
 
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import cartopy.crs as ccrs
     from cnmaps import get_adm_maps, clip_contours_by_map, draw_map
     from cnmaps.sample import load_dem
 
@@ -296,10 +299,43 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
 
 .. image:: ../_static/clip-china-pcolormesh.png
 
+剪切箭矢簇(quiver)图
+
+.. code:: python
+
+    import numpy as np
+    from cnmaps import get_adm_maps, clip_quiver_by_map, clip_contours_by_map, draw_map
+    from cnmaps.sample import load_wind
+
+    lons, lats, u, v = load_wind()
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    map_polygon = get_adm_maps(country='中华人民共和国', record='first', only_polygon=True)
+
+    spd = (u ** 2 + v ** 2) ** 0.5
+
+    qv = ax.quiver(lons, lats, u, v,transform=ccrs.PlateCarree(), zorder=2)
+    cs = ax.contourf(lons, lats, spd, cmap=plt.cm.RdYlBu_r, 
+                    levels=np.linspace(spd.min(), spd.max(), 50), 
+                    transform=ccrs.PlateCarree(), zorder=1)
+
+    clip_contours_by_map(cs, map_polygon)
+    clip_quiver_by_map(qv, map_polygon)
+
+    draw_map(map_polygon, color='k', linewidth=1)
+
+    plt.show()
+
+.. image:: ../_static/clip-china-quiver.png
+
 剪切等值线clabel
 
 .. code:: python
 
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import cartopy.crs as ccrs
     from cnmaps import get_adm_maps, clip_clabels_by_map, clip_contours_by_map, draw_map
     from cnmaps.sample import load_dem
 

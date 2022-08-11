@@ -238,13 +238,10 @@ sample
 ==========
 sample模块主要存放示例数据
 
-.. py:function:: load_dem(area_name, **kwargs)
+.. py:function:: load_dem()
     :module: cnmaps.sample
 
     加载中国地区的 DEM 海拔样例数据
-
-    :param str area_name:
-        区域名称, 目前仅支持 ``'京津冀'``, 若为None则取全国. 默认为 None.
 
     :return:
         (lons, lats, data)
