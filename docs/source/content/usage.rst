@@ -331,6 +331,40 @@ cnmaps可以很方便地对地图进行合并，例如我们可以将北京、�
 
 .. image:: ../_static/clip-china-quiver.png
 
+剪切散点（scatter）图
+
+.. code:: python
+
+    import numpy as np
+    import cartopy.crs as ccrs
+    import matplotlib.pyplot as plt
+
+    from cnmaps import get_adm_maps, clip_scatter_by_map, draw_map
+    from cnmaps.sample import load_wind
+
+    lons, lats, u, v = load_wind()
+    spd = (u ** 2 + v ** 2) ** 0.5
+
+    data = list(zip(lons.flatten(), lats.flatten(), spd.flatten()))
+
+    x = [s[0] for s in data]
+    y = [s[1] for s in data]
+    z = [s[2] for s in data]
+
+    map_polygon = get_adm_maps(record='first', only_polygon=True)
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    scatter = ax.scatter(x, y, s=np.array(z)*10, c=z, 
+                         cmap=plt.cm.RdYlBu_r, transform=ccrs.PlateCarree())
+    clip_scatter_by_map(scatter, map_polygon)
+    draw_map(map_polygon, linewidth=1)
+    ax.set_extent(map_polygon.get_extent(buffer=1))
+
+    plt.show()
+
+.. image:: ../_static/clip-china-scatter.png
+
 剪切等值线clabel
 
 .. code:: python
