@@ -60,7 +60,7 @@ map_args = (
 )
 
 
-def test_draw_maps():
+def test_draw_maps(benchmark):
     """测试多地图绘制功能"""
     map_args = (
         [{"level": "国", "name": "中华人民共和国", "simplify": True}]
@@ -70,24 +70,7 @@ def test_draw_maps():
             for p in provinces
         ]
         + [{"city": c, "level": "区县", "name": c, "simplify": True} for c in cities]
-    )
-    for map_arg in map_args:
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        draw_maps(map_polygon, linewidth=1)
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-    shutil.rmtree("./tmp")
-
-    map_args = (
-        [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
+        + [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
         + [
             {
                 "level": "省",
@@ -117,209 +100,236 @@ def test_draw_maps():
             for c in cities
         ]
     )
-    for map_arg in map_args:
-        name = map_arg["name"]
 
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
+    def inner(map_args):
+        for map_arg in map_args:
+            name = map_arg["name"]
 
-        draw_maps(map_polygon, linewidth=1)
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
 
-    shutil.rmtree("./tmp")
+            draw_maps(map_polygon, linewidth=1)
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
+
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
 
 
-def test_clip_scatter():
+def test_clip_scatter(benchmark):
     """测试剪切散点图."""
 
-    for map_arg in map_args:
-        name = map_arg["name"]
+    def inner(map_args):
+        for map_arg in map_args:
+            name = map_arg["name"]
 
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
 
-        left, lower, right, upper = map_polygon.bounds
+            left, lower, right, upper = map_polygon.bounds
 
-        lon = np.linspace(left, right, 50)
-        lat = np.linspace(lower, upper, 50)
+            lon = np.linspace(left, right, 50)
+            lat = np.linspace(lower, upper, 50)
 
-        _lons, _lats = np.meshgrid(lon, lat)
+            _lons, _lats = np.meshgrid(lon, lat)
 
-        lons = _lons.flatten()
-        lats = _lats.flatten()
+            lons = _lons.flatten()
+            lats = _lats.flatten()
 
-        data = np.random.random(lons.shape) * 10
+            data = np.random.random(lons.shape) * 10
 
-        scatter = ax.scatter(lons, lats, s=data, transform=ccrs.PlateCarree())
+            scatter = ax.scatter(lons, lats, s=data, transform=ccrs.PlateCarree())
 
-        clip_scatter_by_map(scatter, map_polygon)
-        draw_map(map_polygon, linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
+            clip_scatter_by_map(scatter, map_polygon)
+            draw_map(map_polygon, linewidth=1)
+            ax.set_extent(map_polygon.get_extent(buffer=1))
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
 
-    shutil.rmtree("./tmp")
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
 
 
-def test_clip_pcolormesh():
+def test_clip_pcolormesh(benchmark):
     """测试剪切格点图."""
-    lons, lats, data = load_dem()
 
-    for map_arg in map_args:
-        name = map_arg["name"]
+    def inner(map_args):
+        lons, lats, data = load_dem()
 
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
+        for map_arg in map_args:
+            name = map_arg["name"]
 
-        mesh = ax.pcolormesh(
-            lons,
-            lats,
-            data,
-            cmap=plt.cm.terrain,
-            transform=ccrs.PlateCarree(),
-            shading="auto",
-        )
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
 
-        clip_pcolormesh_by_map(mesh, map_polygon)
-        draw_map(map_polygon, linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
+            mesh = ax.pcolormesh(
+                lons,
+                lats,
+                data,
+                cmap=plt.cm.terrain,
+                transform=ccrs.PlateCarree(),
+                shading="auto",
+            )
 
-    shutil.rmtree("./tmp")
+            clip_pcolormesh_by_map(mesh, map_polygon)
+            draw_map(map_polygon, linewidth=1)
+            ax.set_extent(map_polygon.get_extent(buffer=1))
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
+
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
 
 
-def test_clip_contour():
+def test_clip_contour(benchmark):
     """测试剪切等值线."""
-    lons, lats, data = load_temp()
 
-    for map_arg in map_args:
-        name = map_arg["name"]
+    def inner(map_args):
+        lons, lats, data = load_temp()
 
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
+        for map_arg in map_args:
+            name = map_arg["name"]
 
-        cs = ax.contour(
-            lons,
-            lats,
-            data,
-            colors="b",
-            levels=np.linspace(-30, 40, 10),
-            transform=ccrs.PlateCarree(),
-        )
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
 
-        clip_contours_by_map(cs, map_polygon)
-        draw_map(map_polygon, color="k", linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
+            cs = ax.contour(
+                lons,
+                lats,
+                data,
+                colors="b",
+                levels=np.linspace(-30, 40, 10),
+                transform=ccrs.PlateCarree(),
+            )
 
-    shutil.rmtree("./tmp")
+            clip_contours_by_map(cs, map_polygon)
+            draw_map(map_polygon, color="k", linewidth=1)
+            ax.set_extent(map_polygon.get_extent(buffer=1))
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
+
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
 
 
-def test_clip_contourf():
+def test_clip_contourf(benchmark):
     """测试切割填色等值线."""
-    lons, lats, data = load_temp()
 
-    for map_arg in map_args:
-        name = map_arg["name"]
+    def inner(map_args):
+        lons, lats, data = load_temp()
 
+        for map_arg in map_args:
+            name = map_arg["name"]
+
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
+
+            cs = ax.contourf(
+                lons,
+                lats,
+                data,
+                cmap=plt.cm.terrain,
+                levels=np.linspace(-30, 40, 10),
+                transform=ccrs.PlateCarree(),
+            )
+
+            clip_contours_by_map(cs, map_polygon)
+            draw_map(map_polygon, color="k", linewidth=1)
+            ax.set_extent(map_polygon.get_extent(buffer=1))
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
+
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
+
+
+def test_clip_quiver(benchmark):
+    """测试切割箭矢簇."""
+
+    def inner(map_args):
+        lons, lats, u, v = load_wind()
+
+        for map_arg in map_args:
+            name = map_arg["name"]
+
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            map_polygon = get_adm_maps(**map_arg)
+
+            quiver = ax.quiver(
+                lons, lats, u, v, transform=ccrs.PlateCarree(), units="inches", scale=10
+            )
+
+            clip_quiver_by_map(quiver, map_polygon)
+            draw_map(map_polygon, color="k", linewidth=1)
+            ax.set_extent(map_polygon.get_extent(buffer=1))
+            savefp = os.path.join("./tmp", f"{name}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
+
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, map_args)
+
+
+def test_clip_clabel(benchmark):
+    """测试切割等值线标签."""
+
+    def inner():
+        lons, lats, data = load_dem()
+
+        map_polygon = get_adm_maps(record="first", only_polygon=True)
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        cs = ax.contourf(
+        contours = ax.contour(
             lons,
             lats,
             data,
             cmap=plt.cm.terrain,
-            levels=np.linspace(-30, 40, 10),
+            levels=np.linspace(-2500, data.max(), 5),
             transform=ccrs.PlateCarree(),
         )
-
-        clip_contours_by_map(cs, map_polygon)
-        draw_map(map_polygon, color="k", linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-    shutil.rmtree("./tmp")
-
-
-def test_clip_quiver():
-    """测试切割箭矢簇."""
-    lons, lats, u, v = load_wind()
-
-    for map_arg in map_args:
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        quiver = ax.quiver(
-            lons, lats, u, v, transform=ccrs.PlateCarree(), units="inches", scale=10
+        clip_contours_by_map(contours, map_polygon)
+        clabels = ax.clabel(
+            contours, levels=contours.levels, colors="k", fmt="%i", inline=True
         )
+        clip_clabels_by_map(clabels, map_polygon)
+        draw_map(map_polygon, color="k")
+        ax.coastlines()
 
-        clip_quiver_by_map(quiver, map_polygon)
-        draw_map(map_polygon, color="k", linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "clipped_clabels.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
+
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
 
-    shutil.rmtree("./tmp")
+        shutil.rmtree("./tmp")
+
+    benchmark(inner)
 
 
-def test_clip_clabel():
-    """测试切割等值线标签."""
-    lons, lats, data = load_dem()
-
-    map_polygon = get_adm_maps(record="first", only_polygon=True)
-    fig = plt.figure(figsize=(10, 10))
-    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-    contours = ax.contour(
-        lons,
-        lats,
-        data,
-        cmap=plt.cm.terrain,
-        levels=np.linspace(-2500, data.max(), 5),
-        transform=ccrs.PlateCarree(),
-    )
-    clip_contours_by_map(contours, map_polygon)
-    clabels = ax.clabel(
-        contours, levels=contours.levels, colors="k", fmt="%i", inline=True
-    )
-    clip_clabels_by_map(clabels, map_polygon)
-    draw_map(map_polygon, color="k")
-    ax.coastlines()
-
-    savefp = os.path.join("./tmp", "clipped_clabels.png")
-    os.makedirs(os.path.dirname(savefp), exist_ok=True)
-
-    plt.savefig(savefp, bbox_inches="tight")
-    plt.close()
-
-    shutil.rmtree("./tmp")
-
-
-def test_projection():
+def test_projection(benchmark):
     """测试不同投影."""
     PROJECTIONS = [
         ccrs.Orthographic(central_longitude=100),
@@ -341,32 +351,37 @@ def test_projection():
         ccrs.NorthPolarStereo(central_longitude=100),
     ]
 
-    lons, lats, data = load_dem()
+    def inner(PROJECTIONS):
+        lons, lats, data = load_dem()
 
-    for projection in PROJECTIONS:
-        map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=projection)
-        contours = ax.contourf(
-            lons,
-            lats,
-            data,
-            cmap=plt.cm.terrain,
-            levels=np.linspace(-2500, data.max(), 5),
-            transform=ccrs.PlateCarree(),
-        )
-        clip_contours_by_map(contours, map_polygon)
-        draw_map(map_polygon, color="r")
-        ax.coastlines()
-        ax.set_global()
+        for projection in PROJECTIONS:
+            map_polygon = get_adm_maps(
+                province="河南省", record="first", only_polygon=True
+            )
+            fig = plt.figure(figsize=(10, 10))
+            ax = fig.add_subplot(111, projection=projection)
+            contours = ax.contourf(
+                lons,
+                lats,
+                data,
+                cmap=plt.cm.terrain,
+                levels=np.linspace(-2500, data.max(), 5),
+                transform=ccrs.PlateCarree(),
+            )
+            clip_contours_by_map(contours, map_polygon)
+            draw_map(map_polygon, color="r")
+            ax.coastlines()
+            ax.set_global()
 
-        savefp = os.path.join("./tmp", f"{uuid.uuid4().hex}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+            savefp = os.path.join("./tmp", f"{uuid.uuid4().hex}.png")
+            os.makedirs(os.path.dirname(savefp), exist_ok=True)
 
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
+            plt.savefig(savefp, bbox_inches="tight")
+            plt.close()
 
-    shutil.rmtree("./tmp")
+        shutil.rmtree("./tmp")
+
+    benchmark(inner, PROJECTIONS)
 
 
 if __name__ == "__main__":
