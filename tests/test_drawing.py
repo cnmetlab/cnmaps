@@ -26,14 +26,35 @@ districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
 map_args = (
-    [{"only_polygon": True, "record": "first", "name": "中华人民共和国"}]
+    [{"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}]
     + [
-        {"province": p, "only_polygon": True, "record": "first", "name": p}
+        {
+            "province": p,
+            "only_polygon": True,
+            "record": "first",
+            "name": p,
+            "simplify": True,
+        }
         for p in provinces
     ]
-    + [{"city": c, "only_polygon": True, "record": "first", "name": c} for c in cities]
     + [
-        {"district": d, "only_polygon": True, "record": "first", "name": d}
+        {
+            "city": c,
+            "only_polygon": True,
+            "record": "first",
+            "name": c,
+            "simplify": True,
+        }
+        for c in cities
+    ]
+    + [
+        {
+            "district": d,
+            "only_polygon": True,
+            "record": "first",
+            "name": d,
+            "simplify": True,
+        }
         for d in sample_districts
     ]
 )
@@ -42,10 +63,13 @@ map_args = (
 def test_draw_maps():
     """测试多地图绘制功能"""
     map_args = (
-        [{"level": "国", "name": "中华人民共和国"}]
-        + [{"level": "省", "name": "中华人民共和国-分省"}]
-        + [{"province": p, "level": "市", "name": p} for p in provinces]
-        + [{"city": c, "level": "区县", "name": c} for c in cities]
+        [{"level": "国", "name": "中华人民共和国", "simplify": True}]
+        + [{"level": "省", "name": "中华人民共和国-分省", "simplify": True}]
+        + [
+            {"province": p, "level": "市", "name": p, "simplify": True}
+            for p in provinces
+        ]
+        + [{"city": c, "level": "区县", "name": c, "simplify": True} for c in cities]
     )
     for map_arg in map_args:
         name = map_arg["name"]
@@ -63,13 +87,35 @@ def test_draw_maps():
     shutil.rmtree("./tmp")
 
     map_args = (
-        [{"level": "国", "engine": "geopandas", "name": "中华人民共和国"}]
-        + [{"level": "省", "engine": "geopandas", "name": "中华人民共和国-分省"}]
+        [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
         + [
-            {"province": p, "level": "市", "engine": "geopandas", "name": p}
+            {
+                "level": "省",
+                "engine": "geopandas",
+                "name": "中华人民共和国-分省",
+                "simplify": True,
+            }
+        ]
+        + [
+            {
+                "province": p,
+                "level": "市",
+                "engine": "geopandas",
+                "name": p,
+                "simplify": True,
+            }
             for p in provinces
         ]
-        + [{"city": c, "level": "区县", "engine": "geopandas", "name": c} for c in cities]
+        + [
+            {
+                "city": c,
+                "level": "区县",
+                "engine": "geopandas",
+                "name": c,
+                "simplify": True,
+            }
+            for c in cities
+        ]
     )
     for map_arg in map_args:
         name = map_arg["name"]

@@ -355,7 +355,7 @@ def get_adm_maps(
     record: str = "all",
     only_polygon: bool = False,
     wgs84=True,
-    simplify=True,
+    simplify=False,
     *args,
     **kwargs,
 ):
