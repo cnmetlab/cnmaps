@@ -48,7 +48,7 @@ jobs:
         with:
           name: cnmaps Benchmark
           tool: "pytest"
-          output-file-path: python/cnmaps/output.json
+          output-file-path: output.json
           github-token: ${{ secrets.CI_TOKEN }}
           gh-repository: "github.com/cnmetlab/cnmaps"
           auto-push: true
