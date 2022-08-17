@@ -25,39 +25,18 @@ cities = get_adm_names(level="市")
 districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
-map_args = (
-    [{"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}]
-    + [
-        {
-            "province": p,
-            "only_polygon": True,
-            "record": "first",
-            "name": p,
-            "simplify": True,
-        }
-        for p in provinces
-    ]
-    + [
-        {
-            "city": c,
-            "only_polygon": True,
-            "record": "first",
-            "name": c,
-            "simplify": True,
-        }
-        for c in cities
-    ]
-    + [
-        {
-            "district": d,
-            "only_polygon": True,
-            "record": "first",
-            "name": d,
-            "simplify": True,
-        }
-        for d in sample_districts
-    ]
-)
+map_args = [
+    {"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}
+] + [
+    {
+        "province": p,
+        "only_polygon": True,
+        "record": "first",
+        "name": p,
+        "simplify": True,
+    }
+    for p in provinces
+]
 
 
 def test_draw_maps(benchmark):
@@ -65,11 +44,6 @@ def test_draw_maps(benchmark):
     map_args = (
         [{"level": "国", "name": "中华人民共和国", "simplify": True}]
         + [{"level": "省", "name": "中华人民共和国-分省", "simplify": True}]
-        + [
-            {"province": p, "level": "市", "name": p, "simplify": True}
-            for p in provinces
-        ]
-        + [{"city": c, "level": "区县", "name": c, "simplify": True} for c in cities]
         + [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
         + [
             {
@@ -79,26 +53,6 @@ def test_draw_maps(benchmark):
                 "simplify": True,
             }
         ]
-        + [
-            {
-                "province": p,
-                "level": "市",
-                "engine": "geopandas",
-                "name": p,
-                "simplify": True,
-            }
-            for p in provinces
-        ]
-        + [
-            {
-                "city": c,
-                "level": "区县",
-                "engine": "geopandas",
-                "name": c,
-                "simplify": True,
-            }
-            for c in cities
-        ]
     )
 
     def inner(map_args):
@@ -106,7 +60,7 @@ def test_draw_maps(benchmark):
             name = map_arg["name"]
 
             fig = plt.figure(figsize=(10, 10))
-            ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+            fig.add_subplot(111, projection=ccrs.PlateCarree())
             map_polygon = get_adm_maps(**map_arg)
 
             draw_maps(map_polygon, linewidth=1)
