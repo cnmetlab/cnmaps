@@ -16,12 +16,14 @@ from pyproj import Transformer
 
 from .maps import MapPolygon
 
+
 def _transform_polygon(map_polygon, crs_from, crs_to):
     if crs_from == crs_to:
         return map_polygon
     else:
         transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
         return transform(transformer.transform, map_polygon)
+
 
 def _make_clip_path(map_polygon):
     ax = plt.gca()
@@ -32,6 +34,7 @@ def _make_clip_path(map_polygon):
     clip = mpatches.PathPatch(path, transform=ax.transData)
 
     return clip
+
 
 def clip_contours_by_map(contours, map_polygon: MapPolygon):
     """
@@ -234,6 +237,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
         point = sgeom.Point(cbt.get_position())
         if not map_polygon.contains(point):
             cbt.set_visible(False)
+
 
 def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
     """

@@ -169,9 +169,21 @@ class MapPolygon(sgeom.MultiPolygon):
         if not isinstance(ndata, np.ma.MaskedArray):
             ndata = np.ma.MaskedArray(ndata)
 
-        ndata.mask = ~contains(self, lons, lats)
+        ndata.mask = self.make_mask_array(lons, lats)
 
         return ndata
+
+    def make_mask_array(self, lons: np.ndarray, lats: np.ndarray):
+        """
+        生成边界以外的遮罩（掩膜）数组
+        Args:
+            lons (np.ndarray): 经度矩阵（2维）
+            lats (np.ndarray): 纬度矩阵（2维）
+        Returns:
+            np.ndarray: 遮罩（掩膜）数组
+        """
+        return ~contains(self, lons, lats)
+
 
 def read_mapjson(fp, wgs84=True):
     """
