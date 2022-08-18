@@ -182,6 +182,15 @@ class MapPolygon(sgeom.MultiPolygon):
         Returns:
             np.ndarray: 遮罩（掩膜）数组
         """
+        lons = np.atleast_1d(lons)
+        lats = np.atleast_1d(lats)
+
+        if len(lons.shape) != 2 or len(lats.shape) != 2:
+            raise ValueError("x或y不是2维数组")
+
+        if lons.shape != lats.shape:
+            raise ValueError("x和y的形状不匹配")
+
         return ~contains(self, lons, lats)
 
 
