@@ -55,5 +55,5 @@ jobs:
           alert-threshold: "150%"
           comment-on-alert: true
           fail-on-alert: false
-          benchmark-data-dir-path: "benchmark/"
+          benchmark-data-dir-path: "docs/"
           alert-comment-cc-users: "@clarmy"
