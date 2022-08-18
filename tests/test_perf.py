@@ -304,11 +304,7 @@ def test_maskout(benchmark):
         mask_array = np.load(casefp)
 
         map_polygon = get_adm_maps(
-            province="宁夏回族自治区",
-            only_polygon=True,
-            record="first",
-            wgs84=False,
-            simplify=True,
+            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
         )
 
         lons, lats, data = load_dem()
@@ -354,9 +350,7 @@ def test_make_maskout_array(benchmark):
         lat = np.linspace(0, 60, 1000)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(
-            level="国", record="first", only_polygon=True, wgs84=False, simplify=True
-        )
+        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
