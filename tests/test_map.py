@@ -189,27 +189,31 @@ def test_map_load():
 def test_map_operator():
     """测试地图之间的操作符是否正常."""
 
+    china = get_adm_maps(level="国", wgs84=True)[0]["geometry"]
+    china_gcj02 = get_adm_maps(level="国", wgs84=False)[0]["geometry"]
+    sichuan = get_adm_maps(province="四川省")[0]["geometry"]
+    sichuan_gcj02 = get_adm_maps(province="四川省", wgs84=False)[0]["geometry"]
+    chongqing = get_adm_maps(province="重庆市")[0]["geometry"]
+    chongqing_gcj02 = get_adm_maps(province="重庆市", wgs84=False)[0]["geometry"]
+    guizhou = get_adm_maps(province="贵州省")[0]["geometry"]
+    guizhou_gcj02 = get_adm_maps(province="贵州省", wgs84=False)[0]["geometry"]
+    fujian = get_adm_maps(province="福建省")[0]["geometry"]
+    guangdong = get_adm_maps(province="广东省")[0]["geometry"]
+    shanxi = get_adm_maps(province="山西省")[0]["geometry"]
+    shanxi_gcj02 = get_adm_maps(province="山西省", wgs84=False)[0]["geometry"]
+
     # 加法操作符(并集)
     assert isinstance(
-        get_adm_maps(province="四川省")[0]["geometry"]
-        + get_adm_maps(province="重庆市")[0]["geometry"]
-        + get_adm_maps(province="贵州省")[0]["geometry"],
+        sichuan + chongqing + guizhou,
         MapPolygon,
     )
     assert isinstance(
-        get_adm_maps(province="四川省")[0]["geometry"].union(
-            get_adm_maps(province="重庆市")[0]["geometry"]
-        )
-        + get_adm_maps(province="贵州省")[0]["geometry"],
+        sichuan.union(chongqing) + guizhou,
         MapPolygon,
     )
     assert (
         round(
-            (
-                get_adm_maps(province="四川省", wgs84=False)[0]["geometry"]
-                + get_adm_maps(province="重庆市", wgs84=False)[0]["geometry"]
-                + get_adm_maps(province="贵州省", wgs84=False)[0]["geometry"]
-            ).area,
+            (sichuan_gcj02 + chongqing_gcj02 + guizhou_gcj02).area,
             2,
         )
         == 69.49
@@ -217,44 +221,31 @@ def test_map_operator():
 
     assert (
         round(
-            (
-                get_adm_maps(province="四川省", wgs84=True)[0]["geometry"]
-                + get_adm_maps(province="重庆市", wgs84=True)[0]["geometry"]
-                + get_adm_maps(province="贵州省", wgs84=True)[0]["geometry"]
-            ).area,
+            (sichuan + chongqing + guizhou).area,
             2,
         )
         == 69.45
     )
 
     assert isinstance(
-        get_adm_maps(province="福建省")[0]["geometry"]
-        & get_adm_maps(province="广东省")[0]["geometry"],
+        fujian & guangdong,
         MapPolygon,
     )
 
     assert isinstance(
-        get_adm_maps(level="国")[0]["geometry"]
-        - get_adm_maps(province="山西省")[0]["geometry"]
-        + get_adm_maps(province="山西省")[0]["geometry"],
+        china - shanxi + shanxi,
         MapPolygon,
     )
     assert (
         round(
-            (
-                get_adm_maps(level="国", wgs84=True)[0]["geometry"]
-                - get_adm_maps(province="山西省", wgs84=True)[0]["geometry"]
-            ).area,
+            (china - shanxi).area,
             2,
         )
         == 949.08
     )
     assert (
         round(
-            (
-                get_adm_maps(level="国", wgs84=False)[0]["geometry"]
-                - get_adm_maps(province="山西省", wgs84=False)[0]["geometry"]
-            ).area,
+            (china_gcj02 - shanxi_gcj02).area,
             2,
         )
         == 949.32
