@@ -33,9 +33,9 @@ def _make_clip_path(map_polygon):
         prt = len(coords)
         for coord in coords:
             vertices.append(coord)
-        codes += [mpath.Path.MOVETO]
-        codes += [mpath.Path.LINETO] * (prt - 2)
-        codes += [mpath.Path.CLOSEPOLY]
+        codes.append(mpath.Path.MOVETO)
+        codes.extend([mpath.Path.LINETO] * (prt - 2))
+        codes.append(mpath.Path.CLOSEPOLY)
         _clip = mpath.Path(vertices, codes)
         clip = mpatches.PathPatch(_clip, transform=ax.transData)
 
