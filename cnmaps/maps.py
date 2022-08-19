@@ -290,6 +290,7 @@ def get_adm_maps(
     record: str = "all",
     only_polygon: bool = False,
     wgs84=True,
+    simplify=False,
     *args,
     **kwargs,
 ):
@@ -327,6 +328,7 @@ def get_adm_maps(
                                 Defaults to False.
         wgs84 (bool, 可选): 是否使用 WGS84 坐标系, 若为 True 则转为 WGS84 坐标,
                                 若为 False 则使用高德默认的 GCJ02 火星坐标。Defaults to True.
+        simplify  (bool, 可选): 是否对边界进行简化, 若为 True 则进行简化处理, 否则不做简化。Defaults to True.
 
     异常:
         ValueError: 当传入的等级
@@ -435,6 +437,22 @@ def get_adm_maps(
         data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
     )
     gdf["geometry"] = map_polygons
+
+    if simplify:
+        area = gdf["geometry"].area.sum()
+        tolerance = area / 10000
+        simple_geometry = gdf.simplify(tolerance=tolerance)
+
+        geometries = []
+        for g in simple_geometry:
+            if isinstance(g, sgeom.Polygon):
+                geometries.append(MapPolygon([g]))
+            elif isinstance(g, sgeom.MultiPolygon):
+                geometries.append(MapPolygon(g))
+            else:
+                geometries.append(g)
+
+        gdf["geometry"] = geometries
 
     if len(gdf) == 0:
         raise MapNotFoundError("未找到指定地图的边界文件")
