@@ -8,40 +8,32 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
+from cartopy.mpl.patch import geos_to_path
 import shapely.geometry as sgeom
-import shapely.ops as sops
+from shapely.ops import transform
 from geopandas import GeoDataFrame
 from pyproj import Transformer
 
 from .maps import MapPolygon
 
 
-def _make_clip_path(map_polygon):
-    vertices = []
-    codes = []
-    clips = []
-
-    ax = plt.gca()
-    crs_from = ccrs.PlateCarree()
-    crs_to = ax.projection
-    if crs_from != crs_to:
+def _transform_polygon(map_polygon, crs_from, crs_to):
+    if crs_from == crs_to:
+        return map_polygon
+    else:
         transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
-        map_polygon = sops.transform(transformer.transform, map_polygon)
+        return transform(transformer.transform, map_polygon)
 
-    for polygon in map_polygon.geoms:
-        coords = polygon.boundary.coords
-        prt = len(coords)
-        for coord in coords:
-            vertices.append(coord)
-        codes += [mpath.Path.MOVETO]
-        codes += [mpath.Path.LINETO] * (prt - 2)
-        codes += [mpath.Path.CLOSEPOLY]
-        _clip = mpath.Path(vertices, codes)
-        clip = mpatches.PathPatch(_clip, transform=ax.transData)
 
-        clips.append(clip)
+def _make_clip_path(map_polygon):
+    ax = plt.gca()
+    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
-    return clips
+    paths = geos_to_path(map_polygon)
+    path = mpath.Path.make_compound_path(*paths)
+    clip = mpatches.PathPatch(path, transform=ax.transData)
+
+    return clip
 
 
 def clip_contours_by_map(contours, map_polygon: MapPolygon):
@@ -75,11 +67,10 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
         >>> clip_contours_by_map(cs, map_polygon)
         >>> draw_map(map_polygon, color='k', linewidth=1)
     """
-    clips = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon)
 
-    for clip in clips:
-        for contour in contours.collections:
-            contour.set_clip_path(clip)
+    for contour in contours.collections:
+        contour.set_clip_path(clip)
 
 
 def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
@@ -112,10 +103,9 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
     >>> clip_pcolormesh_by_map(mesh, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clips = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon)
 
-    for clip in clips:
-        mesh.set_clip_path(clip)
+    mesh.set_clip_path(clip)
 
 
 def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
@@ -150,10 +140,9 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
     >>> clip_quiver_by_map(quiver, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clips = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon)
 
-    for clip in clips:
-        quiver.set_clip_path(clip)
+    quiver.set_clip_path(clip)
 
 
 def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
@@ -197,10 +186,9 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
     >>> clip_scatter_by_map(scatter, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clips = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon)
 
-    for clip in clips:
-        scatter.set_clip_path(clip)
+    scatter.set_clip_path(clip)
 
 
 def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
@@ -243,26 +231,12 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
     >>> draw_map(map_polygon, color='k')
     """
     ax = plt.gca()
-    crs_from = ccrs.PlateCarree()
-    crs_to = ax.projection
-    if crs_from != crs_to:
-        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
-        map_polygon = sops.transform(transformer.transform, map_polygon)
+    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
     for cbt in clabel_text:
-        cbt.set_visible(False)
-
-    for polygon in map_polygon.geoms:
-        vertices = []
-        coords = polygon.boundary.coords
-        for coord in coords:
-            vertices.append(coord)
-
-        _polygon = sgeom.Polygon(vertices)
-
-        for cbt in clabel_text:
-            if _polygon.contains(sgeom.Point(cbt.get_position())):
-                cbt.set_visible(True)
+        point = sgeom.Point(cbt.get_position())
+        if not map_polygon.contains(point):
+            cbt.set_visible(False)
 
 
 def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
@@ -288,11 +262,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
     """
     ax = plt.gca()
-    crs_from = ccrs.PlateCarree()
-    crs_to = ax.projection
-    if crs_from != crs_to:
-        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
-        map_polygon = sops.transform(transformer.transform, map_polygon)
+    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
     if "color" not in kwargs and "c" not in kwargs:
         kwargs["color"] = "k"
