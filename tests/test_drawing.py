@@ -1,5 +1,4 @@
 import os
-import shutil
 import random
 import uuid
 
@@ -63,12 +62,10 @@ def test_draw_maps():
         map_polygon = get_adm_maps(**map_arg)
 
         draw_maps(map_polygon, linewidth=1)
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_draw_maps", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_scatter():
@@ -98,12 +95,10 @@ def test_clip_scatter():
         clip_scatter_by_map(scatter, map_polygon)
         draw_map(map_polygon, linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_clip_scatter", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_pcolormesh():
@@ -130,12 +125,10 @@ def test_clip_pcolormesh():
         clip_pcolormesh_by_map(mesh, map_polygon)
         draw_map(map_polygon, linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_clip_pcolormesh", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_contour():
@@ -162,12 +155,10 @@ def test_clip_contour():
         clip_contours_by_map(cs, map_polygon)
         draw_map(map_polygon, color="k", linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_clip_contour", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_contourf():
@@ -194,12 +185,10 @@ def test_clip_contourf():
         clip_contours_by_map(cs, map_polygon)
         draw_map(map_polygon, color="k", linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_clip_contourf", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_quiver():
@@ -221,12 +210,10 @@ def test_clip_quiver():
         clip_quiver_by_map(quiver, map_polygon)
         draw_map(map_polygon, color="k", linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "test_clip_quiver", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_clip_clabel():
@@ -253,13 +240,11 @@ def test_clip_clabel():
     draw_map(map_polygon, color="k")
     ax.coastlines()
 
-    savefp = os.path.join("./tmp", "clipped_clabels.png")
+    savefp = os.path.join("./tmp", "test_clip_clabel", "clipped_clabels.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
 
     plt.savefig(savefp, bbox_inches="tight")
     plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 def test_projection():
@@ -303,13 +288,11 @@ def test_projection():
         ax.coastlines()
         ax.set_global()
 
-        savefp = os.path.join("./tmp", f"{uuid.uuid4().hex}.png")
+        savefp = os.path.join("./tmp", "test_projection", f"{uuid.uuid4().hex}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
 
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
-    shutil.rmtree("./tmp")
 
 
 if __name__ == "__main__":

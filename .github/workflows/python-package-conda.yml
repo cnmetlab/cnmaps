@@ -37,7 +37,7 @@ jobs:
           python setup.py develop
       - name: Run tests and collect benchmark
         run: |
-          pytest --verbose -p no:warnings --benchmark-min-rounds=1 --memray --benchmark-json output.json ./tests/test_perf.py 
+          pytest --verbose -p no:warnings --memray --benchmark-json output.json ./tests/test_perf.py 
       - name: Continuous Benchmark
         uses: benchmark-action/github-action-benchmark@v1.14.0
         with:
