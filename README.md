@@ -47,6 +47,10 @@
 <a href="https://www.codacy.com/gh/Clarmy/cnmaps/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Clarmy/cnmaps&amp;utm_campaign=Badge_Grade">
   <img src="https://app.codacy.com/project/badge/Grade/ef6ab1893b0b47428b287f2f2875021c"/>
  </a>
+ 
+<a href="https://cnmetlab.github.io/cnmaps/performance/">
+  <img src="https://img.shields.io/badge/performance-benchmark-yellow"/>
+ </a>
 
 <a href="https://codecov.io/gh/cnmetlab/cnmaps" > 
  <img src="https://codecov.io/gh/cnmetlab/cnmaps/branch/main/graph/badge.svg?token=CF80D3CSR9"/> 
