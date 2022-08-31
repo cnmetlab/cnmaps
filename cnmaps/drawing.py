@@ -25,8 +25,10 @@ def _transform_polygon(map_polygon, crs_from, crs_to):
         return transform(transformer.transform, map_polygon)
 
 
-def _make_clip_path(map_polygon):
-    ax = plt.gca()
+def _make_clip_path(map_polygon, ax=None):
+    if ax is None:
+        ax = plt.gca()
+
     map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
     paths = geos_to_path(map_polygon)
@@ -36,7 +38,7 @@ def _make_clip_path(map_polygon):
     return clip
 
 
-def clip_contours_by_map(contours, map_polygon: MapPolygon):
+def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None):
     """
     使用地图边界对象对等值线对象进行裁剪
 
@@ -67,13 +69,13 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon):
         >>> clip_contours_by_map(cs, map_polygon)
         >>> draw_map(map_polygon, color='k', linewidth=1)
     """
-    clip = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon, ax=ax)
 
     for contour in contours.collections:
         contour.set_clip_path(clip)
 
 
-def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
+def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None):
     """
     使用地图边界对象对填色网格线对象进行裁剪
 
@@ -103,12 +105,12 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon):
     >>> clip_pcolormesh_by_map(mesh, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon, ax=ax)
 
     mesh.set_clip_path(clip)
 
 
-def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
+def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None):
     """
     使用地图边界对象对箭矢簇对象进行裁剪
 
@@ -140,12 +142,12 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon):
     >>> clip_quiver_by_map(quiver, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon, ax=ax)
 
     quiver.set_clip_path(clip)
 
 
-def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
+def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None):
     """
     使用地图边界对象对散点对象进行裁剪
 
@@ -186,12 +188,14 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon):
     >>> clip_scatter_by_map(scatter, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon)
+    clip = _make_clip_path(map_polygon, ax=ax)
 
     scatter.set_clip_path(clip)
 
 
-def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolygon):
+def clip_clabels_by_map(
+    clabel_text: matplotlib.text.Text, map_polygon: MapPolygon, ax=None
+):
     """
     剪切clabel文本, 一般配合contour函数使用
 
@@ -230,7 +234,8 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
     >>> clip_clabels_by_map(clabels, map_polygon)
     >>> draw_map(map_polygon, color='k')
     """
-    ax = plt.gca()
+    if ax is None:
+        ax = plt.gca()
     map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
     for cbt in clabel_text:
@@ -239,7 +244,7 @@ def clip_clabels_by_map(clabel_text: matplotlib.text.Text, map_polygon: MapPolyg
             cbt.set_visible(False)
 
 
-def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
+def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **kwargs):
     """
     绘制单个地图边界线
 
@@ -261,7 +266,9 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
         True
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
     """
-    ax = plt.gca()
+    if ax is None:
+        ax = plt.gca()
+
     map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
 
     if "color" not in kwargs and "c" not in kwargs:
@@ -279,7 +286,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], **kwargs):
             ax.plot(coords[:, 0], coords[:, 1], **kwargs)
 
 
-def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
+def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
     """
     绘制多个地图边界
 
@@ -307,7 +314,7 @@ def draw_maps(maps: Union[list, GeoDataFrame], **kwargs):
         geometries = [m["geometry"] for _, m in maps.iterrows()]
 
     for gm in geometries:
-        draw_map(gm, **kwargs)
+        draw_map(gm, ax=ax, **kwargs)
 
 
 if __name__ == "__main__":
