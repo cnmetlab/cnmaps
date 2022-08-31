@@ -2,7 +2,6 @@ import os
 import pytest
 from itertools import combinations, product
 from glob import glob
-import shutil
 
 import fiona
 import numpy as np
@@ -95,17 +94,20 @@ def test_make_maskout_array():
 def test_mappolygon_to_file():
     """测试将MapPolygon保存为文件."""
     map_polygon = get_adm_maps(province="黑龙江省", only_polygon=True, record="first")
-    os.makedirs("./tmp", exist_ok=True)
+    os.makedirs("./tmp/test_mappolygon_to_file", exist_ok=True)
 
-    map_polygon.to_file("./tmp/heilongjiang.geojson", meta={"id": 0, "name": "黑龙江"})
     map_polygon.to_file(
-        "./tmp/heilongjiang.shp", engine="ESRI shapefile", meta={"id": 0, "name": "黑龙江"}
+        "./tmp/test_mappolygon_to_file/heilongjiang.geojson",
+        meta={"id": 0, "name": "黑龙江"},
+    )
+    map_polygon.to_file(
+        "./tmp/test_mappolygon_to_file/heilongjiang.shp",
+        engine="ESRI shapefile",
+        meta={"id": 0, "name": "黑龙江"},
     )
 
-    fiona.open("./tmp/heilongjiang.geojson")
-    fiona.open("./tmp/heilongjiang.shp")
-
-    shutil.rmtree("./tmp")
+    fiona.open("./tmp/test_mappolygon_to_file/heilongjiang.geojson")
+    fiona.open("./tmp/test_mappolygon_to_file/heilongjiang.shp")
 
 
 def test_not_found():
