@@ -66,7 +66,11 @@ class MapPolygon(sgeom.MultiPolygon):
 
         for one, other in couples:
             if one.contains(other) and one != other:
-                polygons.remove(other)
+                try:
+                    polygons.remove(other)
+                except ValueError:
+                    pass
+
         return MapPolygon(polygons)
 
     def union(self, other):
