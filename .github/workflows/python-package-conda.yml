@@ -54,7 +54,7 @@ jobs:
           alert-comment-cc-users: "@clarmy"
       - name: Run tests and collect coverage
         run: |
-          pytest --verbose -p no:warnings --cov ./tests/test_drawing.py ./tests/test_geo.py ./tests/test_map.py
+          pytest --verbose -p no:warnings --cov ./tests/test_drawing.py ./tests/test_geo.py ./tests/test_map.py ./tests/test_issues.py
       - name: Upload coverage reports to Codecov
         run: |
           curl -Os https://uploader.codecov.io/latest/linux/codecov
