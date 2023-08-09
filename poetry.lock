@@ -20,12 +20,12 @@ tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pyte
 
 [[package]]
 name = "cartopy"
-version = "0.20.3"
+version = "0.21.1"
 description = "A cartographic python library with Matplotlib support for visualisation"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "Cartopy-0.20.3.tar.gz", hash = "sha256:0d60fa2e2fbd77c4d1f6b1f9d3b588966147f07c1b179d2d34570ac1e1b49006"},
+    {file = "Cartopy-0.21.1.tar.gz", hash = "sha256:89d5649712c8582231c6e11825a04c85f6f0cee94dbb89e4db23eabca1cc250a"},
 ]
 
 [package.dependencies]
@@ -38,7 +38,7 @@ shapely = ">=1.6.4"
 [package.extras]
 ows = ["OWSLib (>=0.18.0)", "pillow (>=6.1.0)"]
 plotting = ["GDAL (>=2.3.2)", "pillow (>=6.1.0)", "scipy (>=1.3.1)"]
-tests = ["flufl.lock", "packaging (>=20)", "pytest (>=5.1.2)"]
+tests = ["packaging (>=20)", "pytest (>=5.1.2)", "pytest-mpl (>=0.11)"]
 
 [[package]]
 name = "certifi"
@@ -1072,4 +1072,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "c39a0241126280045e42d242e927d396eadf5b63f36b8b3ed9f5f8d6bc2e3791"
+content-hash = "2df1df9491ab92f2422feceb2aa155bb5436d06a546cf9477f9629359d015206"
