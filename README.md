@@ -19,10 +19,6 @@
  alt="Anaconda" /></a>
 
 <a href="https://anaconda.org/conda-forge/cnmaps">
-<img src="https://anaconda.org/conda-forge/cnmaps/badges/installer/conda.svg"
- alt="Install with conda" /></a>
-
-<a href="https://anaconda.org/conda-forge/cnmaps">
 <img src="https://anaconda.org/conda-forge/cnmaps/badges/platforms.svg" /> </a>
 
 <a href="https://anaconda.org/conda-forge/cnmaps">
