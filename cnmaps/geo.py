@@ -32,7 +32,7 @@ SMA = 6378245.0  # 长半轴
 EER = 0.00669342162296594323  # 偏心率平方
 
 
-@jit
+@jit(nopython=True)
 def transform(lon: float, lat: float):
     lon -= 105
     lat -= 35
@@ -64,7 +64,7 @@ def transform(lon: float, lat: float):
     return nlon, nlat
 
 
-@jit
+@jit(nopython=True)
 def gcj02_to_bd09(lon: float, lat: float) -> tuple:
     """火星坐标系(GCJ-02)转百度坐标系(BD-09)
 
@@ -82,7 +82,7 @@ def gcj02_to_bd09(lon: float, lat: float) -> tuple:
     return bd_lon, bd_lat
 
 
-@jit
+@jit(nopython=True)
 def bd09_to_gcj02(lon: float, lat: float) -> tuple:
     """百度坐标系(BD-09)转火星坐标系(GCJ-02)
 
@@ -102,7 +102,7 @@ def bd09_to_gcj02(lon: float, lat: float) -> tuple:
     return gcj_lon, gcj_lat
 
 
-@jit
+@jit(nopython=True)
 def wgs84_to_gcj02(lon: float, lat: float) -> tuple:
     """WGS84转GCJ02(火星坐标系)
 
@@ -127,7 +127,7 @@ def wgs84_to_gcj02(lon: float, lat: float) -> tuple:
     return gcj_lon, gcj_lat
 
 
-@jit
+@jit(nopython=True)
 def gcj02_to_wgs84(lon: float, lat: float) -> tuple:
     """GCJ02(火星坐标系)转 WGS84
 
@@ -155,7 +155,7 @@ def gcj02_to_wgs84(lon: float, lat: float) -> tuple:
     return new_lon, new_lat
 
 
-@jit
+@jit(nopython=True)
 def bd09_to_wgs84(lon: float, lat: float) -> tuple:
     """百度坐标转 WGS84
 
@@ -170,7 +170,7 @@ def bd09_to_wgs84(lon: float, lat: float) -> tuple:
     return gcj02_to_wgs84(lon, lat)
 
 
-@jit
+@jit(nopython=True)
 def wgs84_to_bd09(lon: float, lat: float) -> tuple:
     """WGS84 转百度坐标
 
