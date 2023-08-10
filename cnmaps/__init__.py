@@ -10,7 +10,7 @@ from shapely.errors import ShapelyDeprecationWarning
 from .maps import *  # noqa: F403, F401
 from .drawing import *  # noqa: F403, F401
 
-__version__ = "1.1.6"
+__version__ = "1.1.7"
 
 CARTOPY_DIGIT_VERSION = re.match(r"(\d*\.\d*\.\d*)", cartopy.__version__).group(1)
 if CARTOPY_DIGIT_VERSION < "0.22.0":

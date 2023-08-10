@@ -440,7 +440,7 @@ def get_adm_maps(
     gdf = gpd.GeoDataFrame(
         data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
     )
-    gdf["geometry"] = map_polygons
+    gdf.set_geometry(map_polygons, inplace=True)
 
     if simplify:
         area = gdf["geometry"].area.sum()
@@ -456,7 +456,7 @@ def get_adm_maps(
             else:
                 geometries.append(g)
 
-        gdf["geometry"] = geometries
+        gdf.set_geometry(geometries, inplace=True)
 
     if len(gdf) == 0:
         raise MapNotFoundError("未找到指定地图的边界文件")

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cnmaps"
-version = "1.1.6"
+version = "1.1.7"
 description = "A python package to draw china maps more easily"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
@@ -27,6 +27,7 @@ flake8 = "^6.1.0"
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 black = "^23.7.0"
+ipython = "^8.14.0"
 
 [build-system]
 requires = ["poetry-core"]
