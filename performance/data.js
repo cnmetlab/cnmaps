@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1691650829884,
+  "lastUpdate": 1691650968578,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -2870,6 +2870,96 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.04594891436543993",
             "extra": "mean: 1.8336241497999253 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "committer": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "id": "e701bab18c1f61de6307319ef5fbc3652dbe3724",
+          "message": "chore: bump version and change some dependencies.",
+          "timestamp": "2023-07-18T03:53:17Z",
+          "url": "https://github.com/cnmetlab/cnmaps/pull/103/commits/e701bab18c1f61de6307319ef5fbc3652dbe3724"
+        },
+        "date": 1691650964467,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.37183340796667286,
+            "unit": "iter/sec",
+            "range": "stddev: 0.030159744226506024",
+            "extra": "mean: 2.6893764211999724 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.06540417896540304,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0640426916141681",
+            "extra": "mean: 15.289542898000013 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.06710211044152022,
+            "unit": "iter/sec",
+            "range": "stddev: 0.055467893536168565",
+            "extra": "mean: 14.902660935999984 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.06773430826388074,
+            "unit": "iter/sec",
+            "range": "stddev: 0.3575628944494088",
+            "extra": "mean: 14.763567025799967 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.0696830172547379,
+            "unit": "iter/sec",
+            "range": "stddev: 0.070164787785423",
+            "extra": "mean: 14.350698913399992 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.07058470765112629,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05072654208830172",
+            "extra": "mean: 14.167374680399963 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.30060489448352834,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03536232362966057",
+            "extra": "mean: 3.326625807999926 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.15570239644767478,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05426333101287619",
+            "extra": "mean: 6.422508726999967 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 12.451644786517265,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03961269523134079",
+            "extra": "mean: 80.31067518749069 msec\nrounds: 16"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.5212442171185628,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06040253930245427",
+            "extra": "mean: 1.9184865120000723 sec\nrounds: 5"
           }
         ]
       }
