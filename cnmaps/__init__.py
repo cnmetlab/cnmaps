@@ -10,11 +10,11 @@ from shapely.errors import ShapelyDeprecationWarning
 from .maps import *  # noqa: F403, F401
 from .drawing import *  # noqa: F403, F401
 
-__version__ = "1.1.4"
+__version__ = "1.1.5"
 
 CARTOPY_DIGIT_VERSION = re.match(r"(\d*\.\d*\.\d*)", cartopy.__version__).group(1)
-if CARTOPY_DIGIT_VERSION < "0.20.0":
-    warnings.warn(("由于Cartopy的版本低于0.20.0, 请将Cartopy的版本升级到0.20.0及以上."))
+if CARTOPY_DIGIT_VERSION < "0.22.0":
+    warnings.warn(("由于Cartopy的版本低于0.22.0, 请将Cartopy的版本升级到0.22.0及以上."))
 
 warnings.filterwarnings("ignore", category=ShapelyDeprecationWarning)
 

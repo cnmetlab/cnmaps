@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cnmaps"
-version = "1.1.4"
+version = "1.1.5"
 description = "A python package to draw china maps more easily"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
@@ -8,12 +8,12 @@ readme = "PYPI.md"
 homepage = "https://github.com/cnmetlab/cnmaps"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 shapely = ">=1.8.0,<2.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"
 geopandas = ">=0.10.2"
-cartopy = ">=0.21.0"
+cartopy = ">=0.22.0"
 matplotlib = ">=3.4.2"
 numpy = ">=1.21.5"
 netcdf4 = ">=1.5.8"
@@ -21,6 +21,12 @@ orjson = ">=3.7.11"
 numba = ">=0.56.0"
 scipy = ">=1.8"
 
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^6.1.0"
+pytest = "^7.4.0"
+pytest-cov = "^4.1.0"
+black = "^23.7.0"
 
 [build-system]
 requires = ["poetry-core"]

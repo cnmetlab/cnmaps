@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: ["main", "1.*"]
+    branches: ["main"]
   pull_request:
-    branches: ["main", "1.*"]
+    branches: ["main"]
 
 jobs:
   build-linux:
@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Python 3.8
+      - name: Set up Python 3.9
         uses: actions/setup-python@v3
         with:
-          python-version: 3.8
+          python-version: 3.9
       - name: Add conda to system path
         run: |
           # $CONDA is an environment variable pointing to the root of the miniconda directory
@@ -37,7 +37,7 @@ jobs:
           python setup.py develop
       - name: Run tests and collect benchmark
         run: |
-          pytest --verbose -p no:warnings --memray --benchmark-json output.json ./tests/test_perf.py 
+          pytest --verbose -p no:warnings --memray --benchmark-json output.json ./tests/test_perf.py
       - name: Continuous Benchmark
         uses: benchmark-action/github-action-benchmark@v1.14.0
         with:
@@ -60,4 +60,3 @@ jobs:
           curl -Os https://uploader.codecov.io/latest/linux/codecov
           chmod +x codecov
           ./codecov -t ${{ secrets.CODECOV_TOKEN }}
-      
