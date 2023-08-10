@@ -22,8 +22,8 @@ copyright = "2022, Clarmy"
 author = "Clarmy"
 
 # The full version, including alpha/beta/rc tags
-release = "1.1"
-version = "1.1"
+release = "1.1.5"
+version = "1.1.5"
 
 # -- General configuration ---------------------------------------------------
 
