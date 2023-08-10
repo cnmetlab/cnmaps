@@ -1,5 +1,5 @@
 <h4>
-    cnmaps是一个可以让中国地图画起来更丝滑的地图类python扩展包
+    cnmaps 是一个可以让中国地图画起来更丝滑的地图类python扩展包
 </h4>
 
 <a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml">
@@ -58,18 +58,13 @@
 
 
 ## 安装
-安装cnmaps建议使用Python的解释器在3.8版本及以上。
-
-### 使用conda安装
-cnmaps最简单的安装方法是使用conda安装： ``$ conda install -c conda-forge cnmaps``
+安装 cnmaps 需要满足 Python 的解释器在 3.9 版本及以上。
 
 ### 使用pip安装
-若要使用pip安装，则需要手动安装一些依赖：
+cnmaps 最简单也最快的安装方法是使用 pip 来安装 cnmaps： `$ pip install -U cnmaps`
 
-* cartopy: `$ conda install -c conda-forge "cartopy>=0.20.0"`
-* fiona: `$ conda install -c conda-forge "fiona>=1.8.21"`
-
-在完成上述依赖的安装以后，你可以使用pip来安装cnmaps： `$ pip install -U cnmaps`
+### 使用conda安装
+你也可以使用 conda 安装： ``$ conda install -c conda-forge cnmaps``
 
 
 ## 快速开始
@@ -139,30 +134,6 @@ ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
 draw_maps(get_adm_maps(level='区县'), linewidth=0.8, color='r') 
 
 plt.show()
-```
-
-### Logo
-
-本项目的Logo地图是如何绘制的？请执行下面的代码。
-
-```python
-import cartopy.crs as ccrs
-import matplotlib.pyplot as plt
-from cnmaps import get_adm_maps
-
-fig = plt.figure(figsize=(5,5))
-proj = ccrs.Orthographic(central_longitude=100.0, central_latitude=30)
-ax = fig.add_subplot(111, projection=proj)
-
-ax.stock_img()
-china, sourth_sea = get_adm_maps(level='国', only_polygon=True)
-
-ax.set_global()
-ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor='r', facecolor='r')
-ax.add_geometries(sourth_sea, crs=ccrs.PlateCarree(), edgecolor='r')
-ax.outline_patch.set_edgecolor('white')
-
-plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
 ```
 
 ## 使用指南
