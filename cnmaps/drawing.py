@@ -309,7 +309,11 @@ def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
         2  中华人民共和国   北京市  北京市  朝阳区  区县  高德  陆地  MULTIPOLYGON (((116.55172 40.05812, 116.55132 ...
     """
     if isinstance(maps, list):
-        geometries = [m["geometry"] for m in maps]
+        try:
+            geometries = [m["geometry"] for m in maps]
+        except TypeError:
+            geometries = maps
+
     elif isinstance(maps, GeoDataFrame):
         geometries = [m["geometry"] for _, m in maps.iterrows()]
 
