@@ -29,7 +29,7 @@ pytest-cov = "^4.1.0"
 black = "^23.7.0"
 ipython = "^8.14.0"
 pytest-benchmark = "^4.0.0"
-pytest-memray = "^1.6.0"
+pytest-memray = { version = "^1.6.0", markers = "sys_platform != 'win32'" }
 
 [build-system]
 requires = ["poetry-core"]
