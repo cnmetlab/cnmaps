@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1715586927322,
+  "lastUpdate": 1715589013510,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -3786,6 +3786,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.04210971936827003",
             "extra": "mean: 1.5845236387999875 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmylee92510@gmail.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a2c473ee159cb2e4abbb46cee31788dafb593427",
+          "message": "fix: #114 (#115)\n\n* fix: #114\r\n\r\n* chore: bump version\r\n\r\n* chore: limit python version.\r\n\r\n* chore: deprecated python-package-conda.yml\r\n\r\n* chore: exclude win for memray",
+          "timestamp": "2024-05-13T16:16:16+08:00",
+          "tree_id": "1c348cce536b75ff763f65317371191541e2cb06",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/a2c473ee159cb2e4abbb46cee31788dafb593427"
+        },
+        "date": 1715589009860,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.4028617688937423,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05538148280279133",
+            "extra": "mean: 2.482240999800001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.054997618608998974,
+            "unit": "iter/sec",
+            "range": "stddev: 0.10921993621633355",
+            "extra": "mean: 18.1826054526 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05367796769435894,
+            "unit": "iter/sec",
+            "range": "stddev: 0.16323713843409104",
+            "extra": "mean: 18.629617382200014 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05377925845156366,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14062423439221244",
+            "extra": "mean: 18.594529355600002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05446920366540429,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07667060933970937",
+            "extra": "mean: 18.358997978799948 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05343029483557306,
+            "unit": "iter/sec",
+            "range": "stddev: 0.19838511986536664",
+            "extra": "mean: 18.71597383239996 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.3213028458200774,
+            "unit": "iter/sec",
+            "range": "stddev: 0.034381763242602816",
+            "extra": "mean: 3.1123284870000134 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.19264638499152045,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05672668275190316",
+            "extra": "mean: 5.190857850999987 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 12.632903617685807,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03476883528932339",
+            "extra": "mean: 79.1583653499913 msec\nrounds: 20"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.6214210930758047,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03615185336918181",
+            "extra": "mean: 1.6092147677999946 sec\nrounds: 5"
           }
         ]
       }
