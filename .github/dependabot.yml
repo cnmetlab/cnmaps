@@ -3,6 +3,4 @@ updates:
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "weekly"
-    ignore:
-      - dependency-name: "shapely"
+      interval: "daily"
