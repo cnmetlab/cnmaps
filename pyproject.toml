@@ -9,7 +9,7 @@ homepage = "https://github.com/cnmetlab/cnmaps"
 
 [tool.poetry.dependencies]
 python = "^3.9"
-shapely = ">=1.8.0,<2.0"
+shapely = ">=1.8.0,<3.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"
 geopandas = ">=0.10.2"
