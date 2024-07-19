@@ -237,6 +237,8 @@ def clip_clabels_by_map(
     if ax is None:
         ax = plt.gca()
     map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
+    if not map_polygon.is_valid:
+        map_polygon = map_polygon.buffer(0)
 
     for cbt in clabel_text:
         point = sgeom.Point(cbt.get_position())

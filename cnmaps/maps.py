@@ -198,17 +198,25 @@ class MapPolygon(sgeom.MultiPolygon):
         return ~contains(self, lons, lats)
 
 
-def read_mapjson(fp, wgs84=True):
+def read_mapjson(fp, wgs84=True, dilution_interval=1):
     """
     读取geojson地图边界文件
 
     参数:
         fp (str, 可选): geojson文件名.
         wgs84 (bool, 可选): 是否使用 WGS84 坐标
+        dilution_interval (int, 可选): 稀疏间隔, 默认为1, 即不稀疏.
+                                        该值越大, 稀释得越强烈. 默认为1.
 
     返回值:
         MapPolygon: 地图边界对象
     """
+    if not isinstance(dilution_interval, int):
+        raise ValueError("dilution_interval必须为整数")
+
+    if dilution_interval < 1:
+        raise ValueError("dilution_interval必须大于等于1")
+
     with open(fp, encoding="utf-8") as f:
         map_json = orjson.loads(f.read())
 
@@ -221,11 +229,14 @@ def read_mapjson(fp, wgs84=True):
     if "Polygon" in geometry["type"]:
         for _coords in geometry["coordinates"]:
             for coords in _coords:
+                __coords = coords[::dilution_interval]
+                if len(__coords) < 3:
+                    __coords = coords
                 if wgs84:
-                    wgs84_coords = [gcj02_to_wgs84(*coord) for coord in coords]
+                    wgs84_coords = [gcj02_to_wgs84(*coord) for coord in __coords]
                     polygon_list.append(sgeom.Polygon(wgs84_coords))
                 else:
-                    polygon_list.append(sgeom.Polygon(coords))
+                    polygon_list.append(sgeom.Polygon(__coords))
 
         return MapPolygon(polygon_list)
 
@@ -295,6 +306,7 @@ def get_adm_maps(
     only_polygon: bool = False,
     wgs84=True,
     simplify=False,
+    dilution_interval=1,
     *args,
     **kwargs,
 ):
@@ -332,6 +344,8 @@ def get_adm_maps(
                                 Defaults to False.
         wgs84 (bool, 可选): 是否使用 WGS84 坐标系, 若为 True 则转为 WGS84 坐标,
                                 若为 False 则使用高德默认的 GCJ02 火星坐标。Defaults to True.
+        dilution_interval (int, 可选): 稀疏间隔, 默认为1, 即不稀疏.
+                                        该值越大, 稀释得越强烈. Defaults to 1.
         simplify  (bool, 可选): 是否对边界进行简化, 若为 True 则进行简化处理, 否则不做简化。Defaults to True.
 
     异常:
@@ -412,7 +426,9 @@ def get_adm_maps(
     elif level in ["区", "县", "区县", "区/县"]:
         level_sql = "level='区县'"
     else:
-        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+        raise ValueError(
+            f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择'
+        )
 
     meta_sql = (
         "SELECT country, province, city, district, level, source, kind"
@@ -432,13 +448,16 @@ def get_adm_maps(
     map_polygons = []
     for path in gemo_rows:
         mapjson = read_mapjson(
-            os.path.join(DATA_DIR, "geojson.min/", path[0]), wgs84=wgs84
+            os.path.join(DATA_DIR, "geojson.min/", path[0]),
+            wgs84=wgs84,
+            dilution_interval=dilution_interval,
         )
 
         map_polygons.append(mapjson)
 
     gdf = gpd.GeoDataFrame(
-        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
+        data=meta_rows,
+        columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"],
     )
     gdf.set_geometry(map_polygons, inplace=True)
 

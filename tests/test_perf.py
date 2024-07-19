@@ -34,7 +34,7 @@ map_arg = {
     "only_polygon": True,
     "record": "first",
     "name": "中华人民共和国",
-    "simplify": True,
+    "dilution_interval": 10
 }
 
 
@@ -233,7 +233,9 @@ def test_clip_clabel(benchmark):
     def inner():
         lons, lats, data = load_dem()
 
-        map_polygon = get_adm_maps(record="first", only_polygon=True, simplify=True)
+        map_polygon = get_adm_maps(
+            record="first", only_polygon=True, dilution_interval=10
+        )
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         contours = ax.contour(
@@ -269,7 +271,9 @@ def test_projection(benchmark):
     def inner():
         lons, lats, data = load_dem()
 
-        map_polygon = get_adm_maps(record="first", only_polygon=True, simplify=True)
+        map_polygon = get_adm_maps(
+            record="first", only_polygon=True, dilution_interval=10
+        )
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=ccrs.Orthographic(central_longitude=100))
         contours = ax.contourf(
@@ -304,7 +308,11 @@ def test_maskout(benchmark):
         mask_array = np.load(casefp)
 
         map_polygon = get_adm_maps(
-            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
+            province="宁夏回族自治区",
+            only_polygon=True,
+            record="first",
+            wgs84=False,
+            dilution_interval=10,
         )
 
         lons, lats, data = load_dem()
@@ -322,7 +330,11 @@ def test_maskout(benchmark):
         mask_array = np.load(casefp)
 
         map_polygon = get_adm_maps(
-            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
+            province="宁夏回族自治区",
+            only_polygon=True,
+            record="first",
+            wgs84=True,
+            dilution_interval=10,
         )
 
         lons, lats, data = load_dem()
@@ -350,7 +362,13 @@ def test_make_maskout_array(benchmark):
         lat = np.linspace(0, 60, 1000)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+        china = get_adm_maps(
+            level="国",
+            record="first",
+            only_polygon=True,
+            wgs84=False,
+            dilution_interval=10,
+        )
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
@@ -362,7 +380,13 @@ def test_make_maskout_array(benchmark):
         lat = np.linspace(0, 60, 1000)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+        china = get_adm_maps(
+            level="国",
+            record="first",
+            only_polygon=True,
+            wgs84=True,
+            dilution_interval=10,
+        )
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()

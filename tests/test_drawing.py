@@ -25,14 +25,19 @@ districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
 map_args = [
-    {"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}
+    {
+        "only_polygon": True,
+        "record": "first",
+        "name": "中华人民共和国",
+        "dilution_interval": 10,
+    }
 ] + [
     {
         "province": p,
         "only_polygon": True,
         "record": "first",
         "name": p,
-        "simplify": True,
+        "dilution_interval": 10,
     }
     for p in ["黑龙江省", "内蒙古自治区"]
 ]
@@ -41,15 +46,22 @@ map_args = [
 def test_draw_maps():
     """测试多地图绘制功能"""
     map_args = (
-        [{"level": "国", "name": "中华人民共和国", "simplify": True}]
-        + [{"level": "省", "name": "中华人民共和国-分省", "simplify": True}]
-        + [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
+        [{"level": "国", "name": "中华人民共和国", "dilution_interval": 10}]
+        + [{"level": "省", "name": "中华人民共和国-分省", "dilution_interval": 10}]
+        + [
+            {
+                "level": "国",
+                "engine": "geopandas",
+                "name": "中华人民共和国",
+                "dilution_interval": 10,
+            }
+        ]
         + [
             {
                 "level": "省",
                 "engine": "geopandas",
                 "name": "中华人民共和国-分省",
-                "simplify": True,
+                "dilution_interval": 10,
             }
         ]
     )
@@ -221,7 +233,7 @@ def test_clip_clabel():
 
     lons, lats, data = load_dem()
 
-    map_polygon = get_adm_maps(record="first", only_polygon=True)
+    map_polygon = get_adm_maps(record="first", only_polygon=True, dilution_interval=10)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(
@@ -272,7 +284,9 @@ def test_projection():
     lons, lats, data = load_dem()
 
     for projection in PROJECTIONS:
-        map_polygon = get_adm_maps(province="河南省", record="first", only_polygon=True)
+        map_polygon = get_adm_maps(
+            record="first", only_polygon=True, dilution_interval=10
+        )
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=projection)
         contours = ax.contourf(

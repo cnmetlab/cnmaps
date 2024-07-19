@@ -127,6 +127,16 @@ def test_get_map_by_fp():
         read_mapjson(fp)
 
 
+def test_read_mapjson_with_dilution():
+    pattern = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)),
+        "../cnmaps/data/geojson.min/*/*/*/*.geojson",
+    )
+    fps = sorted(glob(pattern))
+    for fp in fps:
+        read_mapjson(fp, dilution_interval=10)
+
+
 def test_map_load():
     """测试各级地图数量是否完整，以及各种规则是否都能加载成功."""
     assert len(get_adm_maps(level="国")) == 2
@@ -153,7 +163,11 @@ def test_map_load():
     )
 
     beijing = get_adm_maps(city="北京市")[0]
-    assert beijing["市"] == "北京市" and beijing["区/县"] is None and beijing["级别"] == "市"
+    assert (
+        beijing["市"] == "北京市"
+        and beijing["区/县"] is None
+        and beijing["级别"] == "市"
+    )
 
     chaoyang = get_adm_maps(district="朝阳区")
     assert len(chaoyang) == 2
@@ -261,7 +275,7 @@ def test_province_orthogonality():
 
     couples = sorted([couple for couple in combinations(province_names, r=2)])
 
-    for (one, another) in couples:
+    for one, another in couples:
         assert (
             get_adm_maps(province=one)[0]["geometry"]
             & get_adm_maps(province=another)[0]["geometry"]
@@ -295,7 +309,7 @@ def test_city_orthogonality():
             sorted(("阿勒泰地区", "北屯市")),
         ]
 
-        for (one, another) in couples:
+        for one, another in couples:
             if sorted([one, another]) in problem_set:
                 continue
             area = (
@@ -312,7 +326,7 @@ def test_province_union():
 
     couples = sorted([couple for couple in combinations(province_names, r=2)])
 
-    for (one, another) in couples:
+    for one, another in couples:
         _ = (
             get_adm_maps(province=one)[0]["geometry"]
             + get_adm_maps(province=another)[0]["geometry"]
@@ -326,7 +340,7 @@ def test_province_difference():
 
     couples = sorted([couple for couple in product(province_names, repeat=2)])
 
-    for (one, another) in couples:
+    for one, another in couples:
         _ = (
             get_adm_maps(province=one)[0]["geometry"]
             - get_adm_maps(province=another)[0]["geometry"]
@@ -360,13 +374,17 @@ def test_get_extent():
 
 def test_only_polygon_and_record():
     """测试only_polygon参数和record参数功能."""
-    polygons = get_adm_maps(city="北京市", record="all", level="区县", only_polygon=True)
+    polygons = get_adm_maps(
+        city="北京市", record="all", level="区县", only_polygon=True
+    )
     assert isinstance(polygons, list)
     assert len(polygons) == 16
     for p in polygons:
         assert isinstance(p, MapPolygon)
 
-    polygon = get_adm_maps(city="北京市", record="first", level="区县", only_polygon=True)
+    polygon = get_adm_maps(
+        city="北京市", record="first", level="区县", only_polygon=True
+    )
     assert isinstance(polygon, MapPolygon)
 
     meta = get_adm_maps(city="北京市", record="first", level="市")
