@@ -312,7 +312,6 @@ def test_maskout(benchmark):
             only_polygon=True,
             record="first",
             wgs84=False,
-            dilution_interval=10,
         )
 
         lons, lats, data = load_dem()
@@ -363,7 +362,6 @@ def test_make_maskout_array(benchmark):
             record="first",
             only_polygon=True,
             wgs84=False,
-            dilution_interval=10,
         )
         china_maskout_array = china.make_mask_array(lons, lats)
 
