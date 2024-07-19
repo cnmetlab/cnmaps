@@ -34,7 +34,7 @@ map_arg = {
     "only_polygon": True,
     "record": "first",
     "name": "中华人民共和国",
-    "dilution_interval": 10
+    "dilution_interval": 10,
 }
 
 
@@ -330,11 +330,7 @@ def test_maskout(benchmark):
         mask_array = np.load(casefp)
 
         map_polygon = get_adm_maps(
-            province="宁夏回族自治区",
-            only_polygon=True,
-            record="first",
-            wgs84=True,
-            dilution_interval=10,
+            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
         )
 
         lons, lats, data = load_dem()
@@ -385,7 +381,6 @@ def test_make_maskout_array(benchmark):
             record="first",
             only_polygon=True,
             wgs84=True,
-            dilution_interval=10,
         )
         china_maskout_array = china.make_mask_array(lons, lats)
 
