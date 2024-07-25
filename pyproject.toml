@@ -24,7 +24,7 @@ scipy = ">=1.8"
 
 [tool.poetry.group.dev.dependencies]
 flake8 = "^6.1.0"
-pytest = "^7.4.0"
+pytest = ">=7.4,<9.0"
 pytest-cov = "^4.1.0"
 black = "^23.7.0"
 ipython = "^8.14.0"
