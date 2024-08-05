@@ -23,7 +23,7 @@ scipy = ">=1.8"
 
 
 [tool.poetry.group.dev.dependencies]
-flake8 = "^6.1.0"
+flake8 = ">=6.1,<8.0"
 pytest = "^7.4.0"
 pytest-cov = "^4.1.0"
 black = "^23.7.0"
