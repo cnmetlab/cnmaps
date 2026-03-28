@@ -53,7 +53,7 @@ jobs:
           poetry run flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
       - name: Run tests and collect benchmark
         run: |
-          poetry run pytest --verbose -p no:warnings --memray --benchmark-json output.json ./tests/test_perf.py
+          poetry run pytest --verbose -p no:warnings -m "not heavy" --memray --benchmark-json output.json ./tests/test_perf.py
       - name: Continuous Benchmark
         uses: benchmark-action/github-action-benchmark@v1.14.0
         with:

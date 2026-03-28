@@ -19,6 +19,9 @@ from cnmaps.sample import load_dem
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
 
+# 与 tests/mapcase/china-maskout-*-fast.npy 一致；修改尺寸或遮罩逻辑后需在本地重新生成这两个 npy
+MAKE_MASKOUT_FAST_GRID_SIZE = 100
+
 
 def test_maskout():
     """测试maskout方法"""
@@ -60,7 +63,42 @@ def test_maskout():
 
 
 def test_make_maskout_array():
-    """测试make_maskout_array方法"""
+    """测试 make_maskout_array（较小网格，便于 CI 快速跑完）。"""
+    n = MAKE_MASKOUT_FAST_GRID_SIZE
+    casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02-fast.npy")
+    mask_array = np.load(casefp)
+
+    lon = np.linspace(60, 150, n)
+    lat = np.linspace(0, 60, n)
+    lons, lats = np.meshgrid(lon, lat)
+
+    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+    china_maskout_array = china.make_mask_array(lons, lats)
+
+    assert (china_maskout_array == mask_array).all()
+
+    casefp = os.path.join(MAPCASE_DIR, "china-maskout-wgs84-fast.npy")
+    mask_array = np.load(casefp)
+
+    lon = np.linspace(60, 150, n)
+    lat = np.linspace(0, 60, n)
+    lons, lats = np.meshgrid(lon, lat)
+
+    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+    china_maskout_array = china.make_mask_array(lons, lats)
+
+    assert (china_maskout_array == mask_array).all()
+
+    with pytest.raises(ValueError):
+        china.make_mask_array(lon, lat)
+
+    with pytest.raises(ValueError):
+        china.make_mask_array(lons, lats[:-1])
+
+
+@pytest.mark.heavy
+def test_make_maskout_array_full():
+    """全分辨率 1000×1000 与黄金文件比对；请在本地或高性能环境运行全量 pytest。"""
     casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02.npy")
     mask_array = np.load(casefp)
 
@@ -84,12 +122,6 @@ def test_make_maskout_array():
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
-
-    with pytest.raises(ValueError):
-        china.make_mask_array(lon, lat)
-
-    with pytest.raises(ValueError):
-        china.make_mask_array(lons, lats[:-1])
 
 
 def test_mappolygon_to_file():
