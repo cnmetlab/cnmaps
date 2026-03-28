@@ -4,10 +4,13 @@ import os
 import sqlite3
 import copy
 from itertools import product
+from functools import lru_cache
 
 import numpy as np
 import shapely.geometry as sgeom
 from shapely.geometry import mapping
+from shapely import wkb
+from shapely.strtree import STRtree
 import fiona
 import geojson
 import orjson
@@ -43,6 +46,13 @@ def _ensure_mappolygon(geom):
     if isinstance(geom, (sgeom.MultiPolygon, sgeom.Polygon)):
         return MapPolygon(geom)
     return geom
+
+
+def _clone_geometry(geom):
+    """Return a detached copy of a Shapely geometry."""
+    if geom is None:
+        return None
+    return wkb.loads(geom.wkb)
 
 
 def _as_mappolygon_result(geom):
@@ -91,7 +101,7 @@ class MapPolygon:
                 self._geom = sgeom.MultiPolygon([source])
                 return
             if isinstance(source, sgeom.MultiPolygon):
-                self._geom = sgeom.MultiPolygon(list(source.geoms))
+                self._geom = source
                 return
 
         self._geom = sgeom.MultiPolygon(*args, **kwargs)
@@ -160,14 +170,33 @@ class MapPolygon:
         """
         geom = _get_geom(map_polygon)
         polygons = list(geom.geoms)
-        couples = [couple for couple in product(polygons, repeat=2)]
+        if len(polygons) < 2:
+            return MapPolygon(polygons)
 
-        for one, other in couples:
-            if one.contains(other) and one != other:
-                try:
-                    polygons.remove(other)
-                except ValueError:
-                    pass
+        indexed_polygons = sorted(enumerate(polygons), key=lambda item: item[1].area, reverse=True)
+        sorted_polygons = [polygon for _, polygon in indexed_polygons]
+        original_indices = [index for index, _ in indexed_polygons]
+        tree = STRtree(sorted_polygons)
+        removed_indices = set()
+
+        for idx, polygon in enumerate(sorted_polygons):
+            if idx in removed_indices:
+                continue
+
+            for candidate_idx in tree.query(polygon):
+                if candidate_idx == idx or candidate_idx in removed_indices:
+                    continue
+                candidate = sorted_polygons[candidate_idx]
+                if polygon.area <= candidate.area:
+                    continue
+                if polygon.contains(candidate):
+                    removed_indices.add(candidate_idx)
+
+        polygons = [
+            polygons[original_indices[idx]]
+            for idx in range(len(sorted_polygons))
+            if idx not in removed_indices
+        ]
 
         return MapPolygon(polygons)
 
@@ -288,7 +317,8 @@ class MapPolygon:
         return ~_contains_xy(self._geom, lons, lats)
 
 
-def read_mapjson(fp, wgs84=True):
+@lru_cache(maxsize=8192)
+def _read_mapjson_cached(fp, wgs84=True):
     """
     读取geojson地图边界文件
 
@@ -317,10 +347,79 @@ def read_mapjson(fp, wgs84=True):
                 else:
                     polygon_list.append(sgeom.Polygon(coords))
 
-        return MapPolygon(polygon_list)
+        return sgeom.MultiPolygon(polygon_list)
 
     elif geometry["type"] == "MultiLineString":
         return sgeom.MultiLineString(geometry["coordinates"])
+
+
+def read_mapjson(fp, wgs84=True):
+    geom = _clone_geometry(_read_mapjson_cached(fp, wgs84=wgs84))
+    return _ensure_mappolygon(geom)
+
+
+@lru_cache(maxsize=2048)
+def _query_adm_metadata(
+    province=None,
+    city=None,
+    district=None,
+    level=None,
+    country="中华人民共和国",
+    source="高德",
+    db=DB_FILE,
+):
+    con = sqlite3.connect(db)
+    try:
+        cur = con.cursor()
+
+        country_sql = f"AND country='{country}'" if country else ""
+        province_sql = f"AND province='{province}'" if province else ""
+        city_sql = f"AND city='{city}'" if city else ""
+        district_sql = f"AND district='{district}'" if district else ""
+        source_sql = f"AND source='{source}'" if source else ""
+
+        if not level:
+            if district:
+                level = "区县"
+            elif city:
+                level = "市"
+            elif province:
+                level = "省"
+            elif country:
+                level = "国"
+
+        if level == "国":
+            level_sql = "level='国'"
+            province_sql = ""
+            city_sql = ""
+            district_sql = ""
+        elif level == "省":
+            level_sql = "level='省'"
+            city_sql = ""
+            district_sql = ""
+        elif level == "市":
+            level_sql = "level='市'"
+            district_sql = ""
+        elif level in ["区", "县", "区县", "区/县"]:
+            level_sql = "level='区县'"
+            level = "区县"
+        else:
+            raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+
+        meta_sql = (
+            "SELECT country, province, city, district, level, source, kind, path"
+            " FROM ADMINISTRATIVE"
+            f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+            f" {district_sql} {source_sql};"
+        )
+        rows = tuple(cur.execute(meta_sql))
+    finally:
+        con.close()
+
+    if not rows:
+        raise MapNotFoundError("未找到指定地图的边界文件")
+
+    return rows
 
 
 def get_adm_names(
@@ -432,97 +531,20 @@ def get_adm_maps(
     """
     import geopandas as gpd
 
-    con = sqlite3.connect(db)
-    cur = con.cursor()
-
-    if country:
-        country_level = "国"
-        country_sql = f"AND country='{country}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {country_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        country_sql = ""
-        country_level = None
-
-    if province:
-        province_level = "省"
-        province_sql = f"AND province='{province}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {province_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        province_sql = ""
-        province_level = None
-
-    if city:
-        city_level = "市"
-        city_sql = f"AND city='{city}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {city_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        city_sql = ""
-        city_level = None
-
-    if district:
-        district_level = "区县"
-        district_sql = f"AND district='{district}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {district_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        district_sql = ""
-        district_level = None
-
-    if source:
-        source_sql = f"AND source='{source}'"
-    else:
-        source_sql = ""
-
-    if not level:
-        level = district_level or city_level or province_level or country_level
-
-    if level == "国":
-        level_sql = "level='国'"
-        province_sql = ""
-        city_sql = ""
-        district_sql = ""
-    elif level == "省":
-        level_sql = "level='省'"
-        city_sql = ""
-        district_sql = ""
-    elif level == "市":
-        level_sql = "level='市'"
-        district_sql = ""
-    elif level in ["区", "县", "区县", "区/县"]:
-        level_sql = "level='区县'"
-    else:
-        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
-
-    meta_sql = (
-        "SELECT country, province, city, district, level, source, kind"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-        f" {district_sql} {source_sql};"
+    rows = _query_adm_metadata(
+        province=province,
+        city=city,
+        district=district,
+        level=level,
+        country=country,
+        source=source,
+        db=db,
     )
-    meta_rows = list(cur.execute(meta_sql))
-
-    geom_sql = (
-        "SELECT path"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-        f" {district_sql} {source_sql};"
-    )
-    gemo_rows = list(cur.execute(geom_sql))
+    meta_rows = [row[:7] for row in rows]
     map_polygons = []
-    for path in gemo_rows:
+    for row in rows:
         mapjson = read_mapjson(
-            os.path.join(DATA_DIR, "geojson.min/", path[0]), wgs84=wgs84
+            os.path.join(DATA_DIR, "geojson.min/", row[7]), wgs84=wgs84
         )
 
         map_polygons.append(_get_geom(mapjson))

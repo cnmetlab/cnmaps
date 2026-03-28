@@ -1,12 +1,23 @@
 """样例数据模块."""
 
 import os
+from functools import lru_cache
 
 import netCDF4 as nc
 import numpy as np
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BASE_DATA_DIR = os.path.join(BASE_DIR, "data", "sample")
+
+
+@lru_cache(maxsize=3)
+def _load_dataset_arrays(filename, data_var):
+    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, filename))
+    lon = ds.variables["lon"][:]
+    lat = ds.variables["lat"][:]
+    lons, lats = np.meshgrid(lon, lat)
+    data = ds.variables[data_var][:]
+    return lons, lats, data
 
 
 def load_dem():
@@ -16,13 +27,7 @@ def load_dem():
     返回值:
         tuple: (lons, lats, data)
     """
-    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, "china-dem.nc"))
-    lon = ds.variables["lon"][:]
-    lat = ds.variables["lat"][:]
-    lons, lats = np.meshgrid(lon, lat)
-    data = ds.variables["dem"][:]
-
-    return lons, lats, data
+    return _load_dataset_arrays("china-dem.nc", "dem")
 
 
 def load_wind():
@@ -32,13 +37,8 @@ def load_wind():
     返回值:
         tuple: (lons, lats, u, v)
     """
-    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, "china-wind.nc"))
-    lon = ds.variables["lon"][:]
-    lat = ds.variables["lat"][:]
-    lons, lats = np.meshgrid(lon, lat)
-    u = ds.variables["u"][:]
-    v = ds.variables["v"][:]
-
+    lons, lats, u = _load_dataset_arrays("china-wind.nc", "u")
+    _, _, v = _load_dataset_arrays("china-wind.nc", "v")
     return lons, lats, u, v
 
 
@@ -49,10 +49,4 @@ def load_temp():
     返回值:
         tuple: (lons, lats, temp)
     """
-    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, "china-temp.nc"))
-    lon = ds.variables["lon"][:]
-    lat = ds.variables["lat"][:]
-    lons, lats = np.meshgrid(lon, lat)
-    temp = ds.variables["temp"][:]
-
-    return lons, lats, temp
+    return _load_dataset_arrays("china-temp.nc", "temp")
