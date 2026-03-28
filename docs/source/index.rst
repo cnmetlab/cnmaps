@@ -1,23 +1,23 @@
-cnmaps使用指南
+cnmaps 使用指南
 ==================================
 
 .. image:: _static/logo.png
 
 
-cnmaps是一个致力于让中国地图的获取和使用更丝滑的python扩展包。
+cnmaps 是一个致力于让中国地图的获取和使用更顺手的 Python 扩展包，与 `Cartopy <https://scitools.org.uk/cartopy/>`_ 配合使用。源码与问题反馈见 `GitHub：cnmetlab/cnmaps <https://github.com/cnmetlab/cnmaps>`_ 。
 
 当前版本具有以下几个主要功能：
 
-1. 自带合规地图边界，数据源来自于高德等测绘机构，让你无需再额外寻找地图边界文件。
-2. 支持地图边界之间的加减、交并集等常规操作，让你可以自由地组合想要的地图形状。
-3. 具有易于使用的地图裁剪功能，且裁剪效果好，平滑无锯齿。
-4. 与cartopy集成，可以自动转换地图边界的投影。
+1. 自带合规地图边界数据（行政边界等，数据源包括高德等），无需再单独寻找边界文件。
+2. 支持地图边界之间的加、减、交、并等运算，便于组合出需要的范围。
+3. 提供针对 contour、pcolormesh、quiver、scatter、clabel 等对象的按边界裁剪，效果平滑。
+4. 与 Cartopy 集成，可在不同投影下绘制与裁剪。
 
 .. image:: _static/china-clip-projections.png
    :width: 600 px
 
-cnmaps使用指南
----------------
+目录
+----
 
 .. toctree::
    :maxdepth: 3

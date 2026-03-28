@@ -11,8 +11,8 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
     地图多边形类（内部持有一个 ``shapely.geometry.MultiPolygon``，组合实现，兼容 Shapely 2.0+）
 
-    该是基于shapely.geometry.MultiPolygon的自定义类, 
-    并实现了对于加号操作符的支持.
+    该类基于 ``shapely.geometry.MultiPolygon`` 的自定义封装，
+    并实现了加号等运算符以合并边界。
 
     .. py:method:: drop_inner_duplicate(map_polygon)
 
@@ -40,7 +40,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
         :rtype: tuple
 
-    .. py:method:: to_file(savefp, engine = "GeoJSON", meta = {"id": None, "name": None}, encoding = "utf-8")
+    .. py:method:: to_file(savefp, engine="GeoJSON", meta={"id": None, "name": None}, encoding="utf-8")
 
         存储为文件
 
@@ -48,12 +48,12 @@ maps模块主要存放与地图边界对象相关的类和函数。
             保存路径
 
         :param str engine: 
-            存储引擎，支持的选项为 ``'ESRI Shapefile'`` 和 ``'GeoJSON'``.默认为 ``'GeoJSON'`` .
+            存储引擎，支持的选项为 ``'ESRI Shapefile'`` 和 ``'GeoJSON'`` ，不区分大小写。默认为 ``'GeoJSON'`` 。
 
         :param dict meta: 
-            元信息. 默认为 ``{'id': 0, 'name': 'unknown'}`` .
+            元信息，写入要素属性。默认为 ``{'id': None, 'name': None}`` 。
 
-        :param str encoding: 编码类型. 默认为 ``'utf-8'`` .
+        :param str encoding: 编码类型。默认为 ``'utf-8'`` 。
 
     .. py:method:: make_mask_array(lons, lats)
 
@@ -95,23 +95,23 @@ maps模块主要存放与地图边界对象相关的类和函数。
         cnmaps.maps.MapPolygon
 
 
-.. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德')
+.. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None, level: str = '省', country: str = '中华人民共和国', source: str = '高德')
     :module: cnmaps.maps
 
-    获取行政名称
+    获取行政名称（内部调用 ``get_adm_maps`` 再抽取名称字段）。
 
     :param str province:
-        省/自治区/直辖市/行政特区中文名, 必须为全称, 例如查找河北省应收入 ``'河北省'`` 而非 ``'河北'`` . 默认为 ``None``.
+        省/自治区/直辖市/行政特区中文名，必须为全称。默认为 ``None``。
     :param str city:
-        地级市中文名, 必须为全称, 例如查找北京市应输入 ``'北京市'`` 而非 ``'北京'`` . 默认为 ``None``.
+        地级市中文名，必须为全称。默认为 ``None``。
     :param str district:
-        区/县中文名, 必须为全称. 默认为 ``None``.
+        区/县中文名，必须为全称。默认为 ``None``。
     :param str level:
-        边界等级, 目前支持的等级包括 ``'省'``, ``'市'``, ``'区县'``. 其中 ``'省'`` 级包括直辖市、特区等; ``'市'`` 级为地级市, 若为直辖市, 则名称与 ``'省'`` 级相同, 比如北京市的省级和市级都是 ``'北京市'`` ;  ``'区'`` 和 ``'县'`` 属于同一级别的不同表达形式. 默认为 ``'省'``.
+        边界等级，请使用 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一（与 ``get_adm_maps`` 的 ``level`` 含义一致）。默认为 ``'省'``。
     :param str country:
-        国家名称, 必须为全称. 默认为 ``'中华人民共和国'``.
+        国家名称，必须为全称。默认为 ``'中华人民共和国'``。
     :param str source:
-        数据源. 默认为 ``'高德'``.
+        数据源。默认为 ``'高德'``。
 
     :return:
         满足条件的名称列表
@@ -119,109 +119,130 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :rtype: list
 
 
-.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None,level: str = '省', country: str = '中华人民共和国', source: str = '高德',db: str = DB_FILE, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool=True, *args, **kwargs)
+.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None, level: str = None, country: str = '中华人民共和国', source: str = '高德', db: str = DB_FILE, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool = True, simplify: bool = False, *args, **kwargs)
     :module: cnmaps.maps
 
-    获取行政地图的边界对象
+    获取行政地图的边界对象。
 
     :param str province:
-        省/自治区/直辖市/行政特区中文名, 必须为全称, 例如查找河北省应收入 ``'河北省'`` 而非 ``'河北'`` . 默认为 ``None``.
+        省/自治区/直辖市/行政特区中文名，必须为全称。默认为 ``None``。
     :param str city:
-        地级市中文名, 必须为全称, 例如查找北京市应输入 ``'北京市'`` 而非 ``'北京'`` . 默认为 ``None``.
+        地级市中文名，必须为全称。默认为 ``None``。
     :param str district:
-        区/县中文名, 必须为全称. 默认为 ``None``.
+        区/县中文名，必须为全称。默认为 ``None``。
     :param str level:
-        边界等级, 目前支持的等级包括 ``'省'``, ``'市'``, ``'区县'``. 其中 ``'省'`` 级包括直辖市、特区等; ``'市'`` 级为地级市, 若为直辖市, 则名称与 ``'省'`` 级相同, 比如北京市的省级和市级都是 ``'北京市'`` ;  ``'区'`` 和 ``'县'`` 属于同一级别的不同表达形式. 默认为 ``'省'``.
+        边界等级，须为 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一；也可使用 ``'区'``、``'县'``、``'区/县'`` 等写法（内部归一为 ``'区县'``）。若为 ``None``，则根据是否传入 ``province`` / ``city`` / ``district`` 自动推断等级。国界查询使用 ``level='国'``（全国陆地与南海诸岛等为多条记录，常见用法为 ``record='first'`` 等）。
     :param str country:
-        国家名称, 必须为全称. 默认为 ``'中华人民共和国'``.
+        国家名称，必须为全称。默认为 ``'中华人民共和国'``。
     :param str source:
-        数据源. 默认为 ``'高德'``.
+        数据源。默认为 ``'高德'``。
     :param str db:
-        sqlite db文件路径. 默认从配置文件中取.
+        SQLite 数据库文件路径。默认使用包内数据索引。
     :param str engine:
-        输出引擎, 默认为None, 输出为list列表, 目前支持'geopandas', 若为geopandas, 则返回GeoDataFrame对象. 默认为 None.
+        输出引擎：``None`` 时为 ``list``（元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。
     :param str record:
-        返回记录的形式, 选项包括 ``'all'`` 和 ``'first'`` ; 若为 ``'first'`` , 则无论查询结果又几条，仅返回第一条记录, 若为 ``'all'`` , 则返回全部数据, 若 ``engine==None`` 则返回list, 若 ``engine=='geopandas'`` , 则返回GeoDataFrame对象. 默认为 ``'all'`` .
+        ``'all'`` 返回全部匹配记录；``'first'`` 仅返回第一条。
     :param bool only_polygon:
-        是否仅返回地图边界对象(MapPolygon), 若为 ``True`` 则返回结果为MapPolygon对象或以MapPolygon对象组合的list, 若为 ``False`` , 则返回的结果包含元信息, MapPolygon对象存储在 ``'geometry'`` 键中. 默认为 ``False`` .
+        ``True`` 时只返回 ``MapPolygon`` 或 ``MapPolygon`` 列表；``False`` 时返回带 ``'geometry'`` 等字段的字典列表（或 ``GeoDataFrame``）。
     :param bool wgs84:
-        是否使用 WGS84 坐标，若为 True 则转为 WGS84 坐标，若为 False 则为原始的 GCJ02 坐标（火星坐标）. 默认为 ``True``
+        ``True`` 为 WGS84，``False`` 为 GCJ02（火星坐标）。
+    :param bool simplify:
+        是否对几何做简化。默认为 ``False``。
 
     :return:
-        根据输入参数查找到的地图边界的元信息及边界对象
+        根据参数查到的地图元信息与几何
 
-    :rtype: GeoDataFrame or list
+    :rtype: list or geopandas.GeoDataFrame
 
 drawing
 ==========
 drawing模块主要存放与绘图相关的函数
 
-.. py:function:: clip_contours_by_map(contours, map_polygon)
+.. py:function:: clip_contours_by_map(contours, map_polygon, ax=None)
     :module: cnmaps.drawing
 
-    使用地图边界对象对等值线对象进行裁剪
+    使用地图边界对等值线 / 填色等值线（``contour`` / ``contourf``）结果裁剪。
 
     :param cartopy.mpl.contour.GeoContourSet contours:
-        等值线对象, 该对象是调用 ``ax.contour()`` 或 ``ax.contourf()`` 方法的返回值，注意: 对象须带有投影信息
-                
+        ``ax.contour()`` 或 ``ax.contourf()`` 的返回值，须带投影信息。
     :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象, 可以通过 ``get_adm_maps()`` 获取
+        地图边界对象，通常由 ``get_adm_maps(..., only_polygon=True)`` 得到。
+    :param ax:
+        坐标轴；默认使用当前轴（``matplotlib.pyplot.gca()``）。
 
 
-.. py:function:: clip_pcolormesh_by_map(mesh, map_polygon)
+.. py:function:: clip_pcolormesh_by_map(mesh, map_polygon, ax=None)
     :module: cnmaps.drawing
 
-    使用地图边界对象对填色网格线对象进行裁剪
+    对 ``pcolormesh`` 结果按地图边界裁剪。
 
     :param cartopy.mpl.geocollection.GeoQuadMesh mesh:
-        GeoQuadMesh对象, 该对象是调用 ``ax.pcolormesh()`` 方法的返回值，注意: 对象须带有投影信息
-                
+        ``ax.pcolormesh()`` 的返回值，须带投影信息。
     :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象, 可以通过 ``get_adm_maps()`` 获取
+        地图边界对象。
+    :param ax:
+        坐标轴；默认当前轴。
 
 
-.. py:function:: clip_quiver_by_map(quiver, map_polygon)
+.. py:function:: clip_quiver_by_map(quiver, map_polygon, ax=None)
     :module: cnmaps.drawing
 
-    使用地图边界对象对箭矢簇对象进行裁剪
+    对箭矢图 ``quiver`` 按地图边界裁剪。
 
     :param matplotlib.quiver.Quiver quiver:
-        Quiver对象, 该对象是调用 ``ax.quiver()`` 方法的返回值，注意: 对象须带有投影信息
-                
+        ``ax.quiver()`` 的返回值，须带投影信息。
     :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象, 可以通过 ``get_adm_maps()`` 获取
+        地图边界对象。
+    :param ax:
+        坐标轴；默认当前轴。
 
 
-.. py:function:: clip_clabels_by_map(clabel_text, map_polygon)
+.. py:function:: clip_scatter_by_map(scatter, map_polygon, ax=None)
     :module: cnmaps.drawing
 
-    剪切clabel文本, 一般配合contour函数使用
+    对 ``scatter`` 散点按地图边界裁剪（设置 ``set_clip_path``）。
 
-    **注意: 该函数仅对于cartopy>=0.19.0版本有效**
-
-    :param matplotlib.text.Text clabel_text:
-        matplotlib.text.Text对象, 由 ``clabel`` 函数返回
-
+    :param matplotlib.collections.PathCollection scatter:
+        ``ax.scatter()`` 的返回值。
     :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象, 可以通过 ``get_adm_maps()`` 获取
+        地图边界对象。
+    :param ax:
+        坐标轴；默认当前轴。
 
-.. py:function:: draw_map(map_polygon, **kwargs)
+
+.. py:function:: clip_clabels_by_map(clabel_text, map_polygon, ax=None)
     :module: cnmaps.drawing
 
-    绘制单个地图边界线
+    按边界隐藏落在区域外的等值线标签，一般与 ``contour`` + ``clabel`` 联用。
 
+    **注意：依赖 Cartopy 与地图投影，建议在 cartopy >= 0.19.0 环境下使用。**
+
+    :param clabel_text:
+        ``ax.clabel()`` 返回的可迭代标签集合（内部对逐个 ``matplotlib.text.Text`` 判断位置是否在 ``map_polygon`` 内）。
     :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界线对象
+        地图边界对象。
+    :param ax:
+        坐标轴；默认当前轴。
 
-.. py:function:: draw_maps(maps, **kwargs)
+.. py:function:: draw_map(map_polygon, ax=None, **kwargs)
     :module: cnmaps.drawing
 
-    绘制多个地图边界
+    绘制单个地图边界线（或 ``MultiLineString``）。
+
+    :param map_polygon:
+        ``MapPolygon`` 或 ``shapely.geometry.MultiLineString``。
+    :param ax:
+        坐标轴；默认当前轴。
+
+.. py:function:: draw_maps(maps, ax=None, **kwargs)
+    :module: cnmaps.drawing
+
+    批量绘制多个地图边界。
 
     :param maps:
-        地图边界线对象
-
-    :type maps: list or GeoDataFrame
+        ``list``（``MapPolygon`` 或含 ``geometry`` 的字典）或 ``geopandas.GeoDataFrame``。
+    :param ax:
+        坐标轴；默认当前轴。
 
 regions
 ==========
@@ -259,7 +280,7 @@ sample模块主要存放示例数据
 .. py:function:: load_wind()
     :module: cnmaps.sample
 
-    加载中国地区的气温样例数据
+    加载中国地区的风场样例数据（u、v 分量）
 
     :return:
         (lons, lats, u, v)

@@ -1,11 +1,19 @@
 版本日志
 ===========
+
+1.1.10
+------
+*发布日以 PyPI 为准。*
+
+* **Shapely 2.0**：本版本最重要的变更是将依赖与实现全面对齐 **Shapely 2.x**（``pyproject.toml`` 中为 ``shapely>=2.0.0``），在保留 ``MapPolygon`` 等既有 API 的前提下，消除此前与 Shapely 2.0 迁移相关的兼容性问题；该项变更对应 `Issue #106 <https://github.com/cnmetlab/cnmaps/issues/106>`_。
+* 文档：安装说明、贡献者指南、API 参考等与当前工程及 CI 同步（Python/NumPy 约束、GitHub Actions、函数签名等）。
+
 1.1.7
 ------
 *发布时间: 2023-08-10*
 
 * Python 解释器要求升级到 3.9。
-* catopy 版本要求升级到 0.22.0。
+* Cartopy 版本要求升级到 0.22.0。
 * 修复了由于 ``shapely>=2.0`` 导致的错误。
 * 修复了 Numba、Geopandas 的警告提示问题。
 * pip 安装时不再需要手动安装依赖。
@@ -63,4 +71,4 @@
 * 增加功能: cnmaps.clip_clabels_by_map函数: 基于MapPolygon类对标签做裁减。
 * 对cartopy.crs各类投影的支持。
 * 对全国中国国界、全国各省(特区/直辖市)地图的预置, 且处理了已知的拓扑错误。
-* 集成了travis CI自动化测试。
+* 集成 Travis CI 自动化测试（后续版本已迁移至 GitHub Actions）。

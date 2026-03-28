@@ -27,22 +27,34 @@
 
 文档编写
 -----------
-cnmaps的文档（也就是当前你正在阅读的这个文档）是使用Python语言的sphinx框架托管于GitHub并与Readthedocs.org集成实现的，若你想要完善文档，则可以fork本文档的代码仓库： `cnmaps <https://github.com/Clarmy/cnmaps>`_ ，在你本地进行修改和测试后向主仓库提交Pull Request，在我（们）审核之后会自动合并到主分支并进行构建发布。
+cnmaps 的文档（当前 Sphinx 工程）源码位于主仓库的 ``docs/`` 目录；`Read the Docs <https://readthedocs.org/>`_ 使用仓库根目录的 ``.readthedocs.yaml``，通过 ``requirements/requirements-doc.txt`` 安装 Sphinx 与主题后执行构建。若你想完善文档，请 fork 主仓库 `cnmetlab/cnmaps <https://github.com/cnmetlab/cnmaps>`_ ，本地可用 ``make html``（见 ``docs/Makefile``）预览，再向主仓库提交 Pull Request。
 
 测试
 -----------
-以使用者的角度测试项目的各项功能，在发现bug以后，去 `Issues页面 <https://github.com/Clarmy/cnmaps/issues>`_ 提交议题（Issue），最好能针对发现的bug写出测试用例。你也可以在项目的tests目录中补充测试用例，这可能需要你能熟练使用pytest测试框架。
+以使用者的角度测试项目的各项功能；发现 bug 请到 `Issues <https://github.com/cnmetlab/cnmaps/issues>`_ 提交，并尽量附上可复现步骤或测试用例。你也可以在 ``tests/`` 中补充 `pytest <https://pytest.org/>`_ 用例。
+
+部分用例标记为 ``@pytest.mark.heavy``（全网格等耗时测试）。**默认 CI** 使用 ``pytest -m "not heavy"`` 跳过这些用例；本地若需与 CI 一致可同样加上该参数。运行全部测试可不加 ``-m``。
+
+代码风格方面，CI 使用 **flake8**（配置见 ``.flake8``；工作流中先跑 E9/F63/F7/F82 等严重规则，其余为告警）。``pyproject.toml`` 中还包含 **black** 等开发依赖，提交前可在项目根目录执行 ``poetry run flake8 .``（与 CI 一致）做检查。
+
+持续集成
+-----------
+主分支与 Pull Request 使用 **GitHub Actions**，主要包括：
+
+* ``python-package.yml``：在 macOS / Ubuntu / Windows 上对 Python 3.9–3.12 执行 flake8，并对 ``tests/test_drawing.py``、``test_geo.py``、``test_map.py``、``test_issues.py`` 运行 ``pytest -m "not heavy"``（与本地默认跳过 ``@pytest.mark.heavy`` 一致）。
+* ``perf-test.yml``：在 Ubuntu、Python 3.9 上对 ``tests/test_perf.py`` 运行带 **pytest-benchmark** 与 **memray** 的测试，并将基准结果推送到 ``gh-pages``；随后对主测试文件运行 **pytest-cov** 并通过 Codecov 上传覆盖率（需仓库配置 ``CODECOV_TOKEN``）。
+* ``pypi-publish.yml``：在发布 Release 时向 PyPI 发布。
 
 讨论
 -----------
-如果你对代码并不熟悉，或者对代码质量不自信，但是对项目的功能有自己的想法，也可以通过在 `Issues页面 <https://github.com/Clarmy/cnmaps/issues>`_ 中提出自己的功能需求的方式参与项目（类似于产品经理提出需求），当然也并不限于需求的讨论，对于GIS知识等非代码的一些认知偏差纠正或者指出、修复地图的拓扑错误也算，当然如果你能提供好的数据源也是非常重要的，比如你可以提供一套质量很高的地理边界。
+如果你对代码并不熟悉，或者对代码质量不自信，但是对项目的功能有自己的想法，也可以通过在 `Issues <https://github.com/cnmetlab/cnmaps/issues>`_ 中提出功能需求或参与讨论（GIS 认知、地图拓扑与数据源等同样欢迎）。
 
 开发
 -----------
 如果是想参与到cnmaps的代码的开发，相对来说限制会多一些。首先你必须对代码质量有追求，在平时撸代码的时候会尽量以优雅地方式实现代码，具体来说可能要满足以下几条：
 
-1. 了解PEP8和Google的Python代码规范，并愿意遵守其大部分原则。
-2. 在平时的开发中会使用pylint等工具对自己的代码进行自动化审查。
+1. 了解 PEP 8 与常见的 Python 代码规范，并愿意遵守其大部分原则。
+2. 在开发中会使用 flake8 等工具对代码做自动化检查（与仓库配置保持一致）。
 3. 能够接受“测试驱动开发”（TDD）的工作方式，认同“质量优于速度”的理念。
 4. 会写测试用例，会进行单元测试。
 5. 乐于交流，愿意用最直接高效的方式交流，不要求所谓的空杯心态，但也不要过于傲慢。
