@@ -14,6 +14,10 @@ jobs:
     name: Build test on (${{ matrix.python-version }}, ${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 60
+    # Push gh-pages + optional PR comments from github-action-benchmark (replaces PAT secrets.CI_TOKEN)
+    permissions:
+      contents: write
+      pull-requests: write
     env:
       MPLBACKEND: Agg
     strategy:
@@ -60,8 +64,7 @@ jobs:
           name: cnmaps Benchmark
           tool: "pytest"
           output-file-path: output.json
-          github-token: ${{ secrets.CI_TOKEN }}
-          gh-repository: "github.com/cnmetlab/cnmaps"
+          github-token: ${{ github.token }}
           auto-push: true
           alert-threshold: "150%"
           comment-on-alert: true
