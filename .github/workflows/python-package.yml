@@ -32,10 +32,18 @@ jobs:
           echo "import sys; sys.stdout.reconfigure(encoding='utf-8')" > sitecustomize.py
         if: matrix.os == 'windows-latest'
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           python -m pip install poetry
-          poetry install
+          for i in 1 2 3; do
+            poetry install && break
+            if [ "$i" -eq 3 ]; then
+              exit 1
+            fi
+            echo "poetry install failed, retrying ($i/3)..."
+            sleep 10
+          done
       - name: Lint with flake8
         run: |
           # stop the build if there are Python syntax errors or undefined names
