@@ -8,7 +8,7 @@ readme = "PYPI.md"
 homepage = "https://github.com/cnmetlab/cnmaps"
 
 [tool.poetry.dependencies]
-python = ">=3.9,<3.12"
+python = ">=3.9,<3.13"
 shapely = ">=1.8.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"
