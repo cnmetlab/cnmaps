@@ -6,12 +6,12 @@ import pytest
 
 pytest.importorskip("pytest_benchmark", reason="pytest-benchmark not installed (dev dependency)")
 
-import numpy as np
-import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
+import numpy as np  # noqa: E402
+import matplotlib.pyplot as plt  # noqa: E402
+import cartopy.crs as ccrs  # noqa: E402
 
 
-from cnmaps import (
+from cnmaps import (  # noqa: E402
     get_adm_maps,
     get_adm_names,
     clip_clabels_by_map,
@@ -21,7 +21,7 @@ from cnmaps import (
     clip_quiver_by_map,
     clip_scatter_by_map,
 )
-from cnmaps.sample import load_dem, load_temp, load_wind
+from cnmaps.sample import load_dem, load_temp, load_wind  # noqa: E402
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
 

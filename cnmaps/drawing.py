@@ -307,7 +307,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **k
         >>> get_adm_maps(city='北京市', level='市')[0]['geometry'] == get_adm_maps(city='北京市', level='市', only_polygon=True, record='first')
         True
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
-    """
+    """  # noqa: E501
     if ax is None:
         ax = plt.gca()
 
@@ -350,7 +350,7 @@ def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
         0  中华人民共和国   北京市  北京市  东城区  区县  高德  陆地  MULTIPOLYGON (((116.44364 39.87285, 116.44359 ...
         1  中华人民共和国   北京市  北京市  西城区  区县  高德  陆地  MULTIPOLYGON (((116.38091 39.97272, 116.38114 ...
         2  中华人民共和国   北京市  北京市  朝阳区  区县  高德  陆地  MULTIPOLYGON (((116.55172 40.05812, 116.55132 ...
-    """
+    """  # noqa: E501
     if isinstance(maps, list):
         try:
             geometries = [m["geometry"] for m in maps]

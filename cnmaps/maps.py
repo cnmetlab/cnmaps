@@ -3,7 +3,6 @@
 import os
 import sqlite3
 import copy
-from itertools import product
 from functools import lru_cache
 
 import numpy as np
