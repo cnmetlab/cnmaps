@@ -62,27 +62,15 @@
 
     In [1]: from cnmaps import get_adm_maps
 
-    In [2]: get_adm_maps(province='山西省', level='市')
-    Out[2]:
-    [{'国家': '中华人民共和国',
-    '省/直辖市': '山西省',
-    '市': '太原市',
-    '区/县': None,
-    '级别': '市',
-    '来源': '高德',
-    '类型': '陆地',
-    'geometry': <cnmaps.maps.MapPolygon at 0x7f863fd618d0>},
-    ... # 为节省篇幅，中间部分省略
-    '省/直辖市': '山西省',
-    '市': '吕梁市',
-    '区/县': None,
-    '级别': '市',
-    '来源': '高德',
-    '类型': '陆地',
-    'geometry': <cnmaps.maps.MapPolygon at 0x7f863fd613d0>}]
+    In [2]: maps = get_adm_maps(province='山西省', level='市')
+    In [3]: len(maps)
+    Out[3]: 11
 
-    In [3]: get_adm_maps(province='山西省', level='市', engine='geopandas')
-    Out[3]:
+    In [4]: maps[0]['市']
+    Out[4]: '太原市'
+
+    In [5]: get_adm_maps(province='山西省', level='市', engine='geopandas')
+    Out[5]:
             国家 省/直辖市    市   区/县 级别  来源  类型                                           geometry
     0   中华人民共和国   山西省  太原市  None  市  高德  陆地  MULTIPOLYGON (((113.06683 38.05646, 113.06708 ...
     1   中华人民共和国   山西省  大同市  None  市  高德  陆地  MULTIPOLYGON (((113.57727 39.43812, 113.57460 ...

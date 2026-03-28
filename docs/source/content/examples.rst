@@ -15,11 +15,11 @@
     ax = fig.add_subplot(111, projection=proj)
 
     ax.stock_img()
-    china, sourth_sea = get_adm_maps(level='国', only_polygon=True)
+    china, south_sea = get_adm_maps(level='国', only_polygon=True)
 
     ax.set_global()
     ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor='r', facecolor='r')
-    ax.add_geometries(sourth_sea, crs=ccrs.PlateCarree(), edgecolor='r')
+    ax.add_geometries(south_sea, crs=ccrs.PlateCarree(), edgecolor='r')
     ax.outline_patch.set_edgecolor('white')
 
     plt.show()

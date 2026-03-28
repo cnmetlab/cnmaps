@@ -4,12 +4,14 @@ import random
 import uuid
 import pytest
 
-import numpy as np
-import matplotlib.pyplot as plt
-import cartopy.crs as ccrs
+pytest.importorskip("pytest_benchmark", reason="pytest-benchmark not installed (dev dependency)")
+
+import numpy as np  # noqa: E402
+import matplotlib.pyplot as plt  # noqa: E402
+import cartopy.crs as ccrs  # noqa: E402
 
 
-from cnmaps import (
+from cnmaps import (  # noqa: E402
     get_adm_maps,
     get_adm_names,
     clip_clabels_by_map,
@@ -19,9 +21,12 @@ from cnmaps import (
     clip_quiver_by_map,
     clip_scatter_by_map,
 )
-from cnmaps.sample import load_dem, load_temp, load_wind
+from cnmaps.sample import load_dem, load_temp, load_wind  # noqa: E402
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
+
+# 与 tests/test_map.py 中简版用例一致
+MAKE_MASKOUT_FAST_GRID_SIZE = 100
 
 
 provinces = get_adm_names(level="省")
@@ -340,7 +345,46 @@ def test_maskout(benchmark):
 
 
 def test_make_maskout_array(benchmark):
-    """测试make_maskout_array方法"""
+    """测试 make_maskout_array（与单元测试简版同尺度，便于 CI benchmark）"""
+
+    def inner():
+        n = MAKE_MASKOUT_FAST_GRID_SIZE
+        casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02-fast.npy")
+        mask_array = np.load(casefp)
+
+        lon = np.linspace(60, 150, n)
+        lat = np.linspace(0, 60, n)
+        lons, lats = np.meshgrid(lon, lat)
+
+        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+        china_maskout_array = china.make_mask_array(lons, lats)
+
+        assert (china_maskout_array == mask_array).all()
+
+        casefp = os.path.join(MAPCASE_DIR, "china-maskout-wgs84-fast.npy")
+        mask_array = np.load(casefp)
+
+        lon = np.linspace(60, 150, n)
+        lat = np.linspace(0, 60, n)
+        lons, lats = np.meshgrid(lon, lat)
+
+        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+        china_maskout_array = china.make_mask_array(lons, lats)
+
+        assert (china_maskout_array == mask_array).all()
+
+        with pytest.raises(ValueError):
+            china.make_mask_array(lon, lat)
+
+        with pytest.raises(ValueError):
+            china.make_mask_array(lons, lats[:-1])
+
+    benchmark(inner)
+
+
+@pytest.mark.heavy
+def test_make_maskout_array_full(benchmark):
+    """全分辨率 make_maskout_array 基准；默认 CI 不跑。"""
 
     def inner():
         casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02.npy")
@@ -366,12 +410,6 @@ def test_make_maskout_array(benchmark):
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
-
-        with pytest.raises(ValueError):
-            china.make_mask_array(lon, lat)
-
-        with pytest.raises(ValueError):
-            china.make_mask_array(lons, lats[:-1])
 
     benchmark(inner)
 

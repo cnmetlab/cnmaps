@@ -8,30 +8,67 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
-from cartopy.mpl.patch import geos_to_path
 import shapely.geometry as sgeom
 from shapely.ops import transform
 from geopandas import GeoDataFrame
 from pyproj import Transformer
 
-from .maps import MapPolygon
+from .maps import MapPolygon, _get_geom
+
+try:
+    from cartopy.mpl.path import shapely_to_path as _shapely_to_path
+except ImportError:
+    _shapely_to_path = None
+    from cartopy.mpl.patch import geos_to_path as _geos_to_path
 
 
 def _transform_polygon(map_polygon, crs_from, crs_to):
     if crs_from == crs_to:
         return map_polygon
-    else:
-        transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
-        return transform(transformer.transform, map_polygon)
+    is_mappolygon = isinstance(map_polygon, MapPolygon)
+    geom = _get_geom(map_polygon)
+    transformer = Transformer.from_crs(crs_from, crs_to, always_xy=True)
+    result = transform(transformer.transform, geom)
+    if is_mappolygon and isinstance(result, (sgeom.MultiPolygon, sgeom.Polygon)):
+        return MapPolygon(result)
+    return result
+
+
+def _iter_geoms(map_polygon):
+    """Yield native geometries from a MapPolygon, list, or GeoDataFrame."""
+    if isinstance(map_polygon, GeoDataFrame):
+        for geom in map_polygon.geometry:
+            yield from _iter_geoms(geom)
+        return
+
+    if isinstance(map_polygon, list):
+        for geom in map_polygon:
+            yield from _iter_geoms(geom)
+        return
+
+    geom = _get_geom(map_polygon)
+    if geom is not None:
+        yield geom
+
+
+def _geom_to_path(geom):
+    """Convert a Shapely geometry to a Matplotlib path across Cartopy versions."""
+    if _shapely_to_path is not None:
+        return _shapely_to_path(geom)
+
+    paths = _geos_to_path(geom)
+    return mpath.Path.make_compound_path(*paths)
 
 
 def _make_clip_path(map_polygon, ax=None):
     if ax is None:
         ax = plt.gca()
 
-    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
-
-    paths = geos_to_path(map_polygon)
+    geoms = [
+        _get_geom(_transform_polygon(geom, ccrs.PlateCarree(), ax.projection))
+        for geom in _iter_geoms(map_polygon)
+    ]
+    paths = [_geom_to_path(geom) for geom in geoms if geom is not None and not geom.is_empty]
     path = mpath.Path.make_compound_path(*paths)
     clip = mpatches.PathPatch(path, transform=ax.transData)
 
@@ -71,7 +108,12 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None):
     """
     clip = _make_clip_path(map_polygon, ax=ax)
 
-    for contour in contours.collections:
+    collections = getattr(contours, "collections", None)
+    if collections is None:
+        contours.set_clip_path(clip)
+        return
+
+    for contour in collections:
         contour.set_clip_path(clip)
 
 
@@ -265,23 +307,24 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **k
         >>> get_adm_maps(city='北京市', level='市')[0]['geometry'] == get_adm_maps(city='北京市', level='市', only_polygon=True, record='first')
         True
         >>> draw_map(get_adm_maps(city='北京市', level='市', only_polygon=True, record='first'))
-    """
+    """  # noqa: E501
     if ax is None:
         ax = plt.gca()
 
     map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
+    geom = _get_geom(map_polygon)
 
     if "color" not in kwargs and "c" not in kwargs:
         kwargs["color"] = "k"
 
-    if isinstance(map_polygon, sgeom.MultiPolygon):
-        for polygon in map_polygon.geoms:
-            for ring in [polygon.exterior] + polygon.interiors[:]:
+    if isinstance(geom, sgeom.MultiPolygon):
+        for polygon in geom.geoms:
+            for ring in [polygon.exterior] + list(polygon.interiors):
                 coords = np.array(ring.coords)
                 ax.plot(coords[:, 0], coords[:, 1], **kwargs)
 
-    elif isinstance(map_polygon, sgeom.MultiLineString):
-        for line in map_polygon.geoms:
+    elif isinstance(geom, sgeom.MultiLineString):
+        for line in geom.geoms:
             coords = np.array(line.coords)
             ax.plot(coords[:, 0], coords[:, 1], **kwargs)
 
@@ -307,7 +350,7 @@ def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
         0  中华人民共和国   北京市  北京市  东城区  区县  高德  陆地  MULTIPOLYGON (((116.44364 39.87285, 116.44359 ...
         1  中华人民共和国   北京市  北京市  西城区  区县  高德  陆地  MULTIPOLYGON (((116.38091 39.97272, 116.38114 ...
         2  中华人民共和国   北京市  北京市  朝阳区  区县  高德  陆地  MULTIPOLYGON (((116.55172 40.05812, 116.55132 ...
-    """
+    """  # noqa: E501
     if isinstance(maps, list):
         try:
             geometries = [m["geometry"] for m in maps]

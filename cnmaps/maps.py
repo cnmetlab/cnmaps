@@ -3,16 +3,21 @@
 import os
 import sqlite3
 import copy
-from itertools import product
+from functools import lru_cache
 
 import numpy as np
 import shapely.geometry as sgeom
 from shapely.geometry import mapping
-from shapely.vectorized import contains
+from shapely import wkb
+from shapely.strtree import STRtree
 import fiona
 import geojson
 import orjson
 
+try:
+    from shapely import contains_xy as _contains_xy
+except ImportError:
+    from shapely.vectorized import contains as _contains_xy
 
 from .geo import gcj02_to_wgs84
 
@@ -26,17 +31,118 @@ class MapNotFoundError(Exception):
     pass
 
 
-class MapPolygon(sgeom.MultiPolygon):
+def _get_geom(obj):
+    """Return the underlying Shapely geometry from MapPolygon or the object itself."""
+    return getattr(obj, "geom", obj)
+
+
+def _ensure_mappolygon(geom):
+    """Wrap Shapely Polygon/MultiPolygon as MapPolygon when returning to caller."""
+    if geom is None:
+        return None
+    if isinstance(geom, MapPolygon):
+        return geom
+    if isinstance(geom, (sgeom.MultiPolygon, sgeom.Polygon)):
+        return MapPolygon(geom)
+    return geom
+
+
+def _clone_geometry(geom):
+    """Return a detached copy of a Shapely geometry."""
+    if geom is None:
+        return None
+    return wkb.loads(geom.wkb)
+
+
+def _as_mappolygon_result(geom):
+    """Normalize Shapely set-operation results to MapPolygon."""
+    if geom is None or geom.is_empty:
+        return MapPolygon()
+    if isinstance(geom, MapPolygon):
+        return geom
+    if isinstance(geom, sgeom.Polygon):
+        return MapPolygon([geom])
+    if isinstance(geom, sgeom.MultiPolygon):
+        return MapPolygon.drop_inner_duplicate(MapPolygon(geom))
+    if isinstance(geom, sgeom.GeometryCollection):
+        # Keep historical behavior from the old Shapely<2 subclass version:
+        # non-(Polygon|MultiPolygon) set-operation results are treated as empty.
+        return MapPolygon()
+
+    return MapPolygon()
+
+
+class MapPolygon:
     """
     地图多边形类
 
-    该类是基于shapely.geometry.MultiPolygon的自定义类,
-    并实现了对于加号操作符的支持.
+    该类内部持有一个 shapely.geometry.MultiPolygon 实例（组合而非继承），
+    兼容 Shapely 2.0+，并实现加号(合并)、减号(剪切)、逻辑与(交集)运算符支持.
     """
 
+    _OWN_ATTRS = frozenset(
+        {"_geom", "geom", "union", "difference", "intersection",
+         "__add__", "__and__", "__sub__", "get_extent", "to_file",
+         "maskout", "make_mask_array", "drop_inner_duplicate",
+         "__geo_interface__", "__iter__", "__len__", "__getitem__",
+         "__bool__", "__eq__", "__repr__"}
+    )
+
     def __init__(self, *args, **kwargs):
-        """实例化MapPolygon"""
-        super().__init__(*args, **kwargs)
+        """实例化 MapPolygon，参数与 shapely.geometry.MultiPolygon 一致."""
+        if not args and not kwargs:
+            self._geom = sgeom.MultiPolygon()
+            return
+
+        if len(args) == 1 and not kwargs:
+            source = _get_geom(args[0])
+            if isinstance(source, sgeom.Polygon):
+                self._geom = sgeom.MultiPolygon([source])
+                return
+            if isinstance(source, sgeom.MultiPolygon):
+                self._geom = source
+                return
+
+        self._geom = sgeom.MultiPolygon(*args, **kwargs)
+
+    @property
+    def geom(self):
+        """返回内部的 Shapely MultiPolygon，供需要原生几何的接口使用."""
+        return self._geom
+
+    @property
+    def __geo_interface__(self):
+        """Expose the wrapped geometry to GeoJSON/Fiona-style consumers."""
+        return self._geom.__geo_interface__
+
+    def __getattr__(self, name):
+        """将未在 MapPolygon 上定义的属性委托给内部的 MultiPolygon."""
+        if name in self._OWN_ATTRS:
+            raise AttributeError(name)
+        return getattr(self._geom, name)
+
+    def __iter__(self):
+        """Iterate over member polygons like Shapely < 2.0."""
+        return iter(self._geom.geoms)
+
+    def __len__(self):
+        """Return the polygon count like Shapely < 2.0."""
+        return len(self._geom.geoms)
+
+    def __getitem__(self, item):
+        """Support indexed access to polygons like Shapely < 2.0."""
+        return self._geom.geoms[item]
+
+    def __bool__(self):
+        """Treat empty geometries as falsy."""
+        return not self._geom.is_empty
+
+    def __eq__(self, other):
+        """Preserve geometric equality checks across wrapped/native objects."""
+        return self._geom == _get_geom(other)
+
+    def __repr__(self):
+        return repr(self._geom)
 
     def __add__(self, other):
         """+ 支持."""
@@ -51,53 +157,65 @@ class MapPolygon(sgeom.MultiPolygon):
         return self.difference(other)
 
     @staticmethod
-    def drop_inner_duplicate(map_polygon: sgeom.MultiPolygon):
+    def drop_inner_duplicate(map_polygon):
         """
         清理内部重复多边形
 
         参数:
-            map_polygon (sgeom.MultiPolygon): 地图边界对象
+            map_polygon: 地图边界对象 (MapPolygon 或 sgeom.MultiPolygon)
 
         返回值:
             MapPolygon: 清理后的地图边界对象
         """
-        polygons = list(map_polygon.geoms)
-        couples = [couple for couple in product(polygons, repeat=2)]
+        geom = _get_geom(map_polygon)
+        polygons = list(geom.geoms)
+        if len(polygons) < 2:
+            return MapPolygon(polygons)
 
-        for one, other in couples:
-            if one.contains(other) and one != other:
-                try:
-                    polygons.remove(other)
-                except ValueError:
-                    pass
+        indexed_polygons = sorted(enumerate(polygons), key=lambda item: item[1].area, reverse=True)
+        sorted_polygons = [polygon for _, polygon in indexed_polygons]
+        original_indices = [index for index, _ in indexed_polygons]
+        tree = STRtree(sorted_polygons)
+        removed_indices = set()
+
+        for idx, polygon in enumerate(sorted_polygons):
+            if idx in removed_indices:
+                continue
+
+            for candidate_idx in tree.query(polygon):
+                if candidate_idx == idx or candidate_idx in removed_indices:
+                    continue
+                candidate = sorted_polygons[candidate_idx]
+                if polygon.area <= candidate.area:
+                    continue
+                if polygon.contains(candidate):
+                    removed_indices.add(candidate_idx)
+
+        polygons = [
+            polygons[original_indices[idx]]
+            for idx in range(len(sorted_polygons))
+            if idx not in removed_indices
+        ]
 
         return MapPolygon(polygons)
 
     def union(self, other):
         """并集."""
-        union_result = super().union(other)
-        if isinstance(union_result, sgeom.Polygon):
-            return MapPolygon([union_result])
-        elif isinstance(union_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(union_result))
+        other_geom = _get_geom(other)
+        union_result = self._geom.union(other_geom)
+        return _as_mappolygon_result(union_result)
 
     def difference(self, other):
         """差集."""
-        difference_result = super().difference(other)
-        if isinstance(difference_result, sgeom.Polygon):
-            return MapPolygon([difference_result])
-        elif isinstance(difference_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(difference_result))
+        other_geom = _get_geom(other)
+        difference_result = self._geom.difference(other_geom)
+        return _as_mappolygon_result(difference_result)
 
     def intersection(self, other):
         """交集."""
-        intersection_result = super().intersection(other)
-        if isinstance(intersection_result, sgeom.Polygon):
-            return MapPolygon([intersection_result])
-        elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(intersection_result))
-        else:
-            return MapPolygon()
+        other_geom = _get_geom(other)
+        intersection_result = self._geom.intersection(other_geom)
+        return _as_mappolygon_result(intersection_result)
 
     def get_extent(self, buffer=2):
         """
@@ -195,10 +313,11 @@ class MapPolygon(sgeom.MultiPolygon):
         if lons.shape != lats.shape:
             raise ValueError("x和y的形状不匹配")
 
-        return ~contains(self, lons, lats)
+        return ~_contains_xy(self._geom, lons, lats)
 
 
-def read_mapjson(fp, wgs84=True):
+@lru_cache(maxsize=8192)
+def _read_mapjson_cached(fp, wgs84=True):
     """
     读取geojson地图边界文件
 
@@ -227,10 +346,79 @@ def read_mapjson(fp, wgs84=True):
                 else:
                     polygon_list.append(sgeom.Polygon(coords))
 
-        return MapPolygon(polygon_list)
+        return sgeom.MultiPolygon(polygon_list)
 
     elif geometry["type"] == "MultiLineString":
         return sgeom.MultiLineString(geometry["coordinates"])
+
+
+def read_mapjson(fp, wgs84=True):
+    geom = _clone_geometry(_read_mapjson_cached(fp, wgs84=wgs84))
+    return _ensure_mappolygon(geom)
+
+
+@lru_cache(maxsize=2048)
+def _query_adm_metadata(
+    province=None,
+    city=None,
+    district=None,
+    level=None,
+    country="中华人民共和国",
+    source="高德",
+    db=DB_FILE,
+):
+    con = sqlite3.connect(db)
+    try:
+        cur = con.cursor()
+
+        country_sql = f"AND country='{country}'" if country else ""
+        province_sql = f"AND province='{province}'" if province else ""
+        city_sql = f"AND city='{city}'" if city else ""
+        district_sql = f"AND district='{district}'" if district else ""
+        source_sql = f"AND source='{source}'" if source else ""
+
+        if not level:
+            if district:
+                level = "区县"
+            elif city:
+                level = "市"
+            elif province:
+                level = "省"
+            elif country:
+                level = "国"
+
+        if level == "国":
+            level_sql = "level='国'"
+            province_sql = ""
+            city_sql = ""
+            district_sql = ""
+        elif level == "省":
+            level_sql = "level='省'"
+            city_sql = ""
+            district_sql = ""
+        elif level == "市":
+            level_sql = "level='市'"
+            district_sql = ""
+        elif level in ["区", "县", "区县", "区/县"]:
+            level_sql = "level='区县'"
+            level = "区县"
+        else:
+            raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
+
+        meta_sql = (
+            "SELECT country, province, city, district, level, source, kind, path"
+            " FROM ADMINISTRATIVE"
+            f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
+            f" {district_sql} {source_sql};"
+        )
+        rows = tuple(cur.execute(meta_sql))
+    finally:
+        con.close()
+
+    if not rows:
+        raise MapNotFoundError("未找到指定地图的边界文件")
+
+    return rows
 
 
 def get_adm_names(
@@ -342,100 +530,23 @@ def get_adm_maps(
     """
     import geopandas as gpd
 
-    con = sqlite3.connect(db)
-    cur = con.cursor()
-
-    if country:
-        country_level = "国"
-        country_sql = f"AND country='{country}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {country_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        country_sql = ""
-        country_level = None
-
-    if province:
-        province_level = "省"
-        province_sql = f"AND province='{province}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {province_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        province_sql = ""
-        province_level = None
-
-    if city:
-        city_level = "市"
-        city_sql = f"AND city='{city}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {city_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        city_sql = ""
-        city_level = None
-
-    if district:
-        district_level = "区县"
-        district_sql = f"AND district='{district}'"
-        sql = f"SELECT id" f" FROM ADMINISTRATIVE" f" WHERE 1 {district_sql} ;"
-        count = len(list(cur.execute(sql)))
-        if count == 0:
-            raise MapNotFoundError("未找到指定地图的边界文件")
-    else:
-        district_sql = ""
-        district_level = None
-
-    if source:
-        source_sql = f"AND source='{source}'"
-    else:
-        source_sql = ""
-
-    if not level:
-        level = district_level or city_level or province_level or country_level
-
-    if level == "国":
-        level_sql = "level='国'"
-        province_sql = ""
-        city_sql = ""
-        district_sql = ""
-    elif level == "省":
-        level_sql = "level='省'"
-        city_sql = ""
-        district_sql = ""
-    elif level == "市":
-        level_sql = "level='市'"
-        district_sql = ""
-    elif level in ["区", "县", "区县", "区/县"]:
-        level_sql = "level='区县'"
-    else:
-        raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
-
-    meta_sql = (
-        "SELECT country, province, city, district, level, source, kind"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-        f" {district_sql} {source_sql};"
+    rows = _query_adm_metadata(
+        province=province,
+        city=city,
+        district=district,
+        level=level,
+        country=country,
+        source=source,
+        db=db,
     )
-    meta_rows = list(cur.execute(meta_sql))
-
-    geom_sql = (
-        "SELECT path"
-        " FROM ADMINISTRATIVE"
-        f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-        f" {district_sql} {source_sql};"
-    )
-    gemo_rows = list(cur.execute(geom_sql))
+    meta_rows = [row[:7] for row in rows]
     map_polygons = []
-    for path in gemo_rows:
+    for row in rows:
         mapjson = read_mapjson(
-            os.path.join(DATA_DIR, "geojson.min/", path[0]), wgs84=wgs84
+            os.path.join(DATA_DIR, "geojson.min/", row[7]), wgs84=wgs84
         )
 
-        map_polygons.append(mapjson)
+        map_polygons.append(_get_geom(mapjson))
 
     gdf = gpd.GeoDataFrame(
         data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
@@ -449,31 +560,39 @@ def get_adm_maps(
 
         geometries = []
         for g in simple_geometry:
-            if isinstance(g, sgeom.Polygon):
-                geometries.append(MapPolygon([g]))
-            elif isinstance(g, sgeom.MultiPolygon):
-                geometries.append(MapPolygon(g))
-            else:
-                geometries.append(g)
+            geometries.append(_get_geom(_as_mappolygon_result(g)))
 
         gdf.set_geometry(geometries, inplace=True)
 
     if len(gdf) == 0:
         raise MapNotFoundError("未找到指定地图的边界文件")
 
+    wrapped_geometries = [_ensure_mappolygon(g) for g in gdf.geometry]
+    wrapped_records = None
+
+    def _get_wrapped_records():
+        nonlocal wrapped_records
+        if wrapped_records is None:
+            wrapped_records = []
+            for (_, row), geometry in zip(gdf.iterrows(), wrapped_geometries):
+                record_data = row.to_dict()
+                record_data["geometry"] = geometry
+                wrapped_records.append(record_data)
+        return wrapped_records
+
     if record == "all":
         if only_polygon:
-            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()]
+            return wrapped_geometries
         else:
             if engine == "geopandas":
                 return gdf
             elif engine is None:
-                return [row.to_dict() for _, row in gdf.iterrows()]
+                return _get_wrapped_records()
     elif record == "first":
         if only_polygon:
-            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()][0]
+            return wrapped_geometries[0]
         else:
             if engine == "geopandas":
                 return gdf.iloc[0]
             elif engine is None:
-                return [row.to_dict() for _, row in gdf.iterrows()][0]
+                return _get_wrapped_records()[0]
