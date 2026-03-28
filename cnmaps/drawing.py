@@ -8,13 +8,18 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import matplotlib.path as mpath
 import cartopy.crs as ccrs
-from cartopy.mpl.path import shapely_to_path
 import shapely.geometry as sgeom
 from shapely.ops import transform
 from geopandas import GeoDataFrame
 from pyproj import Transformer
 
 from .maps import MapPolygon, _get_geom
+
+try:
+    from cartopy.mpl.path import shapely_to_path as _shapely_to_path
+except ImportError:
+    _shapely_to_path = None
+    from cartopy.mpl.patch import geos_to_path as _geos_to_path
 
 
 def _transform_polygon(map_polygon, crs_from, crs_to):
@@ -46,6 +51,15 @@ def _iter_geoms(map_polygon):
         yield geom
 
 
+def _geom_to_path(geom):
+    """Convert a Shapely geometry to a Matplotlib path across Cartopy versions."""
+    if _shapely_to_path is not None:
+        return _shapely_to_path(geom)
+
+    paths = _geos_to_path(geom)
+    return mpath.Path.make_compound_path(*paths)
+
+
 def _make_clip_path(map_polygon, ax=None):
     if ax is None:
         ax = plt.gca()
@@ -54,7 +68,7 @@ def _make_clip_path(map_polygon, ax=None):
         _get_geom(_transform_polygon(geom, ccrs.PlateCarree(), ax.projection))
         for geom in _iter_geoms(map_polygon)
     ]
-    paths = [shapely_to_path(geom) for geom in geoms if geom is not None and not geom.is_empty]
+    paths = [_geom_to_path(geom) for geom in geoms if geom is not None and not geom.is_empty]
     path = mpath.Path.make_compound_path(*paths)
     clip = mpatches.PathPatch(path, transform=ax.transData)
 
