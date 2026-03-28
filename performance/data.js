@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774714711552,
+  "lastUpdate": 1774715810917,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -6244,6 +6244,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.8351752559328494",
             "extra": "mean: 122.41923223439998 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "bc09c1905909fab115c41be477aa85aabb124237",
+          "message": "Support Shapely 2 and update version to 1.1.10 (#144)\n\n* Support Shapely 2 and bump version to 1.1.10\n\n* Add Cartopy path import fallback\n\n* Force Agg backend in CI\n\n* Enable Python 3.12 in CI\n\n* Refresh poetry lock for Python 3.12\n\n* Require Shapely 2 across supported Python versions\n\n* Retry poetry install in CI\n\n* Cache map loading and speed up geometry cleanup\n\n* Set timeout for build jobs in GitHub workflows to 60 minutes\n\n* Add pytest markers for heavy tests and update CI configurations to skip heavy tests by default. Introduce fast versions of maskout test data for performance benchmarking.\n\n* Update flake8 max line length to 120 and add noqa comments for E501 in docstrings. Remove unused import from maps.py and adjust pytest command in CI workflows to skip heavy tests.\n\n* Update GitHub Actions workflow to use GitHub token for authentication and adjust permissions for gh-pages and PR comments.\n\n* Update GitHub Actions workflows to use updated versions of checkout and setup-python actions\n\n* Update documentation and copyright information; enhance API references and examples for clarity",
+          "timestamp": "2026-03-29T00:09:50+08:00",
+          "tree_id": "5de3b81cff03a2176a76476c88a088e126afddaa",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/bc09c1905909fab115c41be477aa85aabb124237"
+        },
+        "date": 1774715810452,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.39405505713977657,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06733956181286838",
+            "extra": "mean: 2.5377164481999954 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.055158958978557736,
+            "unit": "iter/sec",
+            "range": "stddev: 0.13716652503949286",
+            "extra": "mean: 18.129421195 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05556871002880052,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07741032288504027",
+            "extra": "mean: 17.995738959599986 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05586975849324352,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06723352128080182",
+            "extra": "mean: 17.898770765600013 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05645766293579856,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07800866701671764",
+            "extra": "mean: 17.71238744220002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05600398138531301,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07869223976238823",
+            "extra": "mean: 17.85587337300003 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.3279238601060602,
+            "unit": "iter/sec",
+            "range": "stddev: 0.024593671972471746",
+            "extra": "mean: 3.0494883772000323 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.1838762033596373,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11578991151824364",
+            "extra": "mean: 5.438441634799983 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1188370035918784,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0012366230026673475",
+            "extra": "mean: 893.7852401999862 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.008614819873608638,
+            "unit": "iter/sec",
+            "range": "stddev: 0.13924983149214326",
+            "extra": "mean: 116.07903759700002 sec\nrounds: 5"
           }
         ]
       }
