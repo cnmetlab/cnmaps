@@ -4,6 +4,8 @@ import random
 import uuid
 import pytest
 
+pytest.importorskip("pytest_benchmark", reason="pytest-benchmark not installed (dev dependency)")
+
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs

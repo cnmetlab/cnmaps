@@ -8,11 +8,14 @@ from itertools import product
 import numpy as np
 import shapely.geometry as sgeom
 from shapely.geometry import mapping
-from shapely.vectorized import contains
 import fiona
 import geojson
 import orjson
 
+try:
+    from shapely import contains_xy as _contains_xy
+except ImportError:
+    from shapely.vectorized import contains as _contains_xy
 
 from .geo import gcj02_to_wgs84
 
@@ -26,17 +29,111 @@ class MapNotFoundError(Exception):
     pass
 
 
-class MapPolygon(sgeom.MultiPolygon):
+def _get_geom(obj):
+    """Return the underlying Shapely geometry from MapPolygon or the object itself."""
+    return getattr(obj, "geom", obj)
+
+
+def _ensure_mappolygon(geom):
+    """Wrap Shapely Polygon/MultiPolygon as MapPolygon when returning to caller."""
+    if geom is None:
+        return None
+    if isinstance(geom, MapPolygon):
+        return geom
+    if isinstance(geom, (sgeom.MultiPolygon, sgeom.Polygon)):
+        return MapPolygon(geom)
+    return geom
+
+
+def _as_mappolygon_result(geom):
+    """Normalize Shapely set-operation results to MapPolygon."""
+    if geom is None or geom.is_empty:
+        return MapPolygon()
+    if isinstance(geom, MapPolygon):
+        return geom
+    if isinstance(geom, sgeom.Polygon):
+        return MapPolygon([geom])
+    if isinstance(geom, sgeom.MultiPolygon):
+        return MapPolygon.drop_inner_duplicate(MapPolygon(geom))
+    if isinstance(geom, sgeom.GeometryCollection):
+        # Keep historical behavior from the old Shapely<2 subclass version:
+        # non-(Polygon|MultiPolygon) set-operation results are treated as empty.
+        return MapPolygon()
+
+    return MapPolygon()
+
+
+class MapPolygon:
     """
     地图多边形类
 
-    该类是基于shapely.geometry.MultiPolygon的自定义类,
-    并实现了对于加号操作符的支持.
+    该类内部持有一个 shapely.geometry.MultiPolygon 实例（组合而非继承），
+    兼容 Shapely 2.0+，并实现加号(合并)、减号(剪切)、逻辑与(交集)运算符支持.
     """
 
+    _OWN_ATTRS = frozenset(
+        {"_geom", "geom", "union", "difference", "intersection",
+         "__add__", "__and__", "__sub__", "get_extent", "to_file",
+         "maskout", "make_mask_array", "drop_inner_duplicate",
+         "__geo_interface__", "__iter__", "__len__", "__getitem__",
+         "__bool__", "__eq__", "__repr__"}
+    )
+
     def __init__(self, *args, **kwargs):
-        """实例化MapPolygon"""
-        super().__init__(*args, **kwargs)
+        """实例化 MapPolygon，参数与 shapely.geometry.MultiPolygon 一致."""
+        if not args and not kwargs:
+            self._geom = sgeom.MultiPolygon()
+            return
+
+        if len(args) == 1 and not kwargs:
+            source = _get_geom(args[0])
+            if isinstance(source, sgeom.Polygon):
+                self._geom = sgeom.MultiPolygon([source])
+                return
+            if isinstance(source, sgeom.MultiPolygon):
+                self._geom = sgeom.MultiPolygon(list(source.geoms))
+                return
+
+        self._geom = sgeom.MultiPolygon(*args, **kwargs)
+
+    @property
+    def geom(self):
+        """返回内部的 Shapely MultiPolygon，供需要原生几何的接口使用."""
+        return self._geom
+
+    @property
+    def __geo_interface__(self):
+        """Expose the wrapped geometry to GeoJSON/Fiona-style consumers."""
+        return self._geom.__geo_interface__
+
+    def __getattr__(self, name):
+        """将未在 MapPolygon 上定义的属性委托给内部的 MultiPolygon."""
+        if name in self._OWN_ATTRS:
+            raise AttributeError(name)
+        return getattr(self._geom, name)
+
+    def __iter__(self):
+        """Iterate over member polygons like Shapely < 2.0."""
+        return iter(self._geom.geoms)
+
+    def __len__(self):
+        """Return the polygon count like Shapely < 2.0."""
+        return len(self._geom.geoms)
+
+    def __getitem__(self, item):
+        """Support indexed access to polygons like Shapely < 2.0."""
+        return self._geom.geoms[item]
+
+    def __bool__(self):
+        """Treat empty geometries as falsy."""
+        return not self._geom.is_empty
+
+    def __eq__(self, other):
+        """Preserve geometric equality checks across wrapped/native objects."""
+        return self._geom == _get_geom(other)
+
+    def __repr__(self):
+        return repr(self._geom)
 
     def __add__(self, other):
         """+ 支持."""
@@ -51,17 +148,18 @@ class MapPolygon(sgeom.MultiPolygon):
         return self.difference(other)
 
     @staticmethod
-    def drop_inner_duplicate(map_polygon: sgeom.MultiPolygon):
+    def drop_inner_duplicate(map_polygon):
         """
         清理内部重复多边形
 
         参数:
-            map_polygon (sgeom.MultiPolygon): 地图边界对象
+            map_polygon: 地图边界对象 (MapPolygon 或 sgeom.MultiPolygon)
 
         返回值:
             MapPolygon: 清理后的地图边界对象
         """
-        polygons = list(map_polygon.geoms)
+        geom = _get_geom(map_polygon)
+        polygons = list(geom.geoms)
         couples = [couple for couple in product(polygons, repeat=2)]
 
         for one, other in couples:
@@ -75,29 +173,21 @@ class MapPolygon(sgeom.MultiPolygon):
 
     def union(self, other):
         """并集."""
-        union_result = super().union(other)
-        if isinstance(union_result, sgeom.Polygon):
-            return MapPolygon([union_result])
-        elif isinstance(union_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(union_result))
+        other_geom = _get_geom(other)
+        union_result = self._geom.union(other_geom)
+        return _as_mappolygon_result(union_result)
 
     def difference(self, other):
         """差集."""
-        difference_result = super().difference(other)
-        if isinstance(difference_result, sgeom.Polygon):
-            return MapPolygon([difference_result])
-        elif isinstance(difference_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(difference_result))
+        other_geom = _get_geom(other)
+        difference_result = self._geom.difference(other_geom)
+        return _as_mappolygon_result(difference_result)
 
     def intersection(self, other):
         """交集."""
-        intersection_result = super().intersection(other)
-        if isinstance(intersection_result, sgeom.Polygon):
-            return MapPolygon([intersection_result])
-        elif isinstance(intersection_result, sgeom.MultiPolygon):
-            return self.drop_inner_duplicate(MapPolygon(intersection_result))
-        else:
-            return MapPolygon()
+        other_geom = _get_geom(other)
+        intersection_result = self._geom.intersection(other_geom)
+        return _as_mappolygon_result(intersection_result)
 
     def get_extent(self, buffer=2):
         """
@@ -195,7 +285,7 @@ class MapPolygon(sgeom.MultiPolygon):
         if lons.shape != lats.shape:
             raise ValueError("x和y的形状不匹配")
 
-        return ~contains(self, lons, lats)
+        return ~_contains_xy(self._geom, lons, lats)
 
 
 def read_mapjson(fp, wgs84=True):
@@ -435,7 +525,7 @@ def get_adm_maps(
             os.path.join(DATA_DIR, "geojson.min/", path[0]), wgs84=wgs84
         )
 
-        map_polygons.append(mapjson)
+        map_polygons.append(_get_geom(mapjson))
 
     gdf = gpd.GeoDataFrame(
         data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
@@ -449,31 +539,39 @@ def get_adm_maps(
 
         geometries = []
         for g in simple_geometry:
-            if isinstance(g, sgeom.Polygon):
-                geometries.append(MapPolygon([g]))
-            elif isinstance(g, sgeom.MultiPolygon):
-                geometries.append(MapPolygon(g))
-            else:
-                geometries.append(g)
+            geometries.append(_get_geom(_as_mappolygon_result(g)))
 
         gdf.set_geometry(geometries, inplace=True)
 
     if len(gdf) == 0:
         raise MapNotFoundError("未找到指定地图的边界文件")
 
+    wrapped_geometries = [_ensure_mappolygon(g) for g in gdf.geometry]
+    wrapped_records = None
+
+    def _get_wrapped_records():
+        nonlocal wrapped_records
+        if wrapped_records is None:
+            wrapped_records = []
+            for (_, row), geometry in zip(gdf.iterrows(), wrapped_geometries):
+                record_data = row.to_dict()
+                record_data["geometry"] = geometry
+                wrapped_records.append(record_data)
+        return wrapped_records
+
     if record == "all":
         if only_polygon:
-            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()]
+            return wrapped_geometries
         else:
             if engine == "geopandas":
                 return gdf
             elif engine is None:
-                return [row.to_dict() for _, row in gdf.iterrows()]
+                return _get_wrapped_records()
     elif record == "first":
         if only_polygon:
-            return [row.to_dict()["geometry"] for _, row in gdf.iterrows()][0]
+            return wrapped_geometries[0]
         else:
             if engine == "geopandas":
                 return gdf.iloc[0]
             elif engine is None:
-                return [row.to_dict() for _, row in gdf.iterrows()][0]
+                return _get_wrapped_records()[0]

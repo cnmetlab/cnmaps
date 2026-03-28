@@ -6,10 +6,10 @@ maps
 =========
 maps模块主要存放与地图边界对象相关的类和函数。
 
-.. py:class:: MapPolygon(shapely.geometry.MultiPolygon)
+.. py:class:: MapPolygon
     :module: cnmaps.maps
 
-    地图多边形类
+    地图多边形类（内部持有一个 ``shapely.geometry.MultiPolygon``，组合实现，兼容 Shapely 2.0+）
 
     该是基于shapely.geometry.MultiPolygon的自定义类, 
     并实现了对于加号操作符的支持.

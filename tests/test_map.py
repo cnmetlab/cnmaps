@@ -6,6 +6,7 @@ from glob import glob
 import fiona
 import numpy as np
 from geopandas import GeoDataFrame
+from shapely.geometry.base import BaseGeometry
 
 from cnmaps import (
     get_adm_maps,
@@ -371,6 +372,25 @@ def test_only_polygon_and_record():
 
     meta = get_adm_maps(city="北京市", record="first", level="市")
     assert isinstance(meta, dict)
+
+
+def test_mappolygon_shapely2_protocols():
+    """兼容 shapely>=2.0 后不再自动暴露的 MultiPolygon 协议."""
+    polygon = get_adm_maps(city="北京市", record="first", level="市", only_polygon=True)
+
+    assert len(polygon) >= 1
+    assert list(polygon)
+    assert polygon[0].geom_type == "Polygon"
+    assert polygon == polygon.geom
+    assert polygon.__geo_interface__["type"] == "MultiPolygon"
+
+
+def test_get_adm_maps_geopandas_geometry_is_native():
+    """GeoDataFrame 应始终持有原生 Shapely geometry."""
+    gdf = get_adm_maps(city="北京市", level="区县", engine="geopandas")
+
+    assert isinstance(gdf.iloc[0]["geometry"], BaseGeometry)
+    assert not isinstance(gdf.iloc[0]["geometry"], MapPolygon)
 
 
 def test_get_adm_names():
