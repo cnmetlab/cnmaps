@@ -6,8 +6,8 @@
 
 <p align="center">
 
-<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml">
-<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml/badge.svg?branch=main"
+<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package.yml">
+<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package.yml/badge.svg"
  alt="Pytest" /></a>
 
 <a href="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml">
