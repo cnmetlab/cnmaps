@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774787953749,
+  "lastUpdate": 1774790428660,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -7978,6 +7978,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.18985968702818598",
             "extra": "mean: 110.72098369300002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "9d1586f8b132688e2c09fcf8624c07fb4e8ce4b2",
+          "message": "Fix #138 auto-detect axes for clipping (#150)\n\n* Fix #138 auto-detect axes for clipping\n\n* Document multi-axes clipping for #138\n\n* Add rendered docs image for #138 example\n\n* Refine #138 multi-axes example with Beijing panels",
+          "timestamp": "2026-03-29T20:54:31+08:00",
+          "tree_id": "e4999c5066f8b8d47dcc9388be42ba6b3c0de9af",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/9d1586f8b132688e2c09fcf8624c07fb4e8ce4b2"
+        },
+        "date": 1774790426209,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.39840350964743226,
+            "unit": "iter/sec",
+            "range": "stddev: 0.030292338396526085",
+            "extra": "mean: 2.5100180489999984 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.05847965979371926,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14673909286235734",
+            "extra": "mean: 17.0999626798 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05844048391588614,
+            "unit": "iter/sec",
+            "range": "stddev: 0.048866375287615005",
+            "extra": "mean: 17.1114257274 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.0588595957564782,
+            "unit": "iter/sec",
+            "range": "stddev: 0.168621842313658",
+            "extra": "mean: 16.9895832132 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05929187720118423,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09094800358719674",
+            "extra": "mean: 16.865716641200002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05948480213536783,
+            "unit": "iter/sec",
+            "range": "stddev: 0.2225883229593672",
+            "extra": "mean: 16.811016664800015 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.3315089652176314,
+            "unit": "iter/sec",
+            "range": "stddev: 0.053300554135742646",
+            "extra": "mean: 3.016509672200004 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.18402558770740643,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08221396271193843",
+            "extra": "mean: 5.434026933199971 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1133114068314018,
+            "unit": "iter/sec",
+            "range": "stddev: 0.006692515841510908",
+            "extra": "mean: 898.2212828000229 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.00893095282149773,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1238010637045085",
+            "extra": "mean: 111.97013577240004 sec\nrounds: 5"
           }
         ]
       }
