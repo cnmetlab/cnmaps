@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774770473000,
+  "lastUpdate": 1774776433806,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -6796,6 +6796,96 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.932169202626462",
             "extra": "mean: 113.55089133439999 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "committer": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "id": "1fa560304b01c8f791e0453f63bec34e002a124f",
+          "message": "Simplify bounded clipping workflows and apply axes clip box",
+          "timestamp": "2026-03-29T07:21:38Z",
+          "url": "https://github.com/cnmetlab/cnmaps/pull/147/commits/1fa560304b01c8f791e0453f63bec34e002a124f"
+        },
+        "date": 1774776431249,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.4550264445093255,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05068291142927279",
+            "extra": "mean: 2.197674469399999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.057749243413022136,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08435445487742359",
+            "extra": "mean: 17.3162441774 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.057324497640554375,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06938269020699363",
+            "extra": "mean: 17.444548860599998 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.058349044374362655,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03802801414706436",
+            "extra": "mean: 17.138241263800012 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.058611748258231726,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04555692388007021",
+            "extra": "mean: 17.06142590380001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.058905487786036805,
+            "unit": "iter/sec",
+            "range": "stddev: 0.12016332872252242",
+            "extra": "mean: 16.97634698539996 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.371778440649168,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03625205942041159",
+            "extra": "mean: 2.689774044600017 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.21089222773680225,
+            "unit": "iter/sec",
+            "range": "stddev: 0.027818653297687075",
+            "extra": "mean: 4.74175843620003 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.3167605305189507,
+            "unit": "iter/sec",
+            "range": "stddev: 0.006932528432360736",
+            "extra": "mean: 759.4395312000188 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.009873828853171661,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1271722009020441",
+            "extra": "mean: 101.27783404700001 sec\nrounds: 5"
           }
         ]
       }
