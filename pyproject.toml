@@ -6,9 +6,11 @@ authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
 readme = "PYPI.md"
 homepage = "https://github.com/cnmetlab/cnmaps"
+exclude = ["cnmaps/data/**", "**/.DS_Store"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
+cnmaps-data = ">=1.0.0"
 shapely = ">=2.0.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"

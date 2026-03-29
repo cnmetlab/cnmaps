@@ -10,6 +10,7 @@ from shapely.geometry.base import BaseGeometry
 
 from cnmaps import (
     get_adm_maps,
+    get_data_provider,
     read_mapjson,
     get_adm_names,
     MapNotFoundError,
@@ -152,12 +153,21 @@ def test_not_found():
 def test_get_map_by_fp():
     """测试是否可以按文件路径加载地图."""
     pattern = os.path.join(
-        os.path.dirname(os.path.abspath(__file__)),
-        "../cnmaps/data/geojson.min/*/*/*/*.geojson",
+        get_data_provider().get_dataset_root("administrative"),
+        "*/*/*.geojson",
     )
     fps = sorted(glob(pattern))
     for fp in fps:
         read_mapjson(fp)
+
+
+def test_data_provider_layout():
+    """测试数据提供者可以解析各类数据目录."""
+    provider = get_data_provider()
+    assert os.path.exists(provider.get_index_db("administrative"))
+    assert os.path.isdir(provider.get_dataset_root("administrative"))
+    assert os.path.isdir(provider.get_dataset_root("geography"))
+    assert os.path.exists(provider.get_sample_path("china-dem.nc"))
 
 
 def test_map_load():

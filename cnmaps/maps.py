@@ -1,6 +1,5 @@
 """地图类模块."""
 
-import os
 import sqlite3
 import copy
 from functools import lru_cache
@@ -20,9 +19,11 @@ except ImportError:
     from shapely.vectorized import contains as _contains_xy
 
 from .geo import gcj02_to_wgs84
+from .provider import get_data_provider
 
-DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data/")
-DB_FILE = os.path.join(DATA_DIR, "index.db")
+DATA_PROVIDER = get_data_provider()
+DATA_DIR = DATA_PROVIDER.get_dataset_root("administrative")
+DB_FILE = DATA_PROVIDER.get_index_db("administrative")
 
 
 class MapNotFoundError(Exception):
@@ -367,6 +368,9 @@ def _query_adm_metadata(
     source="高德",
     db=DB_FILE,
 ):
+    if db is None:
+        db = get_data_provider().get_index_db("administrative")
+
     con = sqlite3.connect(db)
     try:
         cur = con.cursor()
@@ -530,6 +534,7 @@ def get_adm_maps(
     """
     import geopandas as gpd
 
+    provider = get_data_provider()
     rows = _query_adm_metadata(
         province=province,
         city=city,
@@ -542,9 +547,7 @@ def get_adm_maps(
     meta_rows = [row[:7] for row in rows]
     map_polygons = []
     for row in rows:
-        mapjson = read_mapjson(
-            os.path.join(DATA_DIR, "geojson.min/", row[7]), wgs84=wgs84
-        )
+        mapjson = read_mapjson(provider.resolve_dataset_path("administrative", row[7]), wgs84=wgs84)
 
         map_polygons.append(_get_geom(mapjson))
 

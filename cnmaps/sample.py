@@ -1,18 +1,18 @@
 """样例数据模块."""
 
-import os
 from functools import lru_cache
 
 import netCDF4 as nc
 import numpy as np
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DATA_DIR = os.path.join(BASE_DIR, "data", "sample")
+from .provider import get_data_provider
+
+BASE_DATA_DIR = get_data_provider().get_dataset_root("sample")
 
 
 @lru_cache(maxsize=3)
 def _load_dataset_arrays(filename, data_var):
-    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, filename))
+    ds = nc.Dataset(get_data_provider().get_sample_path(filename))
     lon = ds.variables["lon"][:]
     lat = ds.variables["lat"][:]
     lons, lats = np.meshgrid(lon, lat)
