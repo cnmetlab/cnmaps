@@ -2,6 +2,8 @@
 ===========
 我们先用几个小例子，快速入门cnmaps的基本功能的使用。
 
+.. note:: ``cnmaps 2.x`` 不再内置官方边界数据，运行时默认依赖已安装的 ``cnmaps-data`` 包；若你使用的是兼容 ``cnmaps.data_providers`` 协议的第三方数据包，也可以被 ``cnmaps`` 发现并使用。你可以通过 ``get_adm_maps(..., provider='mydata')``、``get_adm_names(..., provider='mydata')`` 或 ``load_dem(provider='mydata')`` 显式切换数据源；不传 ``provider`` 时默认使用官方 ``cnmaps-data``。
+
 查询行政边界
 ------------
 你可以使用 ``get_adm_maps`` 轻松查询到你想要的行政边界，例如你想要查询北京市，可以使用以下方式。

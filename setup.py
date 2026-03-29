@@ -38,9 +38,8 @@ setuptools.setup(
     description="A python package to draw china maps more easily",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Clarmy/cnmaps",
+    url="https://github.com/cnmetlab/cnmaps",
     include_package_data=True,
-    package_data={"": ["*.geojson", "*.nc", "*.db"]},
     packages=setuptools.find_packages(),
     install_requires=required,
     classifiers=[

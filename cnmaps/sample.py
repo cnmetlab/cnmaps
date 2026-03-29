@@ -1,18 +1,18 @@
 """样例数据模块."""
 
-import os
 from functools import lru_cache
 
 import netCDF4 as nc
 import numpy as np
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-BASE_DATA_DIR = os.path.join(BASE_DIR, "data", "sample")
+from .provider import get_data_provider
+
+BASE_DATA_DIR = get_data_provider().get_dataset_root("sample")
 
 
 @lru_cache(maxsize=3)
-def _load_dataset_arrays(filename, data_var):
-    ds = nc.Dataset(os.path.join(BASE_DATA_DIR, filename))
+def _load_dataset_arrays(filename, data_var, provider_name=None):
+    ds = nc.Dataset(get_data_provider(provider_name).get_sample_path(filename))
     lon = ds.variables["lon"][:]
     lat = ds.variables["lat"][:]
     lons, lats = np.meshgrid(lon, lat)
@@ -20,33 +20,33 @@ def _load_dataset_arrays(filename, data_var):
     return lons, lats, data
 
 
-def load_dem():
+def load_dem(provider: str = None):
     """
     加载海拔高度样例数据
 
     返回值:
         tuple: (lons, lats, data)
     """
-    return _load_dataset_arrays("china-dem.nc", "dem")
+    return _load_dataset_arrays("china-dem.nc", "dem", provider_name=provider)
 
 
-def load_wind():
+def load_wind(provider: str = None):
     """
     加载风矢样例数据
 
     返回值:
         tuple: (lons, lats, u, v)
     """
-    lons, lats, u = _load_dataset_arrays("china-wind.nc", "u")
-    _, _, v = _load_dataset_arrays("china-wind.nc", "v")
+    lons, lats, u = _load_dataset_arrays("china-wind.nc", "u", provider_name=provider)
+    _, _, v = _load_dataset_arrays("china-wind.nc", "v", provider_name=provider)
     return lons, lats, u, v
 
 
-def load_temp():
+def load_temp(provider: str = None):
     """
     加载气温样例数据
 
     返回值:
         tuple: (lons, lats, temp)
     """
-    return _load_dataset_arrays("china-temp.nc", "temp")
+    return _load_dataset_arrays("china-temp.nc", "temp", provider_name=provider)
