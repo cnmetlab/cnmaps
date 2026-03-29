@@ -40,7 +40,6 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/Clarmy/cnmaps",
     include_package_data=True,
-    package_data={"": ["*.geojson", "*.nc", "*.db"]},
     packages=setuptools.find_packages(),
     install_requires=required,
     classifiers=[
