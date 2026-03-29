@@ -5,11 +5,13 @@ from glob import glob
 
 import fiona
 import numpy as np
+import shapely.geometry as sgeom
 from geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
 from cnmaps import (
     get_adm_maps,
+    get_available_data_providers,
     get_data_provider,
     read_mapjson,
     get_adm_names,
@@ -17,6 +19,7 @@ from cnmaps import (
     MapPolygon,
 )
 from cnmaps.sample import load_dem
+import cnmaps.provider as provider_module
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
 
@@ -169,6 +172,66 @@ def test_data_provider_layout():
     assert os.path.isdir(provider.get_dataset_root("administrative"))
     assert os.path.isdir(provider.get_dataset_root("geography"))
     assert os.path.exists(provider.get_sample_path("china-dem.nc"))
+
+
+def test_default_provider_is_official():
+    provider = get_data_provider()
+    assert provider.name == "cnmaps-data"
+    assert "cnmaps-data" in get_available_data_providers()
+
+
+def test_get_data_provider_can_select_by_name(monkeypatch):
+    class DummyProvider:
+        def __init__(self, name):
+            self.name = name
+
+    monkeypatch.setattr(
+        provider_module,
+        "_discover_data_providers",
+        lambda: {
+            "cnmaps-data": DummyProvider("cnmaps-data"),
+            "mydata": DummyProvider("mydata"),
+        },
+    )
+
+    assert get_data_provider().name == "cnmaps-data"
+    assert get_data_provider("mydata").name == "mydata"
+    assert get_available_data_providers() == ("cnmaps-data", "mydata")
+
+    with pytest.raises(ImportError, match="my-missing-data"):
+        get_data_provider("my-missing-data")
+
+
+def test_get_adm_maps_accepts_provider_argument(monkeypatch):
+    selected = {}
+
+    class DummyProvider:
+        def __init__(self, name="mydata"):
+            self.name = name
+
+        def get_index_db(self, dataset):
+            selected["dataset"] = dataset
+            return "/tmp/mydata.db"
+
+        def resolve_dataset_path(self, dataset, relative_path):
+            selected["provider"] = "mydata"
+            return relative_path
+
+    monkeypatch.setattr("cnmaps.maps.get_data_provider", lambda name=None: DummyProvider())
+    monkeypatch.setattr(
+        "cnmaps.maps._query_adm_metadata",
+        lambda **kwargs: (("中华人民共和国", "北京市", "北京市", None, "市", "高德", "陆地", "fake.geojson"),),
+    )
+    monkeypatch.setattr(
+        "cnmaps.maps.read_mapjson",
+        lambda fp, wgs84=True: MapPolygon(
+            [sgeom.Polygon([(0, 0), (1, 0), (1, 1), (0, 0)])]
+        ),
+    )
+
+    records = get_adm_maps(city="北京市", provider="mydata", simplify=False)
+    assert records[0]["市"] == "北京市"
+    assert selected == {"dataset": "administrative", "provider": "mydata"}
 
 
 def test_map_load():

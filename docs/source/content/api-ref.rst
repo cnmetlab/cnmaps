@@ -95,7 +95,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
         cnmaps.maps.MapPolygon
 
 
-.. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None, level: str = '省', country: str = '中华人民共和国', source: str = '高德')
+.. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None, level: str = '省', country: str = '中华人民共和国', source: str = '高德', provider: str = None)
     :module: cnmaps.maps
 
     获取行政名称（内部调用 ``get_adm_maps`` 再抽取名称字段）。
@@ -112,6 +112,8 @@ maps模块主要存放与地图边界对象相关的类和函数。
         国家名称，必须为全称。默认为 ``'中华人民共和国'``。
     :param str source:
         数据源。默认为 ``'高德'``。
+    :param str provider:
+        数据提供者名称。默认为官方 ``'cnmaps-data'``；传入其他名称时，会按已安装 provider 的 ``name`` 进行匹配。
 
     :return:
         满足条件的名称列表
@@ -119,7 +121,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :rtype: list
 
 
-.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None, level: str = None, country: str = '中华人民共和国', source: str = '高德', db: str = DB_FILE, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool = True, simplify: bool = False, *args, **kwargs)
+.. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None, level: str = None, country: str = '中华人民共和国', source: str = '高德', db: str = None, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool = True, simplify: bool = False, provider: str = None, *args, **kwargs)
     :module: cnmaps.maps
 
     获取行政地图的边界对象。
@@ -137,7 +139,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :param str source:
         数据源。默认为 ``'高德'``。
     :param str db:
-        SQLite 数据库文件路径。默认使用包内数据索引。
+        SQLite 数据库文件路径。默认使用所选 provider 的索引库。
     :param str engine:
         输出引擎：``None`` 时为 ``list``（元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。当 ``engine='geopandas'`` 时，几何列保持为原生 Shapely geometry；当 ``engine is None`` 时，对外仍返回 ``MapPolygon`` 以保持历史接口。
     :param str record:
@@ -148,11 +150,24 @@ maps模块主要存放与地图边界对象相关的类和函数。
         ``True`` 为 WGS84，``False`` 为 GCJ02（火星坐标）。
     :param bool simplify:
         是否对几何做简化。默认为 ``False``。
+    :param str provider:
+        数据提供者名称。默认为官方 ``'cnmaps-data'``；传入其他名称时，会按已安装 provider 的 ``name`` 进行匹配。
 
     :return:
         根据参数查到的地图元信息与几何
 
     :rtype: list or geopandas.GeoDataFrame
+
+
+.. py:function:: get_available_data_providers()
+    :module: cnmaps.provider
+
+    返回当前环境中已发现的 provider 名称列表。
+
+    :return:
+        已发现的数据提供者名称
+
+    :rtype: tuple
 
 drawing
 ==========
@@ -259,28 +274,37 @@ sample
 ==========
 sample模块主要存放示例数据
 
-.. py:function:: load_dem()
+.. py:function:: load_dem(provider: str = None)
     :module: cnmaps.sample
 
     加载中国地区的 DEM 海拔样例数据
 
+    :param str provider:
+        数据提供者名称。默认为官方 ``'cnmaps-data'``。
+
     :return:
         (lons, lats, data)
 
 
-.. py:function:: load_temp()
+.. py:function:: load_temp(provider: str = None)
     :module: cnmaps.sample
 
     加载中国地区的气温样例数据
 
+    :param str provider:
+        数据提供者名称。默认为官方 ``'cnmaps-data'``。
+
     :return:
         (lons, lats, data)
 
 
-.. py:function:: load_wind()
+.. py:function:: load_wind(provider: str = None)
     :module: cnmaps.sample
 
     加载中国地区的风场样例数据（u、v 分量）
+
+    :param str provider:
+        数据提供者名称。默认为官方 ``'cnmaps-data'``。
 
     :return:
         (lons, lats, u, v)

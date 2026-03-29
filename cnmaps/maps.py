@@ -21,10 +21,6 @@ except ImportError:
 from .geo import gcj02_to_wgs84
 from .provider import get_data_provider
 
-DATA_PROVIDER = get_data_provider()
-DATA_DIR = DATA_PROVIDER.get_dataset_root("administrative")
-DB_FILE = DATA_PROVIDER.get_index_db("administrative")
-
 
 class MapNotFoundError(Exception):
     """地图无法找到的错误"""
@@ -366,7 +362,7 @@ def _query_adm_metadata(
     level=None,
     country="中华人民共和国",
     source="高德",
-    db=DB_FILE,
+    db=None,
 ):
     if db is None:
         db = get_data_provider().get_index_db("administrative")
@@ -432,6 +428,7 @@ def get_adm_names(
     level: str = "省",
     country: str = "中华人民共和国",
     source: str = "高德",
+    provider: str = None,
 ):
     """
     获取行政名称
@@ -450,6 +447,7 @@ def get_adm_names(
                                Defaults to '省'.
         country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
         source (str, 可选): 数据源. Defaults to '高德'.
+        provider (str, 可选): 数据提供者名称；默认为官方 ``cnmaps-data``。
 
     返回值:
         list: 名称列表
@@ -461,6 +459,7 @@ def get_adm_names(
         level=level,
         country=country,
         source=source,
+        provider=provider,
     )
     if level == "国":
         names = [d["国"] for d in data]
@@ -481,12 +480,13 @@ def get_adm_maps(
     level: str = None,
     country: str = "中华人民共和国",
     source: str = "高德",
-    db: str = DB_FILE,
+    db: str = None,
     engine: str = None,
     record: str = "all",
     only_polygon: bool = False,
     wgs84=True,
     simplify=False,
+    provider: str = None,
     *args,
     **kwargs,
 ):
@@ -507,7 +507,7 @@ def get_adm_maps(
                                Defaults to '省'.
         country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
         source (str, 可选): 数据源. Defaults to '高德'.
-        db (str, 可选): sqlite db文件路径. Defaults to DB_FILE.
+        db (str, 可选): sqlite db文件路径. 若未指定则使用所选 provider 的索引库。
         engine (str, 可选): 输出引擎, 默认为None, 输出为列表,
                                 目前支持'geopandas', 若为geopandas,
                                 则返回GeoDataFrame对象.
@@ -525,6 +525,7 @@ def get_adm_maps(
         wgs84 (bool, 可选): 是否使用 WGS84 坐标系, 若为 True 则转为 WGS84 坐标,
                                 若为 False 则使用高德默认的 GCJ02 火星坐标。Defaults to True.
         simplify  (bool, 可选): 是否对边界进行简化, 若为 True 则进行简化处理, 否则不做简化。Defaults to True.
+        provider (str, 可选): 数据提供者名称；默认为官方 ``cnmaps-data``。
 
     异常:
         ValueError: 当传入的等级
@@ -534,7 +535,9 @@ def get_adm_maps(
     """
     import geopandas as gpd
 
-    provider = get_data_provider()
+    data_provider = get_data_provider(provider)
+    if db is None:
+        db = data_provider.get_index_db("administrative")
     rows = _query_adm_metadata(
         province=province,
         city=city,
@@ -547,7 +550,10 @@ def get_adm_maps(
     meta_rows = [row[:7] for row in rows]
     map_polygons = []
     for row in rows:
-        mapjson = read_mapjson(provider.resolve_dataset_path("administrative", row[7]), wgs84=wgs84)
+        mapjson = read_mapjson(
+            data_provider.resolve_dataset_path("administrative", row[7]),
+            wgs84=wgs84,
+        )
 
         map_polygons.append(_get_geom(mapjson))
 

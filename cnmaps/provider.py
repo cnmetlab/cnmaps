@@ -12,6 +12,7 @@ from pathlib import Path
 
 
 CNMAPS_DATA_PROVIDER_GROUP = "cnmaps.data_providers"
+DEFAULT_DATA_PROVIDER = "cnmaps-data"
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,11 @@ def _provider_from_manifest_root(root_dir: Path) -> FileSystemDataProvider:
     )
 
 
+def _load_provider_from_entry_point(entry_point):
+    provider_factory = entry_point.load()
+    return provider_factory()
+
+
 def _iter_entry_points():
     entry_points = metadata.entry_points()
     if hasattr(entry_points, "select"):
@@ -75,16 +81,17 @@ def _iter_entry_points():
 def _load_provider_from_entry_points():
     for entry_point in _iter_entry_points():
         try:
-            provider_factory = entry_point.load()
-            provider = provider_factory()
+            provider = _load_provider_from_entry_point(entry_point)
         except Exception as exc:  # pragma: no cover - defensive for third-party plugins
             warnings.warn(f"加载 cnmaps 数据提供者 {entry_point.name} 失败: {exc}")
             continue
 
         if provider is not None:
-            return provider
+            yield provider
 
-    return None
+
+def _provider_name(provider) -> str:
+    return str(getattr(provider, "name"))
 
 
 def _load_provider_from_package_import():
@@ -97,18 +104,41 @@ def _load_provider_from_package_import():
 
 
 @lru_cache(maxsize=1)
-def get_data_provider():
-    """Return the active data provider for cnmaps."""
+def _discover_data_providers():
+    providers = {}
 
-    provider = _load_provider_from_entry_points()
-    if provider is not None:
-        return provider
+    for provider in _load_provider_from_entry_points():
+        name = _provider_name(provider)
+        if name in providers:
+            warnings.warn(f"发现重复的 cnmaps 数据提供者名称 {name!r}，将优先使用先加载的提供者")
+            continue
+        providers[name] = provider
 
     provider = _load_provider_from_package_import()
     if provider is not None:
-        return provider
+        providers.setdefault(_provider_name(provider), provider)
+
+    return providers
+
+
+def get_available_data_providers():
+    """Return discovered data-provider names."""
+
+    return tuple(sorted(_discover_data_providers()))
+
+
+def get_data_provider(provider: str = None):
+    """Return the requested data provider for cnmaps."""
+
+    provider_name = provider or DEFAULT_DATA_PROVIDER
+    providers = _discover_data_providers()
+    matched_provider = providers.get(provider_name)
+    if matched_provider is not None:
+        return matched_provider
 
     raise ImportError(
-        "未找到可用的 cnmaps 数据提供者。请先安装官方数据包 `cnmaps-data`，"
-        "或安装实现了 `cnmaps.data_providers` entry point 的第三方数据包。"
+        f"未找到名为 {provider_name!r} 的 cnmaps 数据提供者。"
+        f" 当前已发现的 provider: {', '.join(get_available_data_providers()) or '无'}。"
+        " 请先安装官方数据包 `cnmaps-data`，或安装实现了 "
+        "`cnmaps.data_providers` entry point 的第三方数据包。"
     )
