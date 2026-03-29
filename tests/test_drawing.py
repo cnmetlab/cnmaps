@@ -191,6 +191,45 @@ def test_clip_contourf():
         plt.close()
 
 
+def test_clip_contourf_with_extent():
+    """测试 extent 参数可直接限制裁剪范围并同步设置坐标范围."""
+
+    lons, lats, data = load_temp()
+    extent = [70, 140, 40, 55]
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
+
+    cs = ax.contourf(
+        lons,
+        lats,
+        data,
+        cmap=plt.cm.terrain,
+        levels=np.linspace(-30, 40, 10),
+        transform=ccrs.PlateCarree(),
+    )
+
+    clip_contours_by_map(cs, map_polygon, ax=ax, extent=extent, set_extent=True)
+    draw_map(map_polygon, color="k", linewidth=1)
+
+    assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
+
+
+def test_clip_scatter_sets_clip_box():
+    """测试裁剪时同时设置 clip_box，避免对象绘制超出当前 Axes。"""
+
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
+
+    scatter = ax.scatter([80, 120], [25, 45], transform=ccrs.PlateCarree())
+    clip_scatter_by_map(scatter, map_polygon, ax=ax, extent=[70, 140, 15, 55], set_extent=True)
+
+    assert scatter.get_clip_path() is not None
+    assert scatter.get_clip_box() is not None
+
+
 def test_clip_quiver():
     """测试切割箭矢簇."""
 

@@ -3,10 +3,11 @@ import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import numpy as np
 
-from cnmaps import get_adm_maps, clip_contours_by_map, draw_maps, MapPolygon
+from cnmaps import get_adm_maps, clip_contours_by_map, draw_maps
 from cnmaps.sample import load_temp
 from cnmaps.sample import load_dem
-from shapely.geometry import Polygon
+
+TMP_ISSUES_DIR = "./tmp/issues"
 
 TMP_ISSUES_DIR = "./tmp/issues"
 
@@ -38,17 +39,13 @@ def test_issue97():
     ax = fig.add_axes([0.1, 0.1, 0.8, 0.8], projection=ccrs.PlateCarree())
     lons, lats, data = load_temp()
     cs = ax.contourf(lons, lats, data)
-
-    boundary = MapPolygon(
-        [Polygon([[70, 55], [140, 55], [140, 40], [70, 40], [70, 55]])]
-    ) & get_adm_maps(country="中华人民共和国", only_polygon=True, record="first")
-
+    boundary = get_adm_maps(country="中华人民共和国", only_polygon=True, record="first")
+    
     draw_maps(get_adm_maps(country="中华人民共和国"), ax)
-    clip_contours_by_map(cs, boundary, ax)
-    ax.set_extent([70, 140, 40, 55], crs=ccrs.PlateCarree())
+    clip_contours_by_map(cs, boundary, ax=ax, extent=[70, 140, 40, 55], set_extent=True)
+    assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
     os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
     fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue97.png"), bbox_inches="tight")
-
 
 def test_issue114():
     # https://github.com/cnmetlab/cnmaps/issues/114

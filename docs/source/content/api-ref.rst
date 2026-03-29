@@ -173,7 +173,7 @@ drawing
 ==========
 drawing模块主要存放与绘图相关的函数
 
-.. py:function:: clip_contours_by_map(contours, map_polygon, ax=None)
+.. py:function:: clip_contours_by_map(contours, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 
     使用地图边界对等值线 / 填色等值线（``contour`` / ``contourf``）结果裁剪。
@@ -184,9 +184,13 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象；支持单个 ``MapPolygon``、``MapPolygon`` 列表或 ``GeoDataFrame`` 几何列，通常由 ``get_adm_maps(..., only_polygon=True)`` 或 ``get_adm_maps(..., engine='geopandas')`` 得到。
     :param ax:
         坐标轴；默认使用当前轴（``matplotlib.pyplot.gca()``）。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。若传入，则会先用地图边界裁剪，再与该矩形范围求交。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动调用 ``ax.set_extent(extent, crs=ccrs.PlateCarree())``。
 
 
-.. py:function:: clip_pcolormesh_by_map(mesh, map_polygon, ax=None)
+.. py:function:: clip_pcolormesh_by_map(mesh, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 
     对 ``pcolormesh`` 结果按地图边界裁剪。
@@ -197,9 +201,13 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
 
 
-.. py:function:: clip_quiver_by_map(quiver, map_polygon, ax=None)
+.. py:function:: clip_quiver_by_map(quiver, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 
     对箭矢图 ``quiver`` 按地图边界裁剪。
@@ -210,9 +218,13 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
 
 
-.. py:function:: clip_scatter_by_map(scatter, map_polygon, ax=None)
+.. py:function:: clip_scatter_by_map(scatter, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 
     对 ``scatter`` 散点按地图边界裁剪（设置 ``set_clip_path``）。
@@ -223,9 +235,13 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
 
 
-.. py:function:: clip_clabels_by_map(clabel_text, map_polygon, ax=None)
+.. py:function:: clip_clabels_by_map(clabel_text, map_polygon, ax=None, extent=None)
     :module: cnmaps.drawing
 
     按边界隐藏落在区域外的等值线标签，一般与 ``contour`` + ``clabel`` 联用。
@@ -238,6 +254,8 @@ drawing模块主要存放与绘图相关的函数
         地图边界对象。
     :param ax:
         坐标轴；默认当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``；标签可见性会基于地图边界与该范围的交集判断。
 
 .. py:function:: draw_map(map_polygon, ax=None, **kwargs)
     :module: cnmaps.drawing
