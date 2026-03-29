@@ -29,8 +29,7 @@ def test_issue97():
     draw_maps(get_adm_maps(country="中华人民共和国"), ax)
     clip_contours_by_map(cs, boundary, ax=ax, extent=[70, 140, 40, 55], set_extent=True)
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
-    fig.savefig("./test.png", bbox_inches="tight")
-    os.remove("./test.png")
+    fig.savefig("./tmp/issues/test_issue97.png", bbox_inches="tight")
 
 
 def test_issue114():
