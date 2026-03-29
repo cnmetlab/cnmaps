@@ -51,6 +51,23 @@ def _iter_geoms(map_polygon):
         yield geom
 
 
+def _clip_geoms_by_extent(geoms, extent=None):
+    if extent is None:
+        return [geom for geom in geoms if geom is not None and not geom.is_empty]
+
+    left, right, lower, upper = extent
+    bbox = sgeom.box(left, lower, right, upper)
+    clipped_geoms = []
+    for geom in geoms:
+        if geom is None or geom.is_empty:
+            continue
+        clipped = geom.intersection(bbox)
+        if clipped is None or clipped.is_empty:
+            continue
+        clipped_geoms.append(clipped)
+    return clipped_geoms
+
+
 def _geom_to_path(geom):
     """Convert a Shapely geometry to a Matplotlib path across Cartopy versions."""
     if _shapely_to_path is not None:
@@ -60,7 +77,7 @@ def _geom_to_path(geom):
     return mpath.Path.make_compound_path(*paths)
 
 
-def _make_clip_path(map_polygon, ax=None):
+def _make_clip_path(map_polygon, ax=None, extent=None):
     if ax is None:
         ax = plt.gca()
 
@@ -68,14 +85,20 @@ def _make_clip_path(map_polygon, ax=None):
         _get_geom(_transform_polygon(geom, ccrs.PlateCarree(), ax.projection))
         for geom in _iter_geoms(map_polygon)
     ]
-    paths = [_geom_to_path(geom) for geom in geoms if geom is not None and not geom.is_empty]
+    geoms = _clip_geoms_by_extent(geoms, extent=extent)
+    paths = [_geom_to_path(geom) for geom in geoms]
     path = mpath.Path.make_compound_path(*paths)
     clip = mpatches.PathPatch(path, transform=ax.transData)
 
     return clip
 
 
-def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None):
+def _set_extent_if_needed(ax, extent=None, set_extent=False):
+    if set_extent and extent is not None:
+        ax.set_extent(extent, crs=ccrs.PlateCarree())
+
+
+def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对等值线对象进行裁剪
 
@@ -106,7 +129,11 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None):
         >>> clip_contours_by_map(cs, map_polygon)
         >>> draw_map(map_polygon, color='k', linewidth=1)
     """
-    clip = _make_clip_path(map_polygon, ax=ax)
+    if ax is None:
+        ax = plt.gca()
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     collections = getattr(contours, "collections", None)
     if collections is None:
@@ -117,7 +144,7 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None):
         contour.set_clip_path(clip)
 
 
-def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None):
+def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对填色网格线对象进行裁剪
 
@@ -147,12 +174,16 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None):
     >>> clip_pcolormesh_by_map(mesh, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon, ax=ax)
+    if ax is None:
+        ax = plt.gca()
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     mesh.set_clip_path(clip)
 
 
-def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None):
+def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对箭矢簇对象进行裁剪
 
@@ -184,12 +215,16 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None):
     >>> clip_quiver_by_map(quiver, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon, ax=ax)
+    if ax is None:
+        ax = plt.gca()
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     quiver.set_clip_path(clip)
 
 
-def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None):
+def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对散点对象进行裁剪
 
@@ -230,13 +265,17 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None):
     >>> clip_scatter_by_map(scatter, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    clip = _make_clip_path(map_polygon, ax=ax)
+    if ax is None:
+        ax = plt.gca()
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     scatter.set_clip_path(clip)
 
 
 def clip_clabels_by_map(
-    clabel_text: matplotlib.text.Text, map_polygon: MapPolygon, ax=None
+    clabel_text: matplotlib.text.Text, map_polygon: MapPolygon, ax=None, extent=None
 ):
     """
     剪切clabel文本, 一般配合contour函数使用
@@ -278,7 +317,18 @@ def clip_clabels_by_map(
     """
     if ax is None:
         ax = plt.gca()
-    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
+    geoms = [
+        _get_geom(_transform_polygon(geom, ccrs.PlateCarree(), ax.projection))
+        for geom in _iter_geoms(map_polygon)
+    ]
+    geoms = _clip_geoms_by_extent(geoms, extent=extent)
+    if not geoms:
+        return
+
+    if len(geoms) == 1:
+        map_polygon = geoms[0]
+    else:
+        map_polygon = sgeom.GeometryCollection(geoms)
 
     for cbt in clabel_text:
         point = sgeom.Point(cbt.get_position())
