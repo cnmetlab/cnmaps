@@ -216,6 +216,20 @@ def test_clip_contourf_with_extent():
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
 
 
+def test_clip_scatter_sets_clip_box():
+    """测试裁剪时同时设置 clip_box，避免对象绘制超出当前 Axes。"""
+
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
+
+    scatter = ax.scatter([80, 120], [25, 45], transform=ccrs.PlateCarree())
+    clip_scatter_by_map(scatter, map_polygon, ax=ax, extent=[70, 140, 15, 55], set_extent=True)
+
+    assert scatter.get_clip_path() is not None
+    assert scatter.get_clip_box() is not None
+
+
 def test_clip_quiver():
     """测试切割箭矢簇."""
 

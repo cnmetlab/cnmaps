@@ -98,6 +98,11 @@ def _set_extent_if_needed(ax, extent=None, set_extent=False):
         ax.set_extent(extent, crs=ccrs.PlateCarree())
 
 
+def _set_clip_box_if_possible(artist, ax):
+    if hasattr(artist, "set_clip_box"):
+        artist.set_clip_box(ax.bbox)
+
+
 def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对等值线对象进行裁剪
@@ -138,10 +143,12 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None, extent=None
     collections = getattr(contours, "collections", None)
     if collections is None:
         contours.set_clip_path(clip)
+        _set_clip_box_if_possible(contours, ax)
         return
 
     for contour in collections:
         contour.set_clip_path(clip)
+        _set_clip_box_if_possible(contour, ax)
 
 
 def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
@@ -181,6 +188,7 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None, extent=None, 
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     mesh.set_clip_path(clip)
+    _set_clip_box_if_possible(mesh, ax)
 
 
 def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
@@ -222,6 +230,7 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None, extent=None, se
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     quiver.set_clip_path(clip)
+    _set_clip_box_if_possible(quiver, ax)
 
 
 def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
@@ -272,6 +281,7 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None, extent=None, 
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
 
     scatter.set_clip_path(clip)
+    _set_clip_box_if_possible(scatter, ax)
 
 
 def clip_clabels_by_map(
