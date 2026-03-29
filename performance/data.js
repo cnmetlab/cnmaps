@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774767584832,
+  "lastUpdate": 1774770473000,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -6702,6 +6702,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.0245581711784781",
             "extra": "mean: 113.02001836600004 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "eaa3b1440614382fd07f1e9d588ee4f0ae69de9f",
+          "message": "Add external data provider support and slim package distribution (#146)\n\n* Add external data provider support\n\n* Slim package distribution by excluding bundled data\n\n* Prepare cnmaps 2.0.0b1 data package split\n\n* Clarify conda distribution support\n\n* Add explicit data provider selection",
+          "timestamp": "2026-03-29T15:21:32+08:00",
+          "tree_id": "0d31c2f70574c3181607eff00792638d25936859",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/eaa3b1440614382fd07f1e9d588ee4f0ae69de9f"
+        },
+        "date": 1774770470911,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.40680966211252667,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07306042595343201",
+            "extra": "mean: 2.458152038000003 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.05699455914788079,
+            "unit": "iter/sec",
+            "range": "stddev: 0.6941346899079306",
+            "extra": "mean: 17.545534432600004 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.058537103041037306,
+            "unit": "iter/sec",
+            "range": "stddev: 0.19707100135631278",
+            "extra": "mean: 17.083182256200008 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05785192880857792,
+            "unit": "iter/sec",
+            "range": "stddev: 0.27824753635187105",
+            "extra": "mean: 17.285508376200006 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05586092620998954,
+            "unit": "iter/sec",
+            "range": "stddev: 0.43518328689362423",
+            "extra": "mean: 17.901600776200006 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05813924923206873,
+            "unit": "iter/sec",
+            "range": "stddev: 0.4426554954741163",
+            "extra": "mean: 17.20008450759999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.34795106584785673,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04804750959340011",
+            "extra": "mean: 2.8739673423999648 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.18755459034004957,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05515703811806621",
+            "extra": "mean: 5.3317809934000024 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1018727166667246,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00047844325819647",
+            "extra": "mean: 907.545839799991 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.008806623957315008,
+            "unit": "iter/sec",
+            "range": "stddev: 1.932169202626462",
+            "extra": "mean: 113.55089133439999 sec\nrounds: 5"
           }
         ]
       }
