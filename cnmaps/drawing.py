@@ -103,6 +103,17 @@ def _set_clip_box_if_possible(artist, ax):
         artist.set_clip_box(ax.bbox)
 
 
+def _resolve_axes(artist=None, ax=None):
+    if ax is not None:
+        return ax
+
+    artist_axes = getattr(artist, "axes", None)
+    if artist_axes is not None:
+        return artist_axes
+
+    return plt.gca()
+
+
 def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用地图边界对象对等值线对象进行裁剪
@@ -134,8 +145,7 @@ def clip_contours_by_map(contours, map_polygon: MapPolygon, ax=None, extent=None
         >>> clip_contours_by_map(cs, map_polygon)
         >>> draw_map(map_polygon, color='k', linewidth=1)
     """
-    if ax is None:
-        ax = plt.gca()
+    ax = _resolve_axes(contours, ax=ax)
 
     clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
@@ -181,8 +191,7 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None, extent=None, 
     >>> clip_pcolormesh_by_map(mesh, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    if ax is None:
-        ax = plt.gca()
+    ax = _resolve_axes(mesh, ax=ax)
 
     clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
@@ -223,8 +232,7 @@ def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None, extent=None, se
     >>> clip_quiver_by_map(quiver, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    if ax is None:
-        ax = plt.gca()
+    ax = _resolve_axes(quiver, ax=ax)
 
     clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
@@ -274,8 +282,7 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None, extent=None, 
     >>> clip_scatter_by_map(scatter, map_polygon)
     >>> draw_map(map_polygon, linewidth=1)
     """
-    if ax is None:
-        ax = plt.gca()
+    ax = _resolve_axes(scatter, ax=ax)
 
     clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
     _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
@@ -325,8 +332,8 @@ def clip_clabels_by_map(
     >>> clip_clabels_by_map(clabels, map_polygon)
     >>> draw_map(map_polygon, color='k')
     """
-    if ax is None:
-        ax = plt.gca()
+    artist = clabel_text[0] if clabel_text else None
+    ax = _resolve_axes(artist, ax=ax)
     geoms = [
         _get_geom(_transform_polygon(geom, ccrs.PlateCarree(), ax.projection))
         for geom in _iter_geoms(map_polygon)

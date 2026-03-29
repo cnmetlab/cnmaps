@@ -216,6 +216,47 @@ def test_clip_contourf_with_extent():
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
 
 
+def test_clip_contourf_uses_artist_axes_when_ax_is_omitted():
+    """测试多子图下不传 ax 时，仍会使用 contourf 自身所属的 Axes."""
+
+    dem_lons, dem_lats, dem = load_dem()
+    temp_lons, temp_lats, temp = load_temp()
+    map_polygon = get_adm_maps(city="北京市", only_polygon=True, record="first")
+    extent = map_polygon.get_extent(buffer=0.15)
+
+    fig, axes = plt.subplots(
+        1, 2, figsize=(10, 4.6), subplot_kw={"projection": ccrs.PlateCarree()}
+    )
+    panels = [
+        ("Beijing DEM", dem_lons, dem_lats, dem, plt.cm.terrain, np.linspace(-200, dem.max(), 10)),
+        ("Beijing Temperature", temp_lons, temp_lats, temp, plt.cm.coolwarm, np.linspace(-20, 36, 10)),
+    ]
+
+    for ax, (title, lons, lats, data, cmap, levels) in zip(axes, panels):
+        cs = ax.contourf(
+            lons,
+            lats,
+            data,
+            cmap=cmap,
+            levels=levels,
+            transform=ccrs.PlateCarree(),
+        )
+        clip_contours_by_map(cs, map_polygon, extent=extent, set_extent=True)
+        draw_map(map_polygon, ax=ax, color="black", linewidth=1.0)
+        ax.set_title(title)
+
+    ax1, ax2 = axes
+    expected_extent = tuple(round(v, 6) for v in extent)
+    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == expected_extent
+    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == expected_extent
+
+    savefp = os.path.join("./tmp", "test_clip_contourf", "auto_axes_multi_panel.png")
+    os.makedirs(os.path.dirname(savefp), exist_ok=True)
+    plt.tight_layout()
+    plt.savefig(savefp, bbox_inches="tight")
+    plt.close()
+
+
 def test_clip_scatter_sets_clip_box():
     """测试裁剪时同时设置 clip_box，避免对象绘制超出当前 Axes。"""
 
