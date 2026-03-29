@@ -419,6 +419,8 @@ def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
 
     elif isinstance(maps, GeoDataFrame):
         geometries = [m["geometry"] for _, m in maps.iterrows()]
+    else:
+        geometries = [maps]
 
     for gm in geometries:
         draw_map(gm, ax=ax, **kwargs)

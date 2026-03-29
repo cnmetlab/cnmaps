@@ -9,6 +9,8 @@ from cnmaps.sample import load_dem
 
 TMP_ISSUES_DIR = "./tmp/issues"
 
+TMP_ISSUES_DIR = "./tmp/issues"
+
 
 def test_issue85():
     # https://github.com/cnmetlab/cnmaps/issues/85
@@ -20,6 +22,17 @@ def test_issue85():
     ) + get_adm_maps(city="辽源市", level="市", only_polygon=True, record="first")
 
 
+def test_issue95():
+    # https://github.com/cnmetlab/cnmaps/issues/95
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    xian = get_adm_maps(city="西安市", only_polygon=True, record="first")
+
+    draw_maps(xian, ax=ax, color="black", linewidth=1)
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue95.png"), bbox_inches="tight")
+
+
 def test_issue97():
     # https://github.com/cnmetlab/cnmaps/issues/97
     fig = plt.figure(figsize=(6, 5), dpi=300)
@@ -27,13 +40,12 @@ def test_issue97():
     lons, lats, data = load_temp()
     cs = ax.contourf(lons, lats, data)
     boundary = get_adm_maps(country="中华人民共和国", only_polygon=True, record="first")
-
+    
     draw_maps(get_adm_maps(country="中华人民共和国"), ax)
     clip_contours_by_map(cs, boundary, ax=ax, extent=[70, 140, 40, 55], set_extent=True)
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
     os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
     fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue97.png"), bbox_inches="tight")
-
 
 def test_issue114():
     # https://github.com/cnmetlab/cnmaps/issues/114
