@@ -222,35 +222,35 @@ def test_clip_contourf_uses_artist_axes_when_ax_is_omitted():
     lons, lats, data = load_temp()
     map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
 
-    fig = plt.figure(figsize=(10, 5))
-    ax1 = fig.add_subplot(121, projection=ccrs.PlateCarree())
-    ax2 = fig.add_subplot(122, projection=ccrs.PlateCarree())
-
-    cs1 = ax1.contourf(
-        lons,
-        lats,
-        data,
-        cmap=plt.cm.terrain,
-        levels=np.linspace(-30, 40, 10),
-        transform=ccrs.PlateCarree(),
+    fig, axes = plt.subplots(
+        1, 2, figsize=(10, 4.5), subplot_kw={"projection": ccrs.PlateCarree()}
     )
-    cs2 = ax2.contourf(
-        lons,
-        lats,
-        data,
-        cmap=plt.cm.terrain,
-        levels=np.linspace(-30, 40, 10),
-        transform=ccrs.PlateCarree(),
-    )
+    windows = [
+        ("Northwest China", [73, 108, 30, 45]),
+        ("South and Southeast China", [104, 124, 20, 35]),
+    ]
 
-    clip_contours_by_map(cs1, map_polygon, extent=[70, 110, 15, 35], set_extent=True)
-    clip_contours_by_map(cs2, map_polygon, extent=[110, 140, 35, 55], set_extent=True)
+    for ax, (title, extent) in zip(axes, windows):
+        cs = ax.contourf(
+            lons,
+            lats,
+            data,
+            cmap=plt.cm.terrain,
+            levels=np.linspace(-30, 40, 10),
+            transform=ccrs.PlateCarree(),
+        )
+        clip_contours_by_map(cs, map_polygon, extent=extent, set_extent=True)
+        draw_map(map_polygon, ax=ax, color="white", linewidth=0.8)
+        ax.coastlines(linewidth=0.4)
+        ax.set_title(title)
 
-    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == (70.0, 110.0, 15.0, 35.0)
-    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == (110.0, 140.0, 35.0, 55.0)
+    ax1, ax2 = axes
+    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == (73.0, 108.0, 30.0, 45.0)
+    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == (104.0, 124.0, 20.0, 35.0)
 
-    savefp = os.path.join("./tmp", "test_clip_contourf", "auto_axes.png")
+    savefp = os.path.join("./tmp", "test_clip_contourf", "auto_axes_multi_panel.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
+    plt.tight_layout()
     plt.savefig(savefp, bbox_inches="tight")
     plt.close()
 
