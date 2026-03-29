@@ -139,7 +139,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :param str db:
         SQLite 数据库文件路径。默认使用包内数据索引。
     :param str engine:
-        输出引擎：``None`` 时为 ``list``（元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。
+        输出引擎：``None`` 时为 ``list``（元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。当 ``engine='geopandas'`` 时，几何列保持为原生 Shapely geometry；当 ``engine is None`` 时，对外仍返回 ``MapPolygon`` 以保持历史接口。
     :param str record:
         ``'all'`` 返回全部匹配记录；``'first'`` 仅返回第一条。
     :param bool only_polygon:
@@ -165,8 +165,8 @@ drawing模块主要存放与绘图相关的函数
 
     :param cartopy.mpl.contour.GeoContourSet contours:
         ``ax.contour()`` 或 ``ax.contourf()`` 的返回值，须带投影信息。
-    :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象，通常由 ``get_adm_maps(..., only_polygon=True)`` 得到。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、``MapPolygon`` 列表或 ``GeoDataFrame`` 几何列，通常由 ``get_adm_maps(..., only_polygon=True)`` 或 ``get_adm_maps(..., engine='geopandas')`` 得到。
     :param ax:
         坐标轴；默认使用当前轴（``matplotlib.pyplot.gca()``）。
 
@@ -178,8 +178,8 @@ drawing模块主要存放与绘图相关的函数
 
     :param cartopy.mpl.geocollection.GeoQuadMesh mesh:
         ``ax.pcolormesh()`` 的返回值，须带投影信息。
-    :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
 
@@ -191,8 +191,8 @@ drawing模块主要存放与绘图相关的函数
 
     :param matplotlib.quiver.Quiver quiver:
         ``ax.quiver()`` 的返回值，须带投影信息。
-    :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
 
@@ -204,8 +204,8 @@ drawing模块主要存放与绘图相关的函数
 
     :param matplotlib.collections.PathCollection scatter:
         ``ax.scatter()`` 的返回值。
-    :param cnmaps.maps.MapPolygon map_polygon:
-        地图边界对象。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
 

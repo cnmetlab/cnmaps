@@ -33,16 +33,16 @@ cnmaps 的文档（当前 Sphinx 工程）源码位于主仓库的 ``docs/`` 目
 -----------
 以使用者的角度测试项目的各项功能；发现 bug 请到 `Issues <https://github.com/cnmetlab/cnmaps/issues>`_ 提交，并尽量附上可复现步骤或测试用例。你也可以在 ``tests/`` 中补充 `pytest <https://pytest.org/>`_ 用例。
 
-部分用例标记为 ``@pytest.mark.heavy``（全网格等耗时测试）。**默认 CI** 使用 ``pytest -m "not heavy"`` 跳过这些用例；本地若需与 CI 一致可同样加上该参数。运行全部测试可不加 ``-m``。
+当前主测试集为 ``tests/test_drawing.py``、``tests/test_geo.py``、``tests/test_map.py``、``tests/test_issues.py``；性能基准位于 ``tests/test_perf.py``。部分基准或耗时用例会通过 ``@pytest.mark.heavy`` 标记与日常单测区分，CI 默认使用 ``-m "not heavy"`` 运行主测试集。本地提交前建议至少执行一次 ``poetry run pytest --verbose -p no:warnings -m "not heavy" ./tests/test_drawing.py ./tests/test_geo.py ./tests/test_map.py ./tests/test_issues.py``。其中 **pytest-benchmark** 为开发依赖，**pytest-memray** 仅在非 Windows 平台安装。
 
-代码风格方面，CI 使用 **flake8**（配置见 ``.flake8``；工作流中先跑 E9/F63/F7/F82 等严重规则，其余为告警）。``pyproject.toml`` 中还包含 **black** 等开发依赖，提交前可在项目根目录执行 ``poetry run flake8 .``（与 CI 一致）做检查。
+代码风格方面，CI 使用 **flake8**（配置见 ``.flake8``；工作流中先跑 E9/F63/F7/F82 等严重规则，其余为告警）。``pyproject.toml`` 中还包含 **black** 等开发依赖，提交前可在项目根目录执行 ``poetry run flake8 .`` 做检查。
 
 持续集成
 -----------
 主分支与 Pull Request 使用 **GitHub Actions**，主要包括：
 
-* ``python-package.yml``：在 macOS / Ubuntu / Windows 上对 Python 3.9–3.12 执行 flake8，并对 ``tests/test_drawing.py``、``test_geo.py``、``test_map.py``、``test_issues.py`` 运行 ``pytest -m "not heavy"``（与本地默认跳过 ``@pytest.mark.heavy`` 一致）。
-* ``perf-test.yml``：在 Ubuntu、Python 3.9 上对 ``tests/test_perf.py`` 运行带 **pytest-benchmark** 与 **memray** 的测试，并将基准结果推送到 ``gh-pages``；随后对主测试文件运行 **pytest-cov** 并通过 Codecov 上传覆盖率（需仓库配置 ``CODECOV_TOKEN``）。
+* ``python-package.yml``：在 macOS / Ubuntu / Windows 上对 Python 3.9–3.12 执行 flake8，并运行主单元测试。工作流统一设置 ``MPLBACKEND=Agg``，以避免不同平台图形后端差异影响绘图测试。
+* ``perf-test.yml``：在 Ubuntu、Python 3.9 上对 ``tests/test_perf.py`` 运行带 **pytest-benchmark** 与 **memray** 的测试，并将基准结果推送到 ``gh-pages``；随后对主测试文件运行 **pytest-cov** 并通过 Codecov 上传覆盖率（需仓库配置 ``CODECOV_TOKEN``）。依赖安装步骤带自动重试，以降低网络抖动导致的偶发失败。
 * ``pypi-publish.yml``：在发布 Release 时向 PyPI 发布。
 
 讨论
