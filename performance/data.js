@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774755937395,
+  "lastUpdate": 1774755941018,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -6428,6 +6428,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.438524489074897",
             "extra": "mean: 112.39419834280004 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6d6fa39952fd0d886a1064775552046e0d7a7663",
+          "message": "Enhance documentation and update flake8 configuration and CI badge (#145)\n\n* Update flake8 configuration to exclude specific directories and enhance API documentation for map_polygon parameter in usage and API reference. Improve installation instructions and contributor guide with CI details and Python version requirements.\n\n* Update README to change CI workflow badge from python-package-conda.yml to python-package.yml for improved clarity.",
+          "timestamp": "2026-03-29T11:20:56+08:00",
+          "tree_id": "31b63034ab1fb31d1b2e819e89d1279908373e2e",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/6d6fa39952fd0d886a1064775552046e0d7a7663"
+        },
+        "date": 1774755940101,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.45426740692269935,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05863732887680044",
+            "extra": "mean: 2.2013465741999965 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.058226052954818044,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04108970382545656",
+            "extra": "mean: 17.174442526199996 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05789642713518209,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14816193414837817",
+            "extra": "mean: 17.272222993400003 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05906708362935345,
+            "unit": "iter/sec",
+            "range": "stddev: 0.028936783552951137",
+            "extra": "mean: 16.929903061999983 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05943718112861127,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07868055777617217",
+            "extra": "mean: 16.824485633599977 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05874478173536,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1293554162652885",
+            "extra": "mean: 17.022788585800026 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.37691987300615515,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03781884366929464",
+            "extra": "mean: 2.6530837762000146 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.21443981706116697,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04429692419863062",
+            "extra": "mean: 4.66331306239997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.3490211142606314,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0012191718476134846",
+            "extra": "mean: 741.2782419999985 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.009913634420788844,
+            "unit": "iter/sec",
+            "range": "stddev: 0.23523857787892422",
+            "extra": "mean: 100.87117978679996 sec\nrounds: 5"
           }
         ]
       }
