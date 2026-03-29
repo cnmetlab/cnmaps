@@ -68,6 +68,8 @@ cnmaps 最简单也最快的安装方法是使用 pip 来安装 cnmaps： `$ pip
 ### 使用conda安装
 你也可以使用 conda 安装： ``$ conda install -c conda-forge cnmaps``
 
+补充说明：conda-forge 当前只维护到 `1.1.7` 版本；`2.x` 及后续版本仅发布到 PyPI，conda 发行将停止后续维护。
+
 
 ## 快速开始
 

@@ -16,6 +16,8 @@ cnmaps 最简单也最快的安装方法是使用 pip： ``pip install -U cnmaps
 -----------------
 也可以使用 conda-forge： ``conda install -c conda-forge cnmaps``
 
+补充说明：conda-forge 当前仅维护到 ``1.1.7`` 版本；``2.x`` 及后续版本只发布到 PyPI，conda 发行不再继续维护。
+
 从源码安装（参与开发）
 ------------------------
 若需修改源码或运行测试，可在克隆 `主仓库 <https://github.com/cnmetlab/cnmaps>`_ 后使用 `Poetry <https://python-poetry.org/>`_ 安装依赖::
