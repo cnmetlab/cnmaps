@@ -219,34 +219,36 @@ def test_clip_contourf_with_extent():
 def test_clip_contourf_uses_artist_axes_when_ax_is_omitted():
     """测试多子图下不传 ax 时，仍会使用 contourf 自身所属的 Axes."""
 
-    lons, lats, data = load_temp()
-    map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
+    dem_lons, dem_lats, dem = load_dem()
+    temp_lons, temp_lats, temp = load_temp()
+    map_polygon = get_adm_maps(city="北京市", only_polygon=True, record="first")
+    extent = map_polygon.get_extent(buffer=0.15)
 
     fig, axes = plt.subplots(
-        1, 2, figsize=(10, 4.5), subplot_kw={"projection": ccrs.PlateCarree()}
+        1, 2, figsize=(10, 4.6), subplot_kw={"projection": ccrs.PlateCarree()}
     )
-    windows = [
-        ("Northwest China", [73, 108, 30, 45]),
-        ("South and Southeast China", [104, 124, 20, 35]),
+    panels = [
+        ("Beijing DEM", dem_lons, dem_lats, dem, plt.cm.terrain, np.linspace(-200, dem.max(), 10)),
+        ("Beijing Temperature", temp_lons, temp_lats, temp, plt.cm.coolwarm, np.linspace(-20, 36, 10)),
     ]
 
-    for ax, (title, extent) in zip(axes, windows):
+    for ax, (title, lons, lats, data, cmap, levels) in zip(axes, panels):
         cs = ax.contourf(
             lons,
             lats,
             data,
-            cmap=plt.cm.terrain,
-            levels=np.linspace(-30, 40, 10),
+            cmap=cmap,
+            levels=levels,
             transform=ccrs.PlateCarree(),
         )
         clip_contours_by_map(cs, map_polygon, extent=extent, set_extent=True)
-        draw_map(map_polygon, ax=ax, color="white", linewidth=0.8)
-        ax.coastlines(linewidth=0.4)
+        draw_map(map_polygon, ax=ax, color="black", linewidth=1.0)
         ax.set_title(title)
 
     ax1, ax2 = axes
-    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == (73.0, 108.0, 30.0, 45.0)
-    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == (104.0, 124.0, 20.0, 35.0)
+    expected_extent = tuple(round(v, 6) for v in extent)
+    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == expected_extent
+    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == expected_extent
 
     savefp = os.path.join("./tmp", "test_clip_contourf", "auto_axes_multi_panel.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
