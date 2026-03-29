@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774783802610,
+  "lastUpdate": 1774783805936,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -7340,6 +7340,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.6324896087929475",
             "extra": "mean: 113.9228684848 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "4d48d113ae81af9f0f766f114434191be173f18e",
+          "message": "Codex/issue 95 draw maps single polygon (#148)\n\n* Allow draw_maps to accept a single polygon\n\n* Store issue test artifacts under tmp/issues",
+          "timestamp": "2026-03-29T19:00:15+08:00",
+          "tree_id": "1b9454ffa5badb64cf4eab59772ff3c4ffd8af78",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/4d48d113ae81af9f0f766f114434191be173f18e"
+        },
+        "date": 1774783803838,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.40744644510785294,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08177495634842886",
+            "extra": "mean: 2.454310283000004 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.057901174278936846,
+            "unit": "iter/sec",
+            "range": "stddev: 0.15206994279546804",
+            "extra": "mean: 17.270806895600003 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05837241376513873,
+            "unit": "iter/sec",
+            "range": "stddev: 0.10198601797114062",
+            "extra": "mean: 17.13137997040002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05872830593326339,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08898849041214942",
+            "extra": "mean: 17.02756420620002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05807163158850372,
+            "unit": "iter/sec",
+            "range": "stddev: 0.2919706726788499",
+            "extra": "mean: 17.22011200039999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05976773264725555,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09969446835400901",
+            "extra": "mean: 16.7314361062 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.3379809500478161,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06495345394932463",
+            "extra": "mean: 2.9587466389999917 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.18748778351163642,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03053791715256293",
+            "extra": "mean: 5.333680847200026 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1270913270303926,
+            "unit": "iter/sec",
+            "range": "stddev: 0.002023860241798948",
+            "extra": "mean: 887.2395483999981 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.008979153714157856,
+            "unit": "iter/sec",
+            "range": "stddev: 0.3734666356057944",
+            "extra": "mean: 111.36907016340001 sec\nrounds: 5"
           }
         ]
       }
