@@ -2,7 +2,9 @@
 =====
 安装 cnmaps 要求 **Python 3.9 及以上、3.13 以下**（与 ``pyproject.toml`` 中 ``python = ">=3.9,<3.13"`` 及 PyPI 元数据一致；详见 `PyPI <https://pypi.org/project/cnmaps/>`_）。
 
-运行时依赖包含 Cartopy、GeoPandas、Shapely 2.x、Matplotlib、NumPy 等；当前版本约束 NumPy 为 ``>=1.21.5,<2.0``（见 ``pyproject.toml``）。若使用 pip 安装发行包，一般无需手动逐条安装依赖。
+运行时依赖包含 Cartopy、GeoPandas、Shapely 2.x、Matplotlib、NumPy 等；当前版本要求 **Shapely 2.0+**，并约束 NumPy 为 ``>=1.21.5,<2.0``（见 ``pyproject.toml``）。若使用 pip 安装发行包，一般无需手动逐条安装依赖。
+
+项目当前在 GitHub Actions 中持续验证 **Python 3.9、3.10、3.11、3.12** 以及 macOS / Ubuntu / Windows 组合；绘图相关测试在 CI 中统一使用无头 Matplotlib 后端 ``Agg``。
 
 使用 pip 安装
 ---------------
