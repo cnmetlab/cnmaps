@@ -10,6 +10,8 @@
 ---------------
 cnmaps 最简单也最快的安装方法是使用 pip： ``pip install -U cnmaps``
 
+``cnmaps 2.x`` 起，官方边界与样例数据已经独立到 ``cnmaps-data`` 包中；安装 ``cnmaps`` 时会默认一并安装 ``cnmaps-data``，通常无需额外执行第二条命令。
+
 使用 conda 安装
 -----------------
 也可以使用 conda-forge： ``conda install -c conda-forge cnmaps``

@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "cnmaps"
-version = "1.1.10"
+version = "2.0.0b1"
 description = "A python package to draw china maps more easily"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
 readme = "PYPI.md"
 homepage = "https://github.com/cnmetlab/cnmaps"
-exclude = ["cnmaps/data/**", "**/.DS_Store"]
+exclude = ["**/.DS_Store"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"

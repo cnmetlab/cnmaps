@@ -12,7 +12,7 @@ from .maps import *  # noqa: F403, F401
 from .drawing import *  # noqa: F403, F401
 from .provider import get_data_provider
 
-__version__ = "1.1.10"
+__version__ = "2.0.0b1"
 
 CARTOPY_DIGIT_VERSION = re.match(r"(\d*\.\d*\.\d*)", cartopy.__version__).group(1)
 if CARTOPY_DIGIT_VERSION < "0.22.0":

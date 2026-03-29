@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import os
 import warnings
 from dataclasses import dataclass
 from functools import cached_property, lru_cache
@@ -13,20 +12,6 @@ from pathlib import Path
 
 
 CNMAPS_DATA_PROVIDER_GROUP = "cnmaps.data_providers"
-CNMAPS_DATA_DIR_ENV = "CNMAPS_DATA_DIR"
-
-_LEGACY_DATASETS = {
-    "administrative": {
-        "index_db": "index.db",
-        "root": os.path.join("geojson.min", "administrative"),
-    },
-    "geography": {
-        "root": os.path.join("geojson.min", "geography"),
-    },
-    "sample": {
-        "root": "sample",
-    },
-}
 
 
 @dataclass(frozen=True)
@@ -34,21 +19,17 @@ class FileSystemDataProvider:
     """File-system backed data provider."""
 
     root_dir: Path
-    manifest_path: Path | None = None
-    name: str = "cnmaps-builtin-data"
-    version: str = "builtin"
+    manifest_path: Path
+    name: str
+    version: str
 
     @cached_property
     def manifest(self) -> dict:
-        if self.manifest_path is None:
-            return {}
         with self.manifest_path.open(encoding="utf-8") as f:
             return json.load(f)
 
     def _dataset_meta(self, dataset: str) -> dict:
-        if self.manifest:
-            return self.manifest["datasets"][dataset]
-        return _LEGACY_DATASETS[dataset]
+        return self.manifest["datasets"][dataset]
 
     def get_dataset_root(self, dataset: str) -> str:
         dataset_meta = self._dataset_meta(dataset)
@@ -84,38 +65,6 @@ def _provider_from_manifest_root(root_dir: Path) -> FileSystemDataProvider:
     )
 
 
-def _provider_from_legacy_root(root_dir: Path) -> FileSystemDataProvider | None:
-    if not (root_dir / "index.db").exists():
-        return None
-    if not (root_dir / "geojson.min" / "administrative").exists():
-        return None
-    if not (root_dir / "sample").exists():
-        return None
-    return FileSystemDataProvider(root_dir=root_dir)
-
-
-def _provider_from_candidate(candidate: Path | None) -> FileSystemDataProvider | None:
-    if candidate is None:
-        return None
-
-    candidate = candidate.expanduser().resolve()
-    if not candidate.exists():
-        return None
-
-    manifest_candidate = candidate / "manifest.json"
-    if manifest_candidate.exists():
-        return _provider_from_manifest_root(candidate)
-
-    package_manifest_candidate = candidate / "cnmaps_data" / "manifest.json"
-    if package_manifest_candidate.exists():
-        return _provider_from_manifest_root(package_manifest_candidate.parent)
-
-    if candidate.is_dir():
-        return _provider_from_legacy_root(candidate)
-
-    return None
-
-
 def _iter_entry_points():
     entry_points = metadata.entry_points()
     if hasattr(entry_points, "select"):
@@ -147,33 +96,9 @@ def _load_provider_from_package_import():
         return None
 
 
-def _load_provider_from_env() -> FileSystemDataProvider | None:
-    env_dir = os.environ.get(CNMAPS_DATA_DIR_ENV)
-    if not env_dir:
-        return None
-    return _provider_from_candidate(Path(env_dir))
-
-
-def _load_provider_from_sibling_checkout() -> FileSystemDataProvider | None:
-    repo_root = Path(__file__).resolve().parents[2]
-    return _provider_from_candidate(repo_root / "cnmaps-data")
-
-
-def _load_builtin_provider() -> FileSystemDataProvider:
-    builtin_root = Path(__file__).resolve().parent / "data"
-    provider = _provider_from_legacy_root(builtin_root)
-    if provider is None:  # pragma: no cover - would indicate a broken package build
-        raise FileNotFoundError(f"未找到内置 cnmaps 数据目录: {builtin_root}")
-    return provider
-
-
 @lru_cache(maxsize=1)
 def get_data_provider():
     """Return the active data provider for cnmaps."""
-
-    provider = _load_provider_from_env()
-    if provider is not None:
-        return provider
 
     provider = _load_provider_from_entry_points()
     if provider is not None:
@@ -183,8 +108,7 @@ def get_data_provider():
     if provider is not None:
         return provider
 
-    provider = _load_provider_from_sibling_checkout()
-    if provider is not None:
-        return provider
-
-    return _load_builtin_provider()
+    raise ImportError(
+        "未找到可用的 cnmaps 数据提供者。请先安装官方数据包 `cnmaps-data`，"
+        "或安装实现了 `cnmaps.data_providers` entry point 的第三方数据包。"
+    )

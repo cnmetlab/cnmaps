@@ -164,6 +164,7 @@ def test_get_map_by_fp():
 def test_data_provider_layout():
     """测试数据提供者可以解析各类数据目录."""
     provider = get_data_provider()
+    assert provider.name == "cnmaps-data"
     assert os.path.exists(provider.get_index_db("administrative"))
     assert os.path.isdir(provider.get_dataset_root("administrative"))
     assert os.path.isdir(provider.get_dataset_root("geography"))

@@ -2,8 +2,8 @@
     cnmaps 是一个可以让中国地图画起来更丝滑的地图类python扩展包
 </h4>
 
-<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml">
-<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package-conda.yml/badge.svg?branch=main"
+<a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package.yml">
+<img src="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package.yml/badge.svg"
  alt="Pytest" /></a>
 
 <a href="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml">
@@ -62,6 +62,8 @@
 
 ### 使用pip安装
 cnmaps 最简单也最快的安装方法是使用 pip 来安装 cnmaps： `$ pip install -U cnmaps`
+
+从 `2.0.0b1` 开始，官方边界与样例数据已经拆分到独立包 `cnmaps-data`；安装 `cnmaps` 时会默认一并安装 `cnmaps-data`，无需再手动准备内置数据目录。
 
 ### 使用conda安装
 你也可以使用 conda 安装： ``$ conda install -c conda-forge cnmaps``
