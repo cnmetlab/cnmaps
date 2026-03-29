@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774781657862,
+  "lastUpdate": 1774783444456,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -7156,6 +7156,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 2.5263745904967214",
             "extra": "mean: 106.1626695494 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "94c6006db2cc1c3c500dc1c7fcaa512c83be43cc",
+          "message": "Simplify bounded clipping workflows and apply axes clip box (#147)\n\n* Simplify bounded clipping workflows\n\n* Apply axes clip box to clipped artists\n\n* Refactor test output path for issue97 to use a dedicated temporary directory\n\n* Create tmp/issues before saving issue plots",
+          "timestamp": "2026-03-29T18:56:56+08:00",
+          "tree_id": "54638c5165bb2d7c6e55b5aea666c1af66d896b2",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/94c6006db2cc1c3c500dc1c7fcaa512c83be43cc"
+        },
+        "date": 1774783441941,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.38703685054146664,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07577547885575114",
+            "extra": "mean: 2.5837333024000033 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.05234879221718887,
+            "unit": "iter/sec",
+            "range": "stddev: 0.20180639229862782",
+            "extra": "mean: 19.1026374754 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.053354977643084396,
+            "unit": "iter/sec",
+            "range": "stddev: 0.15014104234749595",
+            "extra": "mean: 18.74239375919999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.054143661287266616,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07793640060967724",
+            "extra": "mean: 18.469382679800002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05425558393420552,
+            "unit": "iter/sec",
+            "range": "stddev: 0.028539009322031406",
+            "extra": "mean: 18.43128259780001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.05412271803684247,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09517588837751456",
+            "extra": "mean: 18.476529565999975 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.33037590487882507,
+            "unit": "iter/sec",
+            "range": "stddev: 0.021253774776068712",
+            "extra": "mean: 3.0268551223999793 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.18249531704141467,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02644107327409258",
+            "extra": "mean: 5.479592661399988 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1172425723621149,
+            "unit": "iter/sec",
+            "range": "stddev: 0.002169425766187005",
+            "extra": "mean: 895.0607725999589 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.008921844529828218,
+            "unit": "iter/sec",
+            "range": "stddev: 0.22867065622743485",
+            "extra": "mean: 112.08444584040001 sec\nrounds: 5"
           }
         ]
       }
