@@ -8,6 +8,8 @@ from cnmaps.sample import load_temp
 from cnmaps.sample import load_dem
 from shapely.geometry import Polygon
 
+TMP_ISSUES_DIR = "./tmp/issues"
+
 
 def test_issue85():
     # https://github.com/cnmetlab/cnmaps/issues/85
@@ -26,8 +28,8 @@ def test_issue95():
     xian = get_adm_maps(city="西安市", only_polygon=True, record="first")
 
     draw_maps(xian, ax=ax, color="black", linewidth=1)
-    fig.savefig("./test-issue95.png", bbox_inches="tight")
-    os.remove("./test-issue95.png")
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue95.png"), bbox_inches="tight")
 
 
 def test_issue97():
@@ -44,8 +46,8 @@ def test_issue97():
     draw_maps(get_adm_maps(country="中华人民共和国"), ax)
     clip_contours_by_map(cs, boundary, ax)
     ax.set_extent([70, 140, 40, 55], crs=ccrs.PlateCarree())
-    fig.savefig("./test.png", bbox_inches="tight")
-    os.remove("./test.png")
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue97.png"), bbox_inches="tight")
 
 
 def test_issue114():
@@ -73,6 +75,8 @@ def test_issue114():
 
     clip_contours_by_map(cs, map_polygon)
     draw_maps(map_polygon, color="black", linewidth=1)
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue114.png"), bbox_inches="tight")
 
 
 if __name__ == "__main__":
