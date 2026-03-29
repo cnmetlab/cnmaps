@@ -19,6 +19,17 @@ def test_issue85():
     ) + get_adm_maps(city="辽源市", level="市", only_polygon=True, record="first")
 
 
+def test_issue95():
+    # https://github.com/cnmetlab/cnmaps/issues/95
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    xian = get_adm_maps(city="西安市", only_polygon=True, record="first")
+
+    draw_maps(xian, ax=ax, color="black", linewidth=1)
+    fig.savefig("./test-issue95.png", bbox_inches="tight")
+    os.remove("./test-issue95.png")
+
+
 def test_issue97():
     # https://github.com/cnmetlab/cnmaps/issues/97
     fig = plt.figure(figsize=(6, 5), dpi=300)
