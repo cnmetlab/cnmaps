@@ -7,6 +7,8 @@ from cnmaps import get_adm_maps, clip_contours_by_map, draw_maps
 from cnmaps.sample import load_temp
 from cnmaps.sample import load_dem
 
+TMP_ISSUES_DIR = "./tmp/issues"
+
 
 def test_issue85():
     # https://github.com/cnmetlab/cnmaps/issues/85
@@ -29,7 +31,8 @@ def test_issue97():
     draw_maps(get_adm_maps(country="中华人民共和国"), ax)
     clip_contours_by_map(cs, boundary, ax=ax, extent=[70, 140, 40, 55], set_extent=True)
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
-    fig.savefig("./tmp/issues/test_issue97.png", bbox_inches="tight")
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue97.png"), bbox_inches="tight")
 
 
 def test_issue114():
@@ -57,6 +60,8 @@ def test_issue114():
 
     clip_contours_by_map(cs, map_polygon)
     draw_maps(map_polygon, color="black", linewidth=1)
+    os.makedirs(TMP_ISSUES_DIR, exist_ok=True)
+    fig.savefig(os.path.join(TMP_ISSUES_DIR, "test_issue114.png"), bbox_inches="tight")
 
 
 if __name__ == "__main__":
