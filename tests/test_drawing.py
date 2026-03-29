@@ -216,6 +216,45 @@ def test_clip_contourf_with_extent():
     assert tuple(round(v, 6) for v in ax.get_extent(crs=ccrs.PlateCarree())) == (70.0, 140.0, 40.0, 55.0)
 
 
+def test_clip_contourf_uses_artist_axes_when_ax_is_omitted():
+    """测试多子图下不传 ax 时，仍会使用 contourf 自身所属的 Axes."""
+
+    lons, lats, data = load_temp()
+    map_polygon = get_adm_maps(level="国", only_polygon=True, record="first", simplify=True)
+
+    fig = plt.figure(figsize=(10, 5))
+    ax1 = fig.add_subplot(121, projection=ccrs.PlateCarree())
+    ax2 = fig.add_subplot(122, projection=ccrs.PlateCarree())
+
+    cs1 = ax1.contourf(
+        lons,
+        lats,
+        data,
+        cmap=plt.cm.terrain,
+        levels=np.linspace(-30, 40, 10),
+        transform=ccrs.PlateCarree(),
+    )
+    cs2 = ax2.contourf(
+        lons,
+        lats,
+        data,
+        cmap=plt.cm.terrain,
+        levels=np.linspace(-30, 40, 10),
+        transform=ccrs.PlateCarree(),
+    )
+
+    clip_contours_by_map(cs1, map_polygon, extent=[70, 110, 15, 35], set_extent=True)
+    clip_contours_by_map(cs2, map_polygon, extent=[110, 140, 35, 55], set_extent=True)
+
+    assert tuple(round(v, 6) for v in ax1.get_extent(crs=ccrs.PlateCarree())) == (70.0, 110.0, 15.0, 35.0)
+    assert tuple(round(v, 6) for v in ax2.get_extent(crs=ccrs.PlateCarree())) == (110.0, 140.0, 35.0, 55.0)
+
+    savefp = os.path.join("./tmp", "test_clip_contourf", "auto_axes.png")
+    os.makedirs(os.path.dirname(savefp), exist_ok=True)
+    plt.savefig(savefp, bbox_inches="tight")
+    plt.close()
+
+
 def test_clip_scatter_sets_clip_box():
     """测试裁剪时同时设置 clip_box，避免对象绘制超出当前 Axes。"""
 
