@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
@@ -20,6 +22,7 @@ from cnmaps.sample import load_dem, load_temp, load_wind
 
 DOCSAMPLE_DIR = "./tmp/docsample"
 MASKOUT_GRID_SIZE = 200
+DOCS_EXAMPLES_DIR = "/Users/clarmylee/github/cnmaps/docs/source/_examples"
 
 
 def _ensure_docsample_dir(*parts):
@@ -33,6 +36,22 @@ def _savefig(fig, *parts):
     savefp = os.path.join(output_dir, parts[-1])
     fig.savefig(savefp, bbox_inches="tight")
     plt.close(fig)
+    return savefp
+
+
+def _run_example_script(script_name, *parts):
+    output_dir = _ensure_docsample_dir(*parts[:-1]) if len(parts) > 1 else _ensure_docsample_dir()
+    savefp = os.path.join(output_dir, parts[-1])
+    env = os.environ.copy()
+    env["MPLBACKEND"] = "Agg"
+    env["PYTHONPATH"] = "/Users/clarmylee/github/cnmaps" + os.pathsep + env.get("PYTHONPATH", "")
+    subprocess.run(
+        [sys.executable, os.path.join(DOCS_EXAMPLES_DIR, script_name)],
+        check=True,
+        env=env,
+        cwd=output_dir,
+    )
+    assert os.path.exists(savefp)
     return savefp
 
 
@@ -69,7 +88,7 @@ def test_docs_draw_boundary_examples():
     """覆盖 usage.rst 中的行政边界绘制示例。"""
 
     draw_cases = [
-        ("country-level.png", {"level": "国"}, {"linewidth": 1.0}),
+        ("country-level.png", {"country": "中国", "level": "国"}, {"linewidth": 1.0}),
         ("province-level.png", {"level": "省"}, {"linewidth": 0.8, "color": "r"}),
         ("city-level.png", {"level": "市"}, {"linewidth": 0.5, "color": "g"}),
         ("district-level.png", {"level": "区县"}, {"linewidth": 0.3, "color": "b"}),
@@ -80,6 +99,10 @@ def test_docs_draw_boundary_examples():
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         draw_maps(get_adm_maps(**query_kwargs), ax=ax, **draw_kwargs)
         _savefig(fig, "usage", filename)
+
+    _run_example_script("china_and_neighbors_borders.py", "usage", "china-and-neighbors-borders.png")
+    _run_example_script("world_countries_borders_globe.py", "usage", "world-countries-borders-globe.png")
+    _run_example_script("world_countries_borders_flat.py", "usage", "world-countries-borders-flat.png")
 
 
 def test_docs_union_example():
@@ -99,7 +122,7 @@ def test_docs_union_example():
 def test_docs_clip_examples():
     """覆盖 usage.rst 中 contourf、pcolormesh、quiver、scatter、clabel 裁剪示例。"""
 
-    china = get_adm_maps(country="中华人民共和国", record="first", only_polygon=True)
+    china = get_adm_maps(country="中国", record="first", only_polygon=True)
 
     lons_dem, lats_dem, dem = load_dem()
     lons_temp, lats_temp, temp = load_temp()
@@ -202,7 +225,7 @@ def test_docs_projection_example():
 
     fig = plt.figure(figsize=(16, 12))
     fig.tight_layout()
-    china = get_adm_maps(country="中华人民共和国", record="first", only_polygon=True)
+    china = get_adm_maps(country="中国", record="first", only_polygon=True)
 
     for i, projection in enumerate(projections):
         ax = fig.add_subplot(2, 2, i + 1, projection=projection[1])
@@ -223,7 +246,7 @@ def test_docs_maskout_examples():
     lon = np.linspace(60, 150, MASKOUT_GRID_SIZE)
     lat = np.linspace(0, 60, MASKOUT_GRID_SIZE)
     lons, lats = np.meshgrid(lon, lat)
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
 
     mask_array = china.make_mask_array(lons, lats)
     fig = plt.figure(figsize=(10, 6))
@@ -245,7 +268,7 @@ def test_docs_maskout_examples():
 def test_docs_export_example():
     """覆盖 usage.rst 中的矢量文件导出示例。"""
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
     output_dir = _ensure_docsample_dir("usage")
     china.to_file(os.path.join(output_dir, "china.geojson"))
     china.to_file(os.path.join(output_dir, "china.shp"), engine="ESRI Shapefile")
@@ -257,7 +280,7 @@ def test_docs_examples_rst_examples():
     fig = plt.figure(figsize=(5, 5))
     proj = ccrs.Orthographic(central_longitude=100.0, central_latitude=30)
     ax = fig.add_subplot(111, projection=proj)
-    china, south_sea = get_adm_maps(level="国", only_polygon=True)
+    china, south_sea = get_adm_maps(country="中国", level="国", only_polygon=True)
     ax.set_global()
     ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor="r", facecolor="r")
     ax.add_geometries(south_sea, crs=ccrs.PlateCarree(), edgecolor="r")

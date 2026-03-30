@@ -2,6 +2,7 @@
 
 import sqlite3
 import copy
+import re
 from functools import lru_cache
 
 import numpy as np
@@ -26,6 +27,34 @@ class MapNotFoundError(Exception):
     """地图无法找到的错误"""
 
     pass
+
+
+_COUNTRY_CODE_PATTERN = re.compile(r"^[A-Za-z0-9-]{3,}$")
+_COUNTRY_ALIASES = {
+    "中国": "中华人民共和国",
+}
+
+
+def _escape_sql_literal(value):
+    return str(value).replace("'", "''")
+
+
+def _build_country_sql(country, level, has_iso3_column=False):
+    if not country:
+        return ""
+
+    country_value = _COUNTRY_ALIASES.get(str(country).strip(), str(country).strip())
+    escaped_country = _escape_sql_literal(country_value)
+
+    if level == "国" and _COUNTRY_CODE_PATTERN.fullmatch(country_value):
+        country_code = country_value.upper()
+        clauses = [f"country='{escaped_country}'"]
+        if has_iso3_column:
+            clauses.append(f"UPPER(iso3)='{country_code}'")
+        clauses.append(f"UPPER(path) LIKE '%/{country_code}.GEOJSON'")
+        return "AND (" + " OR ".join(clauses) + ")"
+
+    return f"AND country='{escaped_country}'"
 
 
 def _get_geom(obj):
@@ -334,14 +363,24 @@ def _read_mapjson_cached(fp, wgs84=True):
         geometry = map_json
 
     polygon_list = []
-    if "Polygon" in geometry["type"]:
-        for _coords in geometry["coordinates"]:
-            for coords in _coords:
-                if wgs84:
-                    wgs84_coords = [gcj02_to_wgs84(*coord) for coord in coords]
-                    polygon_list.append(sgeom.Polygon(wgs84_coords))
-                else:
-                    polygon_list.append(sgeom.Polygon(coords))
+    if geometry["type"] == "Polygon":
+        rings = geometry["coordinates"]
+        shell = rings[0]
+        holes = rings[1:]
+        if wgs84:
+            shell = [gcj02_to_wgs84(*coord) for coord in shell]
+            holes = [[gcj02_to_wgs84(*coord) for coord in hole] for hole in holes]
+        polygon_list.append(sgeom.Polygon(shell, holes))
+        return sgeom.MultiPolygon(polygon_list)
+
+    if geometry["type"] == "MultiPolygon":
+        for rings in geometry["coordinates"]:
+            shell = rings[0]
+            holes = rings[1:]
+            if wgs84:
+                shell = [gcj02_to_wgs84(*coord) for coord in shell]
+                holes = [[gcj02_to_wgs84(*coord) for coord in hole] for hole in holes]
+            polygon_list.append(sgeom.Polygon(shell, holes))
 
         return sgeom.MultiPolygon(polygon_list)
 
@@ -360,8 +399,8 @@ def _query_adm_metadata(
     city=None,
     district=None,
     level=None,
-    country="中华人民共和国",
-    source="高德",
+    country=None,
+    source=None,
     db=None,
 ):
     if db is None:
@@ -370,12 +409,16 @@ def _query_adm_metadata(
     con = sqlite3.connect(db)
     try:
         cur = con.cursor()
+        columns = {row[1] for row in cur.execute("PRAGMA table_info(ADMINISTRATIVE);")}
+        has_iso3_column = "iso3" in columns
 
-        country_sql = f"AND country='{country}'" if country else ""
         province_sql = f"AND province='{province}'" if province else ""
         city_sql = f"AND city='{city}'" if city else ""
         district_sql = f"AND district='{district}'" if district else ""
-        source_sql = f"AND source='{source}'" if source else ""
+        source_sql = f"AND source='{_escape_sql_literal(source)}'" if source else ""
+
+        if not any([province, city, district, level, country]):
+            country = "中华人民共和国"
 
         if not level:
             if district:
@@ -405,6 +448,8 @@ def _query_adm_metadata(
         else:
             raise ValueError(f'无法识别level等级: {level}, level参数请从"国", "省", "市", "区县"中选择')
 
+        country_sql = _build_country_sql(country, level, has_iso3_column=has_iso3_column)
+
         meta_sql = (
             "SELECT country, province, city, district, level, source, kind, path"
             " FROM ADMINISTRATIVE"
@@ -426,8 +471,8 @@ def get_adm_names(
     city: str = None,
     district: str = None,
     level: str = "省",
-    country: str = "中华人民共和国",
-    source: str = "高德",
+    country: str = None,
+    source: str = None,
     provider: str = None,
 ):
     """
@@ -445,8 +490,8 @@ def get_adm_names(
                                比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
-        country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
-        source (str, 可选): 数据源. Defaults to '高德'.
+        country (str, 可选): 国家名称。国家级查询可传中文名、ISO3 或组合码；不传时不做国家过滤。
+        source (str, 可选): 数据源过滤条件；不传时不做来源过滤。
         provider (str, 可选): 数据提供者名称；默认为官方 ``cnmaps-data``。
 
     返回值:
@@ -478,8 +523,8 @@ def get_adm_maps(
     city: str = None,
     district: str = None,
     level: str = None,
-    country: str = "中华人民共和国",
-    source: str = "高德",
+    country: str = None,
+    source: str = None,
     db: str = None,
     engine: str = None,
     record: str = "all",
@@ -505,8 +550,8 @@ def get_adm_maps(
                                比如北京市的省级和市级都是'北京市';
                                '区'和'县'属于同一级别的不同表达形式.
                                Defaults to '省'.
-        country (str, 可选): 国家名称, 必须为全称. Defaults to '中华人民共和国'.
-        source (str, 可选): 数据源. Defaults to '高德'.
+        country (str, 可选): 国家名称。国家级查询可传中文名、ISO3 或组合码；不传时不做国家过滤。
+        source (str, 可选): 数据源过滤条件；不传时不做来源过滤。
         db (str, 可选): sqlite db文件路径. 若未指定则使用所选 provider 的索引库。
         engine (str, 可选): 输出引擎, 默认为None, 输出为列表,
                                 目前支持'geopandas', 若为geopandas,
@@ -550,9 +595,10 @@ def get_adm_maps(
     meta_rows = [row[:7] for row in rows]
     map_polygons = []
     for row in rows:
+        use_wgs84 = wgs84 if row[5] == "高德" else False
         mapjson = read_mapjson(
             data_provider.resolve_dataset_path("administrative", row[7]),
-            wgs84=wgs84,
+            wgs84=use_wgs84,
         )
 
         map_polygons.append(_get_geom(mapjson))

@@ -2,7 +2,6 @@
 
 from typing import Union
 
-import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -378,22 +377,29 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **k
     if ax is None:
         ax = plt.gca()
 
-    map_polygon = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
-    geom = _get_geom(map_polygon)
-
     if "color" not in kwargs and "c" not in kwargs:
         kwargs["color"] = "k"
+    geom = _get_geom(map_polygon)
+    if geom is None or geom.is_empty:
+        return
+
+    color = kwargs.pop("c", kwargs.pop("color"))
+    collection_kwargs = dict(kwargs)
+    collection_kwargs.setdefault("edgecolor", color)
+    collection_kwargs.setdefault("facecolor", "none")
 
     if isinstance(geom, sgeom.MultiPolygon):
-        for polygon in geom.geoms:
-            for ring in [polygon.exterior] + list(polygon.interiors):
-                coords = np.array(ring.coords)
-                ax.plot(coords[:, 0], coords[:, 1], **kwargs)
-
+        geoms = list(geom.geoms)
+    elif isinstance(geom, sgeom.Polygon):
+        geoms = [geom]
     elif isinstance(geom, sgeom.MultiLineString):
-        for line in geom.geoms:
-            coords = np.array(line.coords)
-            ax.plot(coords[:, 0], coords[:, 1], **kwargs)
+        geoms = list(geom.geoms)
+    elif isinstance(geom, sgeom.LineString):
+        geoms = [geom]
+    else:
+        return
+
+    ax.add_geometries(geoms, ccrs.PlateCarree(), **collection_kwargs)
 
 
 def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
