@@ -2,6 +2,7 @@
 
 from typing import Union
 
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -383,6 +384,7 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **k
     if geom is None or geom.is_empty:
         return
 
+    autoscale = kwargs.pop("autoscale", True)
     color = kwargs.pop("c", kwargs.pop("color"))
     collection_kwargs = dict(kwargs)
     collection_kwargs.setdefault("edgecolor", color)
@@ -400,6 +402,14 @@ def draw_map(map_polygon: Union[MapPolygon, sgeom.MultiLineString], ax=None, **k
         return
 
     ax.add_geometries(geoms, ccrs.PlateCarree(), **collection_kwargs)
+
+    if autoscale:
+        projected_geom = _transform_polygon(map_polygon, ccrs.PlateCarree(), ax.projection)
+        projected_geom = _get_geom(projected_geom)
+        if projected_geom is not None and not projected_geom.is_empty:
+            minx, miny, maxx, maxy = projected_geom.bounds
+            ax.update_datalim(np.array([[minx, miny], [maxx, maxy]]))
+            ax.autoscale_view()
 
 
 def draw_maps(maps: Union[list, GeoDataFrame], ax=None, **kwargs):
