@@ -120,25 +120,33 @@ class MapPolygon:
          "__add__", "__and__", "__sub__", "get_extent", "to_file",
          "maskout", "make_mask_array", "drop_inner_duplicate",
          "__geo_interface__", "__iter__", "__len__", "__getitem__",
-         "__bool__", "__eq__", "__repr__"}
+         "__bool__", "__eq__", "__repr__", "_last_mask_cache_key", "_last_mask_cache_value"}
     )
 
     def __init__(self, *args, **kwargs):
         """实例化 MapPolygon，参数与 shapely.geometry.MultiPolygon 一致."""
         if not args and not kwargs:
             self._geom = sgeom.MultiPolygon()
+            self._last_mask_cache_key = None
+            self._last_mask_cache_value = None
             return
 
         if len(args) == 1 and not kwargs:
             source = _get_geom(args[0])
             if isinstance(source, sgeom.Polygon):
                 self._geom = sgeom.MultiPolygon([source])
+                self._last_mask_cache_key = None
+                self._last_mask_cache_value = None
                 return
             if isinstance(source, sgeom.MultiPolygon):
                 self._geom = source
+                self._last_mask_cache_key = None
+                self._last_mask_cache_value = None
                 return
 
         self._geom = sgeom.MultiPolygon(*args, **kwargs)
+        self._last_mask_cache_key = None
+        self._last_mask_cache_value = None
 
     @property
     def geom(self):
@@ -349,6 +357,10 @@ class MapPolygon:
         if lons.shape != lats.shape:
             raise ValueError("x和y的形状不匹配")
 
+        cache_key = (id(lons), id(lats), lons.shape, lats.shape)
+        if cache_key == self._last_mask_cache_key and self._last_mask_cache_value is not None:
+            return self._last_mask_cache_value.copy()
+
         minx, miny, maxx, maxy = self._geom.bounds
         within_bounds = (
             (lons >= minx)
@@ -361,6 +373,8 @@ class MapPolygon:
         if np.any(within_bounds):
             mask[within_bounds] = ~_contains_xy(self._geom, lons[within_bounds], lats[within_bounds])
 
+        self._last_mask_cache_key = cache_key
+        self._last_mask_cache_value = mask.copy()
         return mask
 
 
