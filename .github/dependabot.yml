@@ -1,6 +1,10 @@
 version: 2
 updates:
+  # Poetry：仅对 [tool.poetry.dependencies] 做版本升级 PR；
+  # [tool.poetry.group.dev.dependencies] 不参与（dependency-type: production）。
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
-      interval: "daily"
+      interval: "weekly"
+    allow:
+      - dependency-type: "production"
