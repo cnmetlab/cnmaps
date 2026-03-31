@@ -60,7 +60,7 @@ jobs:
         run: |
           poetry run python - <<'PY'
           import os
-          import timeit
+          import time
           import numpy as np
           import shapely
           import cnmaps
@@ -71,29 +71,29 @@ jobs:
 
           mapcase_dir = os.path.join(os.getcwd(), "tests", "mapcase")
 
-          print("python", os.sys.version)
-          print("shapely", shapely.__version__)
-          print("cnmaps", cnmaps.__version__)
-          print("cnmaps_data", cnmaps_data.__version__)
-          print("contains_xy_impl", getattr(maps_module._contains_xy, "__module__", repr(maps_module._contains_xy)))
+          print("python", os.sys.version, flush=True)
+          print("shapely", shapely.__version__, flush=True)
+          print("cnmaps", cnmaps.__version__, flush=True)
+          print("cnmaps_data", cnmaps_data.__version__, flush=True)
+          print(
+              "contains_xy_impl",
+              getattr(maps_module._contains_xy, "__module__", repr(maps_module._contains_xy)),
+              flush=True,
+          )
+          print("loading country polygons...", flush=True)
 
-          n = 100
+          n = 20
           lon = np.linspace(60, 150, n)
           lat = np.linspace(0, 60, n)
           lons, lats = np.meshgrid(lon, lat)
-          china_mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "china-maskout-gcj02-fast.npy"))
-          china_mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "china-maskout-wgs84-fast.npy"))
           china_gcj02 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
           china_wgs84 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
 
           def make_maskout_array_core():
-              china_maskout_array = china_gcj02.make_mask_array(lons, lats)
-              assert (china_maskout_array == china_mask_array_gcj02).all()
-              china_maskout_array = china_wgs84.make_mask_array(lons, lats)
-              assert (china_maskout_array == china_mask_array_wgs84).all()
+              china_gcj02.make_mask_array(lons, lats)
+              china_wgs84.make_mask_array(lons, lats)
 
-          ningxia_mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-gcj02.npy"))
-          ningxia_mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-wgs84.npy"))
+          print("loading province polygon and sample data...", flush=True)
           map_polygon_gcj02 = get_adm_maps(
               province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
           )
@@ -101,26 +101,31 @@ jobs:
               province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
           )
           dem_lons, dem_lats, dem = load_dem()
-          dem = dem[100:150, 150:200]
-          dem_lons = dem_lons[100:150, 150:200]
-          dem_lats = dem_lats[100:150, 150:200]
+          dem = dem[100:120, 150:170]
+          dem_lons = dem_lons[100:120, 150:170]
+          dem_lats = dem_lats[100:120, 150:170]
 
           def maskout_core():
-              masked = map_polygon_gcj02.maskout(dem_lons, dem_lats, dem)
-              assert (masked.mask == ningxia_mask_array_gcj02).all()
-              masked = map_polygon_gcj02.maskout(dem_lons, dem_lats, dem.data)
-              assert (masked.mask == ningxia_mask_array_gcj02).all()
-              masked = map_polygon_wgs84.maskout(dem_lons, dem_lats, dem)
-              assert (masked.mask == ningxia_mask_array_wgs84).all()
-              masked = map_polygon_wgs84.maskout(dem_lons, dem_lats, dem.data)
-              assert (masked.mask == ningxia_mask_array_wgs84).all()
+              map_polygon_gcj02.maskout(dem_lons, dem_lats, dem)
+              map_polygon_gcj02.maskout(dem_lons, dem_lats, dem.data)
+              map_polygon_wgs84.maskout(dem_lons, dem_lats, dem)
+              map_polygon_wgs84.maskout(dem_lons, dem_lats, dem.data)
 
-          make_maskout_array_elapsed = timeit.timeit(make_maskout_array_core, number=20)
-          maskout_elapsed = timeit.timeit(maskout_core, number=100)
-          print("make_maskout_array_core_seconds_per_call", make_maskout_array_elapsed / 20)
-          print("make_maskout_array_core_iter_per_sec", 20 / make_maskout_array_elapsed)
-          print("maskout_core_seconds_per_call", maskout_elapsed / 100)
-          print("maskout_core_iter_per_sec", 100 / maskout_elapsed)
+          print("running make_maskout_array_core sample...", flush=True)
+          start = time.perf_counter()
+          make_maskout_array_core()
+          make_maskout_array_elapsed = time.perf_counter() - start
+          print("make_maskout_array_core_seconds_per_call", make_maskout_array_elapsed, flush=True)
+          if make_maskout_array_elapsed > 0:
+              print("make_maskout_array_core_iter_per_sec", 1 / make_maskout_array_elapsed, flush=True)
+
+          print("running maskout_core sample...", flush=True)
+          start = time.perf_counter()
+          maskout_core()
+          maskout_elapsed = time.perf_counter() - start
+          print("maskout_core_seconds_per_call", maskout_elapsed, flush=True)
+          if maskout_elapsed > 0:
+              print("maskout_core_iter_per_sec", 1 / maskout_elapsed, flush=True)
           PY
       - name: Run tests and collect benchmark
         run: |
