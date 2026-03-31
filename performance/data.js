@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774907271368,
+  "lastUpdate": 1774930505976,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -8616,6 +8616,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 1.5549099905643253",
             "extra": "mean: 123.6044044748 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "8795cb43ee18cb85e523b0f0edea4c0cf80d9b28",
+          "message": "chore(deps): bump netcdf4 from 1.6.5 to 1.7.2 (#154)\n\nBumps [netcdf4](https://github.com/Unidata/netcdf4-python) from 1.6.5 to 1.7.2.\n- [Release notes](https://github.com/Unidata/netcdf4-python/releases)\n- [Changelog](https://github.com/Unidata/netcdf4-python/blob/master/Changelog)\n- [Commits](https://github.com/Unidata/netcdf4-python/commits)\n\n---\nupdated-dependencies:\n- dependency-name: netcdf4\n  dependency-version: 1.7.2\n  dependency-type: direct:production\n  update-type: version-update:semver-minor\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-03-31T11:49:21+08:00",
+          "tree_id": "4fcd4bd1631e6e84254ddea637af218ce4fbf64e",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/8795cb43ee18cb85e523b0f0edea4c0cf80d9b28"
+        },
+        "date": 1774930502731,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.4271658265066953,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04108615650411458",
+            "extra": "mean: 2.3410112372000014 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.05746101283371724,
+            "unit": "iter/sec",
+            "range": "stddev: 0.8348037304788344",
+            "extra": "mean: 17.4031043082 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05939844100335629,
+            "unit": "iter/sec",
+            "range": "stddev: 0.14223940393745288",
+            "extra": "mean: 16.83545869399999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05799367740388392,
+            "unit": "iter/sec",
+            "range": "stddev: 0.37094538319476844",
+            "extra": "mean: 17.243259002799995 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.06053714610953745,
+            "unit": "iter/sec",
+            "range": "stddev: 0.09735582635255617",
+            "extra": "mean: 16.518783329999973 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.0610056837056747,
+            "unit": "iter/sec",
+            "range": "stddev: 0.1775927513178073",
+            "extra": "mean: 16.391915298000026 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.3477580532160411,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06698141460722255",
+            "extra": "mean: 2.8755624513999694 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.19068807993970388,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03599617418960307",
+            "extra": "mean: 5.24416628619997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1203396006021946,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000583599407213324",
+            "extra": "mean: 892.5864973999751 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.00896319380522723,
+            "unit": "iter/sec",
+            "range": "stddev: 3.619478053989285",
+            "extra": "mean: 111.56737450179999 sec\nrounds: 5"
           }
         ]
       }
