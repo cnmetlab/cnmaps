@@ -226,14 +226,17 @@ test = ["pytest-cov"]
 
 [[package]]
 name = "cnmaps-data"
-version = "1.0.0"
+version = "1.1.1"
 description = "Official data package for cnmaps"
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "cnmaps_data-1.0.0-py3-none-any.whl", hash = "sha256:d2917cca695df10af37c107d807033c5ba1131d63e0fdf3a2ca98a4a635a88a6"},
-    {file = "cnmaps_data-1.0.0.tar.gz", hash = "sha256:81f45c06e915d511bd29bbb04b29ae5befc017e5500a4ced0301d0d26a9585d1"},
+    {file = "cnmaps_data-1.1.1-py3-none-any.whl", hash = "sha256:7c15edce8a583c9ff3cf5639943af0e0f45f0c4af140c71064adbf92fa3cf88c"},
+    {file = "cnmaps_data-1.1.1.tar.gz", hash = "sha256:231224fff6f4e45ef1182a559054e5db1b3b7a842d790a457e46cf60fd5152ed"},
 ]
+
+[package.dependencies]
+tqdm = ">=4.67.1,<5.0.0"
 
 [[package]]
 name = "colorama"
@@ -1917,13 +1920,13 @@ files = [
 
 [[package]]
 name = "pygments"
-version = "2.19.2"
+version = "2.20.0"
 description = "Pygments is a syntax highlighting package written in Python."
 optional = false
-python-versions = ">=3.8"
+python-versions = ">=3.9"
 files = [
-    {file = "pygments-2.19.2-py3-none-any.whl", hash = "sha256:86540386c03d588bb81d44bc3928634ff26449851e99741617ecb9037ee5ec0b"},
-    {file = "pygments-2.19.2.tar.gz", hash = "sha256:636cb2477cec7f8952536970bc533bc43743542f70392ae026374600add5b887"},
+    {file = "pygments-2.20.0-py3-none-any.whl", hash = "sha256:81a9e26dd42fd28a23a2d169d86d7ac03b46e2f8b59ed4698fb4785f946d0176"},
+    {file = "pygments-2.20.0.tar.gz", hash = "sha256:6757cd03768053ff99f3039c1a36d6c0aa0b263438fcab17520b30a303a82b5f"},
 ]
 
 [package.extras]
@@ -2381,6 +2384,27 @@ files = [
 ]
 
 [[package]]
+name = "tqdm"
+version = "4.67.3"
+description = "Fast, Extensible Progress Meter"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "tqdm-4.67.3-py3-none-any.whl", hash = "sha256:ee1e4c0e59148062281c49d80b25b67771a127c85fc9676d3be5f243206826bf"},
+    {file = "tqdm-4.67.3.tar.gz", hash = "sha256:7d825f03f89244ef73f1d4ce193cb1774a8179fd96f31d7e1dcde62092b960bb"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["nbval", "pytest (>=6)", "pytest-asyncio (>=0.24)", "pytest-cov", "pytest-timeout"]
+discord = ["requests"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
+
+[[package]]
 name = "traitlets"
 version = "5.14.3"
 description = "Traitlets Python configuration system"
@@ -2464,4 +2488,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "368753d86c3f57cb934c3cf235d5bf5993aff8e59aee71b45cc3fa2917646c52"
+content-hash = "dfccb7d684c16f587aa1ca402cd5d1b79de5feb4ca5bf4a8a28ed05a2e070252"

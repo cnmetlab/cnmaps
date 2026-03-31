@@ -10,7 +10,7 @@ exclude = ["**/.DS_Store"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-cnmaps-data = ">=1.0.0"
+cnmaps-data = ">=1.1.1"
 shapely = ">=2.0.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"
