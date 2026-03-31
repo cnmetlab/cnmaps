@@ -96,7 +96,7 @@ from cnmaps import get_adm_maps, draw_maps
 fig = plt.figure(figsize=(10,10))
 ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
 
-draw_maps(get_adm_maps(level='国')) 
+draw_maps(get_adm_maps(country='中国', level='国'))
 plt.show()
 ```
 

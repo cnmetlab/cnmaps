@@ -75,7 +75,7 @@ cnmaps 最简单也最快的安装方法是使用 pip 来安装 cnmaps： `$ pip
 
 ### 绘制国界
 
-用最简单直接的方式，来绘制你的第一张中国地图。   
+用最简单直接的方式，来绘制你的第一张中国地图。
 
 ```python
 import cartopy.crs as ccrs
@@ -85,7 +85,7 @@ from cnmaps import get_adm_maps, draw_maps
 fig = plt.figure(figsize=(10,10))
 ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
 
-draw_maps(get_adm_maps(level='国')) 
+draw_maps(get_adm_maps(country='中国', level='国'))
 plt.show()
 ```
 
