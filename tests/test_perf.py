@@ -305,43 +305,32 @@ def test_projection(benchmark):
 
 def test_maskout(benchmark):
     """测试maskout方法"""
+    mask_array_gcj02 = np.load(os.path.join(MAPCASE_DIR, "ningxia-maskout-gcj02.npy"))
+    map_polygon_gcj02 = get_adm_maps(
+        province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
+    )
+    mask_array_wgs84 = np.load(os.path.join(MAPCASE_DIR, "ningxia-maskout-wgs84.npy"))
+    map_polygon_wgs84 = get_adm_maps(
+        province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
+    )
+
+    lons, lats, data = load_dem()
+    data = data[100:150, 150:200]
+    lons = lons[100:150, 150:200]
+    lats = lats[100:150, 150:200]
 
     def inner():
-        casefp = os.path.join(MAPCASE_DIR, "ningxia-maskout-gcj02.npy")
-        mask_array = np.load(casefp)
+        ndata = map_polygon_gcj02.maskout(lons, lats, data)
+        assert (ndata.mask == mask_array_gcj02).all()
 
-        map_polygon = get_adm_maps(
-            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
-        )
+        ndata = map_polygon_gcj02.maskout(lons, lats, data.data)
+        assert (ndata.mask == mask_array_gcj02).all()
 
-        lons, lats, data = load_dem()
-        data = data[100:150, 150:200]
-        lons = lons[100:150, 150:200]
-        lats = lats[100:150, 150:200]
+        ndata = map_polygon_wgs84.maskout(lons, lats, data)
+        assert (ndata.mask == mask_array_wgs84).all()
 
-        ndata = map_polygon.maskout(lons, lats, data)
-        assert (ndata.mask == mask_array).all()
-
-        ndata = map_polygon.maskout(lons, lats, data.data)
-        assert (ndata.mask == mask_array).all()
-
-        casefp = os.path.join(MAPCASE_DIR, "ningxia-maskout-wgs84.npy")
-        mask_array = np.load(casefp)
-
-        map_polygon = get_adm_maps(
-            province="宁夏回族自治区", only_polygon=True, record="first", wgs84=True
-        )
-
-        lons, lats, data = load_dem()
-        data = data[100:150, 150:200]
-        lons = lons[100:150, 150:200]
-        lats = lats[100:150, 150:200]
-
-        ndata = map_polygon.maskout(lons, lats, data)
-        assert (ndata.mask == mask_array).all()
-
-        ndata = map_polygon.maskout(lons, lats, data.data)
-        assert (ndata.mask == mask_array).all()
+        ndata = map_polygon_wgs84.maskout(lons, lats, data.data)
+        assert (ndata.mask == mask_array_wgs84).all()
 
     benchmark(inner)
 
