@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cnmaps"
-version = "2.0.0"
+version = "2.0.1"
 description = "A python package to draw china maps more easily"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
