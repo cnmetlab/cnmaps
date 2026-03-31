@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774936504637,
+  "lastUpdate": 1774937555343,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -9430,6 +9430,100 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.5475824008955529",
             "extra": "mean: 122.02650889000002 sec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "18d37c28b45d2ae8febe08de442d5d24df0da8f7",
+          "message": "Improve country-level documentation examples and restore draw_map autoscaling (#156)\n\n* Improve country-level docs examples\n\n* Restore draw_map autoscaling\n\n* Update installation instructions and enhance documentation\n\n- Removed outdated Anaconda badges from README.md.\n- Improved installation instructions for pip and conda, including code blocks for clarity.\n- Added a section for installing from source using pip in editable mode.\n- Updated contributor guide for clarity on documentation building.\n- Enhanced test cases to include country parameter for map drawing functionality.\n\n* Update dependabot configuration to change update schedule and specify dependency types\n\n- Changed the update schedule for pip dependencies from daily to weekly.\n- Added configuration to allow only production dependency updates for Poetry.\n\n* Update dependencies and versions in project files\n\n- Bump version of cnmaps-data to 1.1.1 in poetry.lock, pyproject.toml, and requirements.txt.\n- Update pygments version to 2.20.0 in poetry.lock.\n- Add tqdm package version 4.67.3 to poetry.lock with dependencies and extras.\n- Adjust python-versions for pygments to >=3.9 in poetry.lock.\n\n* Update poetry.lock to reflect changes in package versions and remove unnecessary group markers\n\n- Updated Poetry version from 2.2.1 to 1.8.4.\n- Removed group markers for several packages to streamline dependency management.\n- Adjusted package entries for consistency and clarity.",
+          "timestamp": "2026-03-31T13:46:58+08:00",
+          "tree_id": "c7c591d55e483e6fae7b3d2dabc5e8af3be1b3e6",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/18d37c28b45d2ae8febe08de442d5d24df0da8f7"
+        },
+        "date": 1774937552503,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_draw_maps",
+            "value": 0.5783180271597493,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07550067471117111",
+            "extra": "mean: 1.7291523919999974 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_scatter",
+            "value": 0.05838672493684033,
+            "unit": "iter/sec",
+            "range": "stddev: 0.4417307283832587",
+            "extra": "mean: 17.127180897400002 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_pcolormesh",
+            "value": 0.05564576685162871,
+            "unit": "iter/sec",
+            "range": "stddev: 0.23836965371859678",
+            "extra": "mean: 17.97081892440001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contour",
+            "value": 0.05972125015308642,
+            "unit": "iter/sec",
+            "range": "stddev: 0.16901186904812698",
+            "extra": "mean: 16.7444585878 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf",
+            "value": 0.05949877548627234,
+            "unit": "iter/sec",
+            "range": "stddev: 0.3113675828456529",
+            "extra": "mean: 16.807068579599957 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_quiver",
+            "value": 0.06298532354312328,
+            "unit": "iter/sec",
+            "range": "stddev: 0.06584688245504988",
+            "extra": "mean: 15.8767145066 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_clabel",
+            "value": 0.472094847599162,
+            "unit": "iter/sec",
+            "range": "stddev: 0.08346605884329365",
+            "extra": "mean: 2.118218415399997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_projection",
+            "value": 0.1649233941643189,
+            "unit": "iter/sec",
+            "range": "stddev: 0.05053976556851135",
+            "extra": "mean: 6.063421172399989 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout",
+            "value": 1.1164998614682697,
+            "unit": "iter/sec",
+            "range": "stddev: 0.013917857967300306",
+            "extra": "mean: 895.6561792000002 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array",
+            "value": 0.009112552566828861,
+            "unit": "iter/sec",
+            "range": "stddev: 1.1318437528810157",
+            "extra": "mean: 109.73873595420002 sec\nrounds: 5"
           }
         ]
       }
