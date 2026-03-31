@@ -81,19 +81,19 @@ jobs:
           lon = np.linspace(60, 150, n)
           lat = np.linspace(0, 60, n)
           lons, lats = np.meshgrid(lon, lat)
-          mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "china-maskout-gcj02-fast.npy"))
-          mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "china-maskout-wgs84-fast.npy"))
+          china_mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "china-maskout-gcj02-fast.npy"))
+          china_mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "china-maskout-wgs84-fast.npy"))
           china_gcj02 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
           china_wgs84 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
 
           def make_maskout_array_core():
               china_maskout_array = china_gcj02.make_mask_array(lons, lats)
-              assert (china_maskout_array == mask_array_gcj02).all()
+              assert (china_maskout_array == china_mask_array_gcj02).all()
               china_maskout_array = china_wgs84.make_mask_array(lons, lats)
-              assert (china_maskout_array == mask_array_wgs84).all()
+              assert (china_maskout_array == china_mask_array_wgs84).all()
 
-          mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-gcj02.npy"))
-          mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-wgs84.npy"))
+          ningxia_mask_array_gcj02 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-gcj02.npy"))
+          ningxia_mask_array_wgs84 = np.load(os.path.join(mapcase_dir, "ningxia-maskout-wgs84.npy"))
           map_polygon_gcj02 = get_adm_maps(
               province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
           )
@@ -107,13 +107,13 @@ jobs:
 
           def maskout_core():
               masked = map_polygon_gcj02.maskout(dem_lons, dem_lats, dem)
-              assert (masked.mask == mask_array_gcj02).all()
+              assert (masked.mask == ningxia_mask_array_gcj02).all()
               masked = map_polygon_gcj02.maskout(dem_lons, dem_lats, dem.data)
-              assert (masked.mask == mask_array_gcj02).all()
+              assert (masked.mask == ningxia_mask_array_gcj02).all()
               masked = map_polygon_wgs84.maskout(dem_lons, dem_lats, dem)
-              assert (masked.mask == mask_array_wgs84).all()
+              assert (masked.mask == ningxia_mask_array_wgs84).all()
               masked = map_polygon_wgs84.maskout(dem_lons, dem_lats, dem.data)
-              assert (masked.mask == mask_array_wgs84).all()
+              assert (masked.mask == ningxia_mask_array_wgs84).all()
 
           make_maskout_array_elapsed = timeit.timeit(make_maskout_array_core, number=20)
           maskout_elapsed = timeit.timeit(maskout_core, number=100)
