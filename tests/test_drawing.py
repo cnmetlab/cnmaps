@@ -41,9 +41,9 @@ map_args = [
 def test_draw_maps():
     """测试多地图绘制功能"""
     map_args = (
-        [{"level": "国", "name": "中华人民共和国", "simplify": True}]
+        [{"country": "中国", "level": "国", "name": "中华人民共和国", "simplify": True}]
         + [{"level": "省", "name": "中华人民共和国-分省", "simplify": True}]
-        + [{"level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
+        + [{"country": "中国", "level": "国", "engine": "geopandas", "name": "中华人民共和国", "simplify": True}]
         + [
             {
                 "level": "省",

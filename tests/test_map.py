@@ -368,8 +368,12 @@ def test_map_load():
     assert len(get_adm_maps(province="河南省", level="市", engine="geopandas")) == 18
     assert len(get_adm_maps(city="郑州市", level="区县", engine="geopandas")) == 12
 
+    france = get_adm_maps(country="法国", level="国", record="first")
+    assert france["国家"] == "法国"
+    assert france["来源"] == "世界银行"
+
     with pytest.raises(MapNotFoundError):
-        get_adm_maps(country="法国")
+        get_adm_maps(country="火星共和国")
 
     with pytest.raises(MapNotFoundError):
         get_adm_maps(province="麻省")
