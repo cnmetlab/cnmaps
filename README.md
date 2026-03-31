@@ -14,20 +14,6 @@
 <img src="https://github.com/cnmetlab/cnmaps/actions/workflows/pypi-publish.yml/badge.svg" 
  alt="Pypi publish"/> </a>
 
-<a href="https://anaconda.org/conda-forge/cnmaps">
-<img src="https://anaconda.org/conda-forge/cnmaps/badges/version.svg"
- alt="Anaconda" /></a>
-
-<a href="https://anaconda.org/conda-forge/cnmaps">
-<img src="https://anaconda.org/conda-forge/cnmaps/badges/platforms.svg" /> </a>
-
-<a href="https://anaconda.org/conda-forge/cnmaps">
-<img src="https://anaconda.org/conda-forge/cnmaps/badges/latest_release_relative_date.svg" /> </a>
-
-<a href="https://anaconda.org/conda-forge/cnmaps">
-<img src="https://anaconda.org/conda-forge/cnmaps/badges/downloads.svg" 
- alt="Conda downloads"/> </a>
-
 <a href="https://badge.fury.io/py/cnmaps">
 <img src="https://badge.fury.io/py/cnmaps.svg"
  alt="PyPI version" /></a>
@@ -68,15 +54,33 @@
 ## 安装
 安装 cnmaps 需要满足 Python 的解释器在 3.9 版本及以上。
 
-### 使用pip安装
-cnmaps 最简单也最快的安装方法是使用 pip 来安装 cnmaps： `$ pip install -U cnmaps`
+### 使用 pip 安装
 
-从 `2.0.0` 开始，官方边界与样例数据已经拆分到独立包 `cnmaps-data`；安装 `cnmaps` 时会默认一并安装 `cnmaps-data`，无需再手动准备内置数据目录。
+cnmaps 最简单也最快的安装方法是使用 pip：
 
-### 使用conda安装
-你也可以使用 conda 安装： ``$ conda install -c conda-forge cnmaps``
+```bash
+pip install -U cnmaps
+```
+
+从 `2.0.0` 开始，官方边界与样例数据已经拆分到独立包 [cnmaps-data](https://pypi.org/project/cnmaps-data/)；安装 `cnmaps` 时会默认一并安装该数据包，无需再手动准备内置数据目录。
+
+### 使用 conda 安装
+
+你也可以使用 conda-forge：
+
+```bash
+conda install -c conda-forge cnmaps
+```
 
 补充说明：conda-forge 当前只维护到 `1.1.7` 版本；`2.x` 及后续版本仅发布到 PyPI，conda 发行将停止后续维护。
+
+### 从源码安装（参与开发）
+
+若需修改源码或运行测试，可在克隆 [主仓库](https://github.com/cnmetlab/cnmaps) 后使用 [Poetry](https://python-poetry.org/) 安装依赖：
+
+```bash
+poetry install
+```
 
 ## 快速开始
 

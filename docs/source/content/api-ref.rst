@@ -133,15 +133,15 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :param str district:
         区/县中文名，必须为全称。默认为 ``None``。
     :param str level:
-        边界等级，须为 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一；也可使用 ``'区'``、``'县'``、``'区/县'`` 等写法（内部归一为 ``'区县'``）。若为 ``None``，则根据是否传入 ``province`` / ``city`` / ``district`` 自动推断等级。国界查询使用 ``level='国'``（全国陆地与南海诸岛等为多条记录，常见用法为 ``record='first'`` 等）。
+        边界等级，须为 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一；也可使用 ``'区'``、``'县'``、``'区/县'`` 等写法（内部归一为 ``'区县'``）。若为 ``None``，则根据是否传入 ``province`` / ``city`` / ``district`` 自动推断等级。国界查询使用 ``level='国'`` （全国陆地与南海诸岛等为多条记录，常见用法为 ``record='first'`` 等）。
     :param str country:
-        国家名称，必须为全称。默认为 ``'中华人民共和国'``。
+        国家名称。国家级查询可传中文名、``ISO3`` 或组合码；不传时不做国家过滤。
     :param str source:
-        数据源。默认为 ``'高德'``。
+        数据源过滤条件；不传时不做来源过滤。
     :param str db:
         SQLite 数据库文件路径。默认使用所选 provider 的索引库。
     :param str engine:
-        输出引擎：``None`` 时为 ``list``（元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。当 ``engine='geopandas'`` 时，几何列保持为原生 Shapely geometry；当 ``engine is None`` 时，对外仍返回 ``MapPolygon`` 以保持历史接口。
+        输出引擎：``None`` 时为 ``list`` （元素为字典或 ``MapPolygon``）；``'geopandas'`` 时为 ``GeoDataFrame``。当 ``engine='geopandas'`` 时，几何列保持为原生 Shapely geometry；当 ``engine is None`` 时，对外仍返回 ``MapPolygon`` 以保持历史接口。
     :param str record:
         ``'all'`` 返回全部匹配记录；``'first'`` 仅返回第一条。
     :param bool only_polygon:
@@ -273,7 +273,7 @@ drawing模块主要存放与绘图相关的函数
     批量绘制多个地图边界。
 
     :param maps:
-        ``list``（``MapPolygon`` 或含 ``geometry`` 的字典）或 ``geopandas.GeoDataFrame``。
+        ``list`` （``MapPolygon`` 或含 ``geometry`` 的字典）或 ``geopandas.GeoDataFrame``。
     :param ax:
         坐标轴；默认当前轴。
 

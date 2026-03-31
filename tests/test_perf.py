@@ -356,7 +356,7 @@ def test_make_maskout_array(benchmark):
         lat = np.linspace(0, 60, n)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
@@ -368,7 +368,7 @@ def test_make_maskout_array(benchmark):
         lat = np.linspace(0, 60, n)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
@@ -394,7 +394,7 @@ def test_make_maskout_array_full(benchmark):
         lat = np.linspace(0, 60, 1000)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()
@@ -406,7 +406,7 @@ def test_make_maskout_array_full(benchmark):
         lat = np.linspace(0, 60, 1000)
         lons, lats = np.meshgrid(lon, lat)
 
-        china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
         china_maskout_array = china.make_mask_array(lons, lats)
 
         assert (china_maskout_array == mask_array).all()

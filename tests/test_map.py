@@ -1,4 +1,5 @@
 import os
+import sqlite3
 import pytest
 from itertools import combinations, product
 from glob import glob
@@ -20,6 +21,7 @@ from cnmaps import (
 )
 from cnmaps.sample import load_dem
 import cnmaps.provider as provider_module
+import cnmaps.maps as maps_module
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
 
@@ -76,7 +78,7 @@ def test_make_maskout_array():
     lat = np.linspace(0, 60, n)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -88,7 +90,7 @@ def test_make_maskout_array():
     lat = np.linspace(0, 60, n)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -110,7 +112,7 @@ def test_make_maskout_array_full():
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=False)
+    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -122,7 +124,7 @@ def test_make_maskout_array_full():
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -234,19 +236,108 @@ def test_get_adm_maps_accepts_provider_argument(monkeypatch):
     assert selected == {"dataset": "administrative", "provider": "mydata"}
 
 
+def test_country_level_queries_support_iso3_codes(tmp_path):
+    db = tmp_path / "administrative.db"
+    con = sqlite3.connect(db)
+    try:
+        con.execute(
+            """
+            CREATE TABLE ADMINISTRATIVE (
+                id TEXT,
+                country TEXT,
+                iso3 TEXT,
+                province TEXT,
+                city TEXT,
+                district TEXT,
+                path TEXT,
+                level TEXT,
+                source TEXT,
+                kind TEXT
+            )
+            """
+        )
+        con.executemany(
+            """
+            INSERT INTO ADMINISTRATIVE
+            (id, country, iso3, province, city, district, path, level, source, kind)
+            VALUES (?, ?, ?, NULL, NULL, NULL, ?, '国', '世界银行', '陆地')
+            """,
+            (
+                ("1", "约旦河西岸和加沙", "PSE", "administrative/world-countries/land/PSE.geojson"),
+                ("2", "查谟和克什米尔", "IND-PAK-JK", "administrative/world-countries/land/IND-PAK-JK.geojson"),
+                ("3", "阿富汗", "AFG", "administrative/cn-neighbors/land/AFG.geojson"),
+            ),
+        )
+        con.commit()
+    finally:
+        con.close()
+
+    rows = maps_module._query_adm_metadata(country="PSE", level="国", db=str(db))
+    assert rows[0][0] == "约旦河西岸和加沙"
+
+    rows = maps_module._query_adm_metadata(country="IND-PAK-JK", level="国", db=str(db))
+    assert rows[0][0] == "查谟和克什米尔"
+
+    rows_all = maps_module._query_adm_metadata(country=None, level="国", db=str(db))
+    assert len(rows_all) == 3
+    assert {row[0] for row in rows_all} == {"约旦河西岸和加沙", "查谟和克什米尔", "阿富汗"}
+
+
+def test_country_alias_china_matches_full_name(tmp_path):
+    db = tmp_path / "administrative.db"
+    con = sqlite3.connect(db)
+    try:
+        con.execute(
+            """
+            CREATE TABLE ADMINISTRATIVE (
+                id TEXT,
+                country TEXT,
+                iso3 TEXT,
+                province TEXT,
+                city TEXT,
+                district TEXT,
+                path TEXT,
+                level TEXT,
+                source TEXT,
+                kind TEXT
+            )
+            """
+        )
+        con.execute(
+            """
+            INSERT INTO ADMINISTRATIVE
+            (id, country, iso3, province, city, district, path, level, source, kind)
+            VALUES ('1', '中华人民共和国', 'CHN', NULL, NULL, NULL, 'administrative/amap/land/100000.geojson', '国', '高德', '陆地')
+            """
+        )
+        con.commit()
+    finally:
+        con.close()
+
+    rows = maps_module._query_adm_metadata(country="中国", level="国", db=str(db))
+    assert len(rows) == 1
+    assert rows[0][0] == "中华人民共和国"
+
+
+def test_get_adm_maps_can_load_foreign_country_geojson_without_gcj_conversion():
+    palestine = get_adm_maps(country="PSE", level="国", record="first")
+    assert palestine["国家"] == "约旦河西岸和加沙"
+    assert palestine["来源"] == "世界银行"
+
+
 def test_map_load():
     """测试各级地图数量是否完整，以及各种规则是否都能加载成功."""
-    assert len(get_adm_maps(level="国")) == 2
+    assert len(get_adm_maps(country="中华人民共和国", level="国")) == 2
     assert len(get_adm_maps(level="省")) == 34
     assert len(get_adm_maps(level="市")) == 370
     assert len(get_adm_maps(level="区县")) == 2875
 
-    assert isinstance(get_adm_maps(level="国", engine="geopandas"), GeoDataFrame)
+    assert isinstance(get_adm_maps(country="中华人民共和国", level="国", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="省", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="市", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="区县", engine="geopandas"), GeoDataFrame)
 
-    assert len(get_adm_maps(level="国", engine="geopandas")) == 2
+    assert len(get_adm_maps(country="中华人民共和国", level="国", engine="geopandas")) == 2
     assert len(get_adm_maps(level="省", engine="geopandas")) == 34
     assert len(get_adm_maps(level="市", engine="geopandas")) == 370
     assert len(get_adm_maps(level="区县", engine="geopandas")) == 2875
@@ -277,8 +368,12 @@ def test_map_load():
     assert len(get_adm_maps(province="河南省", level="市", engine="geopandas")) == 18
     assert len(get_adm_maps(city="郑州市", level="区县", engine="geopandas")) == 12
 
+    france = get_adm_maps(country="法国", level="国", record="first")
+    assert france["国家"] == "法国"
+    assert france["来源"] == "世界银行"
+
     with pytest.raises(MapNotFoundError):
-        get_adm_maps(country="法国")
+        get_adm_maps(country="火星共和国")
 
     with pytest.raises(MapNotFoundError):
         get_adm_maps(province="麻省")
@@ -298,8 +393,8 @@ def test_map_load():
 def test_map_operator():
     """测试地图之间的操作符是否正常."""
 
-    china = get_adm_maps(level="国", wgs84=True)[0]["geometry"]
-    china_gcj02 = get_adm_maps(level="国", wgs84=False)[0]["geometry"]
+    china = get_adm_maps(country="中华人民共和国", level="国", wgs84=True)[0]["geometry"]
+    china_gcj02 = get_adm_maps(country="中华人民共和国", level="国", wgs84=False)[0]["geometry"]
     sichuan = get_adm_maps(province="四川省")[0]["geometry"]
     sichuan_gcj02 = get_adm_maps(province="四川省", wgs84=False)[0]["geometry"]
     chongqing = get_adm_maps(province="重庆市")[0]["geometry"]

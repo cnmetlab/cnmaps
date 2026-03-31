@@ -27,7 +27,7 @@
 
 文档编写
 -----------
-cnmaps 的文档（当前 Sphinx 工程）源码位于主仓库的 ``docs/`` 目录；`Read the Docs <https://readthedocs.org/>`_ 使用仓库根目录的 ``.readthedocs.yaml``，通过 ``requirements/requirements-doc.txt`` 安装 Sphinx 与主题后执行构建。若你想完善文档，请 fork 主仓库 `cnmetlab/cnmaps <https://github.com/cnmetlab/cnmaps>`_ ，本地可用 ``make html``（见 ``docs/Makefile``）预览，再向主仓库提交 Pull Request。
+cnmaps 的文档（当前 Sphinx 工程）源码位于主仓库的 ``docs/`` 目录；`Read the Docs <https://readthedocs.org/>`_ 使用仓库根目录的 ``.readthedocs.yaml``，通过 ``requirements/requirements-doc.txt`` 安装 Sphinx 与主题后执行构建。若你想完善文档，请 fork 主仓库 `cnmetlab/cnmaps <https://github.com/cnmetlab/cnmaps>`_ ，本地可用 ``make html`` （见 ``docs/Makefile``）预览，再向主仓库提交 Pull Request。
 
 测试
 -----------
