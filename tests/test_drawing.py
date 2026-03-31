@@ -308,7 +308,7 @@ def test_clip_clabel():
 
     lons, lats, data = load_dem()
 
-    map_polygon = get_adm_maps(record="first", only_polygon=True)
+    map_polygon = get_adm_maps(country="中国", level="国", record="first", only_polygon=True)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(
@@ -325,7 +325,6 @@ def test_clip_clabel():
     )
     clip_clabels_by_map(clabels, map_polygon)
     draw_map(map_polygon, color="k")
-    ax.coastlines()
 
     savefp = os.path.join("./tmp", "test_clip_clabel", "clipped_clabels.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
