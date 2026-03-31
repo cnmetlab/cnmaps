@@ -423,6 +423,7 @@ def _query_adm_metadata(
     level=None,
     country=None,
     source=None,
+    record="all",
     db=None,
 ):
     if db is None:
@@ -472,11 +473,13 @@ def _query_adm_metadata(
 
         country_sql = _build_country_sql(country, level, has_iso3_column=has_iso3_column)
 
+        limit_sql = " LIMIT 1" if record == "first" else ""
+
         meta_sql = (
             "SELECT country, province, city, district, level, source, kind, path"
             " FROM ADMINISTRATIVE"
             f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-            f" {district_sql} {source_sql};"
+            f" {district_sql} {source_sql}{limit_sql};"
         )
         rows = tuple(cur.execute(meta_sql))
     finally:
@@ -612,6 +615,7 @@ def get_adm_maps(
         level=level,
         country=country,
         source=source,
+        record=record,
         db=db,
     )
     meta_rows = [row[:7] for row in rows]
