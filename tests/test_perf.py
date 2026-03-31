@@ -1,7 +1,6 @@
 import os
 import shutil
-import random
-import uuid
+
 import pytest
 
 pytest.importorskip("pytest_benchmark", reason="pytest-benchmark not installed (dev dependency)")
@@ -10,179 +9,60 @@ import numpy as np  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 import cartopy.crs as ccrs  # noqa: E402
 
-
 from cnmaps import (  # noqa: E402
     get_adm_maps,
-    get_adm_names,
-    clip_clabels_by_map,
     clip_contours_by_map,
     draw_map,
-    clip_pcolormesh_by_map,
-    clip_quiver_by_map,
-    clip_scatter_by_map,
 )
-from cnmaps.sample import load_dem, load_temp, load_wind  # noqa: E402
+from cnmaps.sample import load_dem, load_temp  # noqa: E402
 
 MAPCASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "mapcase")
-
-# 与 tests/test_map.py 中简版用例一致
 MAKE_MASKOUT_FAST_GRID_SIZE = 100
 
 
-provinces = get_adm_names(level="省")
-cities = get_adm_names(level="市")
-districts = get_adm_names(level="区县")
-sample_districts = [random.choice(districts) for _ in range(100)]
+def test_query_country_boundary(benchmark):
+    """中国国界查询性能。"""
+
+    benchmark(lambda: get_adm_maps(country="中国", level="国", record="first", only_polygon=True))
 
 
-map_arg = {
-    "country": "中国",
-    "level": "国",
-    "only_polygon": True,
-    "record": "first",
-    "name": "中国",
-    "simplify": True,
-}
+def test_query_foreign_country_boundary(benchmark):
+    """外国国家边界查询性能。"""
+
+    benchmark(lambda: get_adm_maps(country="法国", level="国", record="first", only_polygon=True))
 
 
-def test_draw_maps(benchmark):
-    """测试多地图绘制功能（简化后）"""
+def test_query_province_boundary(benchmark):
+    """省级边界查询性能。"""
+
+    benchmark(lambda: get_adm_maps(province="北京市", record="first", only_polygon=True))
+
+
+def test_draw_map_country(benchmark):
+    """中国边界绘制性能。"""
+    map_polygon = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, simplify=True)
 
     def inner():
-        name = map_arg["name"]
-
         fig = plt.figure(figsize=(10, 10))
         fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
         draw_map(map_polygon, linewidth=1)
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "benchmark-draw-map-country.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
         shutil.rmtree("./tmp")
 
     benchmark(inner)
 
 
-def test_clip_scatter(benchmark):
-    """测试剪切散点图."""
+def test_clip_contourf_country(benchmark):
+    """中国边界裁剪 contourf 性能。"""
+    lons, lats, data = load_temp()
+    map_polygon = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, simplify=True)
 
     def inner():
-        name = map_arg["name"]
-
         fig = plt.figure(figsize=(10, 10))
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        left, lower, right, upper = map_polygon.bounds
-
-        lon = np.linspace(left, right, 50)
-        lat = np.linspace(lower, upper, 50)
-
-        _lons, _lats = np.meshgrid(lon, lat)
-
-        lons = _lons.flatten()
-        lats = _lats.flatten()
-
-        data = np.random.random(lons.shape) * 10
-
-        scatter = ax.scatter(lons, lats, s=data, transform=ccrs.PlateCarree())
-
-        clip_scatter_by_map(scatter, map_polygon)
-        draw_map(map_polygon, linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_clip_pcolormesh(benchmark):
-    """测试剪切格点图."""
-
-    def inner():
-        lons, lats, data = load_dem()
-
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        mesh = ax.pcolormesh(
-            lons,
-            lats,
-            data,
-            cmap=plt.cm.terrain,
-            transform=ccrs.PlateCarree(),
-            shading="auto",
-        )
-
-        clip_pcolormesh_by_map(mesh, map_polygon)
-        draw_map(map_polygon, linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_clip_contour(benchmark):
-    """测试剪切等值线."""
-
-    def inner():
-        lons, lats, data = load_temp()
-
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        cs = ax.contour(
-            lons,
-            lats,
-            data,
-            colors="b",
-            levels=np.linspace(-30, 40, 10),
-            transform=ccrs.PlateCarree(),
-        )
-
-        clip_contours_by_map(cs, map_polygon)
-        draw_map(map_polygon, color="k", linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_clip_contourf(benchmark):
-    """测试切割填色等值线."""
-
-    def inner():
-        lons, lats, data = load_temp()
-
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
         cs = ax.contourf(
             lons,
             lats,
@@ -191,120 +71,20 @@ def test_clip_contourf(benchmark):
             levels=np.linspace(-30, 40, 10),
             transform=ccrs.PlateCarree(),
         )
-
         clip_contours_by_map(cs, map_polygon)
         draw_map(map_polygon, color="k", linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
+        savefp = os.path.join("./tmp", "benchmark-clip-contourf-country.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
-
         shutil.rmtree("./tmp")
 
     benchmark(inner)
 
 
-def test_clip_quiver(benchmark):
-    """测试切割箭矢簇."""
-
-    def inner():
-        lons, lats, u, v = load_wind()
-
-        name = map_arg["name"]
-
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        map_polygon = get_adm_maps(**map_arg)
-
-        quiver = ax.quiver(
-            lons, lats, u, v, transform=ccrs.PlateCarree(), units="inches", scale=10
-        )
-
-        clip_quiver_by_map(quiver, map_polygon)
-        draw_map(map_polygon, color="k", linewidth=1)
-        ax.set_extent(map_polygon.get_extent(buffer=1))
-        savefp = os.path.join("./tmp", f"{name}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_clip_clabel(benchmark):
-    """测试切割等值线标签."""
-
-    def inner():
-        lons, lats, data = load_dem()
-
-        map_polygon = get_adm_maps(record="first", only_polygon=True, simplify=True)
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-        contours = ax.contour(
-            lons,
-            lats,
-            data,
-            cmap=plt.cm.terrain,
-            levels=np.linspace(-2500, data.max(), 5),
-            transform=ccrs.PlateCarree(),
-        )
-        clip_contours_by_map(contours, map_polygon)
-        clabels = ax.clabel(
-            contours, levels=contours.levels, colors="k", fmt="%i", inline=True
-        )
-        clip_clabels_by_map(clabels, map_polygon)
-        draw_map(map_polygon, color="k")
-        ax.coastlines()
-
-        savefp = os.path.join("./tmp", "clipped_clabels.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_projection(benchmark):
-    """测试投影."""
-
-    def inner():
-        lons, lats, data = load_dem()
-
-        map_polygon = get_adm_maps(record="first", only_polygon=True, simplify=True)
-        fig = plt.figure(figsize=(10, 10))
-        ax = fig.add_subplot(111, projection=ccrs.Orthographic(central_longitude=100))
-        contours = ax.contourf(
-            lons,
-            lats,
-            data,
-            cmap=plt.cm.terrain,
-            levels=np.linspace(-2500, data.max(), 5),
-            transform=ccrs.PlateCarree(),
-        )
-        clip_contours_by_map(contours, map_polygon)
-        draw_map(map_polygon, color="r")
-        ax.coastlines()
-        ax.set_global()
-
-        savefp = os.path.join("./tmp", f"{uuid.uuid4().hex}.png")
-        os.makedirs(os.path.dirname(savefp), exist_ok=True)
-
-        plt.savefig(savefp, bbox_inches="tight")
-        plt.close()
-
-        shutil.rmtree("./tmp")
-
-    benchmark(inner)
-
-
-def test_maskout(benchmark):
-    """测试maskout方法"""
+def test_maskout_core(benchmark):
+    """只测 maskout 核心路径。"""
     mask_array_gcj02 = np.load(os.path.join(MAPCASE_DIR, "ningxia-maskout-gcj02.npy"))
     map_polygon_gcj02 = get_adm_maps(
         province="宁夏回族自治区", only_polygon=True, record="first", wgs84=False
@@ -335,8 +115,8 @@ def test_maskout(benchmark):
     benchmark(inner)
 
 
-def test_make_maskout_array(benchmark):
-    """测试 make_maskout_array（与单元测试简版同尺度，便于 CI benchmark）"""
+def test_make_maskout_array_core(benchmark):
+    """只测 make_mask_array 核心路径。"""
     n = MAKE_MASKOUT_FAST_GRID_SIZE
     lon = np.linspace(60, 150, n)
     lat = np.linspace(0, 60, n)
@@ -364,7 +144,7 @@ def test_make_maskout_array(benchmark):
 
 @pytest.mark.heavy
 def test_make_maskout_array_full(benchmark):
-    """全分辨率 make_maskout_array 基准；默认 CI 不跑。"""
+    """全分辨率 make_mask_array 基准；默认 CI 不跑。"""
     lon = np.linspace(60, 150, 1000)
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)

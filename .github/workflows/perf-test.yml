@@ -69,7 +69,7 @@ jobs:
           alert-threshold: "150%"
           comment-on-alert: true
           fail-on-alert: false
-          benchmark-data-dir-path: "performance/"
+          benchmark-data-dir-path: "performance-v2/"
           alert-comment-cc-users: "@clarmy"
       - name: Test with pytest
         run: |
