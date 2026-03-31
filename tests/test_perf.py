@@ -36,9 +36,11 @@ sample_districts = [random.choice(districts) for _ in range(100)]
 
 
 map_arg = {
+    "country": "中国",
+    "level": "国",
     "only_polygon": True,
     "record": "first",
-    "name": "中华人民共和国",
+    "name": "中国",
     "simplify": True,
 }
 
@@ -346,38 +348,27 @@ def test_maskout(benchmark):
 
 def test_make_maskout_array(benchmark):
     """测试 make_maskout_array（与单元测试简版同尺度，便于 CI benchmark）"""
+    n = MAKE_MASKOUT_FAST_GRID_SIZE
+    lon = np.linspace(60, 150, n)
+    lat = np.linspace(0, 60, n)
+    lons, lats = np.meshgrid(lon, lat)
+    mask_array_gcj02 = np.load(os.path.join(MAPCASE_DIR, "china-maskout-gcj02-fast.npy"))
+    mask_array_wgs84 = np.load(os.path.join(MAPCASE_DIR, "china-maskout-wgs84-fast.npy"))
+    china_gcj02 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
+    china_wgs84 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
 
     def inner():
-        n = MAKE_MASKOUT_FAST_GRID_SIZE
-        casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02-fast.npy")
-        mask_array = np.load(casefp)
+        china_maskout_array = china_gcj02.make_mask_array(lons, lats)
+        assert (china_maskout_array == mask_array_gcj02).all()
 
-        lon = np.linspace(60, 150, n)
-        lat = np.linspace(0, 60, n)
-        lons, lats = np.meshgrid(lon, lat)
-
-        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
-        china_maskout_array = china.make_mask_array(lons, lats)
-
-        assert (china_maskout_array == mask_array).all()
-
-        casefp = os.path.join(MAPCASE_DIR, "china-maskout-wgs84-fast.npy")
-        mask_array = np.load(casefp)
-
-        lon = np.linspace(60, 150, n)
-        lat = np.linspace(0, 60, n)
-        lons, lats = np.meshgrid(lon, lat)
-
-        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
-        china_maskout_array = china.make_mask_array(lons, lats)
-
-        assert (china_maskout_array == mask_array).all()
+        china_maskout_array = china_wgs84.make_mask_array(lons, lats)
+        assert (china_maskout_array == mask_array_wgs84).all()
 
         with pytest.raises(ValueError):
-            china.make_mask_array(lon, lat)
+            china_wgs84.make_mask_array(lon, lat)
 
         with pytest.raises(ValueError):
-            china.make_mask_array(lons, lats[:-1])
+            china_wgs84.make_mask_array(lons, lats[:-1])
 
     benchmark(inner)
 
@@ -385,31 +376,20 @@ def test_make_maskout_array(benchmark):
 @pytest.mark.heavy
 def test_make_maskout_array_full(benchmark):
     """全分辨率 make_maskout_array 基准；默认 CI 不跑。"""
+    lon = np.linspace(60, 150, 1000)
+    lat = np.linspace(0, 60, 1000)
+    lons, lats = np.meshgrid(lon, lat)
+    mask_array_gcj02 = np.load(os.path.join(MAPCASE_DIR, "china-maskout-gcj02.npy"))
+    mask_array_wgs84 = np.load(os.path.join(MAPCASE_DIR, "china-maskout-wgs84.npy"))
+    china_gcj02 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
+    china_wgs84 = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
 
     def inner():
-        casefp = os.path.join(MAPCASE_DIR, "china-maskout-gcj02.npy")
-        mask_array = np.load(casefp)
+        china_maskout_array = china_gcj02.make_mask_array(lons, lats)
+        assert (china_maskout_array == mask_array_gcj02).all()
 
-        lon = np.linspace(60, 150, 1000)
-        lat = np.linspace(0, 60, 1000)
-        lons, lats = np.meshgrid(lon, lat)
-
-        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
-        china_maskout_array = china.make_mask_array(lons, lats)
-
-        assert (china_maskout_array == mask_array).all()
-
-        casefp = os.path.join(MAPCASE_DIR, "china-maskout-wgs84.npy")
-        mask_array = np.load(casefp)
-
-        lon = np.linspace(60, 150, 1000)
-        lat = np.linspace(0, 60, 1000)
-        lons, lats = np.meshgrid(lon, lat)
-
-        china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
-        china_maskout_array = china.make_mask_array(lons, lats)
-
-        assert (china_maskout_array == mask_array).all()
+        china_maskout_array = china_wgs84.make_mask_array(lons, lats)
+        assert (china_maskout_array == mask_array_wgs84).all()
 
     benchmark(inner)
 

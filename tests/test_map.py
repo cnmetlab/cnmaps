@@ -78,7 +78,7 @@ def test_make_maskout_array():
     lat = np.linspace(0, 60, n)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -90,7 +90,7 @@ def test_make_maskout_array():
     lat = np.linspace(0, 60, n)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -112,7 +112,7 @@ def test_make_maskout_array_full():
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=False)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=False)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -124,7 +124,7 @@ def test_make_maskout_array_full():
     lat = np.linspace(0, 60, 1000)
     lons, lats = np.meshgrid(lon, lat)
 
-    china = get_adm_maps(country="中华人民共和国", level="国", record="first", only_polygon=True, wgs84=True)
+    china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True, wgs84=True)
     china_maskout_array = china.make_mask_array(lons, lats)
 
     assert (china_maskout_array == mask_array).all()
@@ -327,17 +327,17 @@ def test_get_adm_maps_can_load_foreign_country_geojson_without_gcj_conversion():
 
 def test_map_load():
     """测试各级地图数量是否完整，以及各种规则是否都能加载成功."""
-    assert len(get_adm_maps(country="中华人民共和国", level="国")) == 2
+    assert len(get_adm_maps(country="中国", level="国")) == 2
     assert len(get_adm_maps(level="省")) == 34
     assert len(get_adm_maps(level="市")) == 370
     assert len(get_adm_maps(level="区县")) == 2875
 
-    assert isinstance(get_adm_maps(country="中华人民共和国", level="国", engine="geopandas"), GeoDataFrame)
+    assert isinstance(get_adm_maps(country="中国", level="国", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="省", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="市", engine="geopandas"), GeoDataFrame)
     assert isinstance(get_adm_maps(level="区县", engine="geopandas"), GeoDataFrame)
 
-    assert len(get_adm_maps(country="中华人民共和国", level="国", engine="geopandas")) == 2
+    assert len(get_adm_maps(country="中国", level="国", engine="geopandas")) == 2
     assert len(get_adm_maps(level="省", engine="geopandas")) == 34
     assert len(get_adm_maps(level="市", engine="geopandas")) == 370
     assert len(get_adm_maps(level="区县", engine="geopandas")) == 2875
@@ -393,8 +393,8 @@ def test_map_load():
 def test_map_operator():
     """测试地图之间的操作符是否正常."""
 
-    china = get_adm_maps(country="中华人民共和国", level="国", wgs84=True)[0]["geometry"]
-    china_gcj02 = get_adm_maps(country="中华人民共和国", level="国", wgs84=False)[0]["geometry"]
+    china = get_adm_maps(country="中国", level="国", wgs84=True)[0]["geometry"]
+    china_gcj02 = get_adm_maps(country="中国", level="国", wgs84=False)[0]["geometry"]
     sichuan = get_adm_maps(province="四川省")[0]["geometry"]
     sichuan_gcj02 = get_adm_maps(province="四川省", wgs84=False)[0]["geometry"]
     chongqing = get_adm_maps(province="重庆市")[0]["geometry"]

@@ -25,7 +25,14 @@ districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
 map_args = [
-    {"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}
+    {
+        "country": "中国",
+        "level": "国",
+        "only_polygon": True,
+        "record": "first",
+        "name": "中华人民共和国",
+        "simplify": True,
+    }
 ] + [
     {
         "province": p,
@@ -199,7 +206,7 @@ def test_clip_contourf_with_extent():
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-    map_polygon = get_adm_maps(country="中华人民共和国", level="国", only_polygon=True, record="first", simplify=True)
+    map_polygon = get_adm_maps(country="中国", level="国", only_polygon=True, record="first", simplify=True)
 
     cs = ax.contourf(
         lons,
@@ -262,7 +269,7 @@ def test_clip_scatter_sets_clip_box():
 
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-    map_polygon = get_adm_maps(country="中华人民共和国", level="国", only_polygon=True, record="first", simplify=True)
+    map_polygon = get_adm_maps(country="中国", level="国", only_polygon=True, record="first", simplify=True)
 
     scatter = ax.scatter([80, 120], [25, 45], transform=ccrs.PlateCarree())
     clip_scatter_by_map(scatter, map_polygon, ax=ax, extent=[70, 140, 15, 55], set_extent=True)
