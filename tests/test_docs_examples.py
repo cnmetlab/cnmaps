@@ -103,6 +103,10 @@ def test_docs_draw_boundary_examples():
     _run_example_script("china_and_neighbors_borders.py", "usage", "china-and-neighbors-borders.png")
     _run_example_script("world_countries_borders_globe.py", "usage", "world-countries-borders-globe.png")
     _run_example_script("world_countries_borders_flat.py", "usage", "world-countries-borders-flat.png")
+    _run_example_script("city_centroids_overview.py", "usage", "city-centroids-overview.png")
+    _run_example_script("province_centroids_overview.py", "usage", "province-centroids-overview.png")
+    _run_example_script("country_centroids_overview.py", "usage", "country-centroids-overview.png")
+    _run_example_script("province_capitals_labels.py", "usage", "province-capitals-labeled.png")
 
 
 def test_docs_union_example():
@@ -280,7 +284,8 @@ def test_docs_examples_rst_examples():
     fig = plt.figure(figsize=(5, 5))
     proj = ccrs.Orthographic(central_longitude=100.0, central_latitude=30)
     ax = fig.add_subplot(111, projection=proj)
-    china, south_sea = get_adm_maps(country="中国", level="国", only_polygon=True)
+    ax.stock_img()
+    china, south_sea = get_adm_maps(country="中国", level="国", record="all", only_polygon=True)
     ax.set_global()
     ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor="r", facecolor="r")
     ax.add_geometries(south_sea, crs=ccrs.PlateCarree(), edgecolor="r")

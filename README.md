@@ -48,7 +48,7 @@
 </p>
 
 <h4 align="center">
-    cnmaps 是一个可以让中国地图画起来更丝滑的地图类 python 扩展包
+    cnmaps 是一个以中国领土主张为标准开发的地图类 Python 扩展包
 </h4>
 
 ## 安装
@@ -156,31 +156,25 @@ plt.show()
 ```
 ![district-level](static/images/district-level.png)
 
-### Logo
+### 绘制全球国家边界
 
-本项目的Logo地图是如何绘制的？请执行下面的代码。
+如果你想快速验证 `cnmaps` 现在的全球国家级边界能力，可以直接执行下面这段最小示例代码。
 
 ```python
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
-from cnmaps import get_adm_maps
+from cnmaps import get_adm_maps, draw_maps
 
-fig = plt.figure(figsize=(5,5))
-proj = ccrs.Orthographic(central_longitude=100.0, central_latitude=30)
-ax = fig.add_subplot(111, projection=proj)
+fig = plt.figure(figsize=(14, 7))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree(central_longitude=105))
 
-ax.stock_img()
-china, sourth_sea = get_adm_maps(level='国', only_polygon=True)
+draw_maps(get_adm_maps(level='国', source='世界银行'), linewidth=0.4, color='#666666')
+draw_maps(get_adm_maps(country='中国', level='国'), linewidth=1.0, color='crimson')
 
-ax.set_global()
-ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor='r', facecolor='r')
-ax.add_geometries(sourth_sea, crs=ccrs.PlateCarree(), edgecolor='r')
-ax.outline_patch.set_edgecolor('white')
-
-plt.savefig('../static/images/logo-base.png', bbox_inches='tight')
+plt.show()
 ```
 
-![logo-base](static/images/logo-base.png)
+![world-countries-borders-flat](static/images/world-countries-borders-flat.png)
 
 ## 使用指南
 

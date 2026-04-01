@@ -15,7 +15,7 @@
     ax = fig.add_subplot(111, projection=proj)
 
     ax.stock_img()
-    china, south_sea = get_adm_maps(level='国', only_polygon=True)
+    china, south_sea = get_adm_maps(country='中国', level='国', record='all', only_polygon=True)
 
     ax.set_global()
     ax.add_geometries(china, crs=ccrs.PlateCarree(), edgecolor='r', facecolor='r')
@@ -74,3 +74,13 @@
     plt.show()
 
 .. image:: ../_static/henan-nanyang.png
+
+绘制科技风全球边界图
+--------------------
+
+下面这个例子使用 ``cnmaps`` 查询全球国家级边界与中国国界，并绘制一张以中国为视觉焦点的科技风全球地图。
+
+.. literalinclude:: ../_examples/world_tech_map_centered_v2.py
+   :language: python
+
+.. image:: ../_static/world-tech-map-centered-v2.png

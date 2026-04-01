@@ -2,6 +2,7 @@
 
 import sqlite3
 import re
+import warnings
 from functools import lru_cache
 
 import numpy as np
@@ -28,9 +29,66 @@ class MapNotFoundError(Exception):
     pass
 
 
+class MapRecord(dict):
+    """支持点号访问的地图记录对象。"""
+
+    def __getitem__(self, key):
+        if key in _LEGACY_RECORD_KEY_ALIASES:
+            warnings.warn(
+                f'使用中文键 "{key}" 访问地图记录将在 3.x 版本弃用，请改用 "{_LEGACY_RECORD_KEY_ALIASES[key]}"。',
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            key = _LEGACY_RECORD_KEY_ALIASES[key]
+        return super().__getitem__(key)
+
+    def __getattr__(self, name):
+        try:
+            return self[name]
+        except KeyError as exc:
+            raise AttributeError(name) from exc
+
+    def get(self, key, default=None):
+        if key in _LEGACY_RECORD_KEY_ALIASES:
+            warnings.warn(
+                f'使用中文键 "{key}" 访问地图记录将在 3.x 版本弃用，请改用 "{_LEGACY_RECORD_KEY_ALIASES[key]}"。',
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            key = _LEGACY_RECORD_KEY_ALIASES[key]
+        return super().get(key, default)
+
+    def __contains__(self, key):
+        if key in _LEGACY_RECORD_KEY_ALIASES:
+            key = _LEGACY_RECORD_KEY_ALIASES[key]
+        return super().__contains__(key)
+
+
 _COUNTRY_CODE_PATTERN = re.compile(r"^[A-Za-z0-9-]{3,}$")
 _COUNTRY_ALIASES = {
     "中国": "中华人民共和国",
+}
+_LEGACY_RECORD_KEY_ALIASES = {
+    "国家": "country",
+    "省/直辖市": "province",
+    "市": "city",
+    "区/县": "district",
+    "级别": "level",
+    "来源": "source",
+    "类型": "kind",
+    "经度": "longitude",
+    "纬度": "latitude",
+}
+_LEGACY_GDF_COLUMNS = {
+    "country": "国家",
+    "province": "省/直辖市",
+    "city": "市",
+    "district": "区/县",
+    "level": "级别",
+    "source": "来源",
+    "kind": "类型",
+    "longitude": "经度",
+    "latitude": "纬度",
 }
 
 
@@ -546,13 +604,13 @@ def get_adm_names(
         provider=provider,
     )
     if level == "国":
-        names = [d["国"] for d in data]
+        names = [d["country"] for d in data]
     elif level == "省":
-        names = [d["省/直辖市"] for d in data]
+        names = [d["province"] for d in data]
     elif level == "市":
-        names = [d["市"] for d in data]
+        names = [d["city"] for d in data]
     elif level == "区县":
-        names = [d["区/县"] for d in data]
+        names = [d["district"] for d in data]
 
     return names
 
@@ -634,6 +692,7 @@ def get_adm_maps(
     )
     meta_rows = [row[:7] for row in rows]
     map_polygons = []
+    centroid_coords = []
     for row in rows:
         use_wgs84 = wgs84 if row[5] == "高德" else False
         mapjson = read_mapjson(
@@ -641,12 +700,19 @@ def get_adm_maps(
             wgs84=use_wgs84,
         )
 
-        map_polygons.append(_get_geom(mapjson))
+        geom = _get_geom(mapjson)
+        centroid = geom.centroid
+        centroid_coords.append((centroid.x, centroid.y))
+        map_polygons.append(geom)
 
     gdf = gpd.GeoDataFrame(
-        data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
+        data=meta_rows, columns=["country", "province", "city", "district", "level", "source", "kind"]
     )
     gdf.set_geometry(map_polygons, inplace=True)
+    gdf["longitude"] = [coord[0] for coord in centroid_coords]
+    gdf["latitude"] = [coord[1] for coord in centroid_coords]
+    for english_name, legacy_name in _LEGACY_GDF_COLUMNS.items():
+        gdf[legacy_name] = gdf[english_name]
 
     if simplify:
         area = gdf["geometry"].area.sum()
@@ -670,7 +736,7 @@ def get_adm_maps(
         if wrapped_records is None:
             wrapped_records = []
             for (_, row), geometry in zip(gdf.iterrows(), wrapped_geometries):
-                record_data = row.to_dict()
+                record_data = MapRecord(row.to_dict())
                 record_data["geometry"] = geometry
                 wrapped_records.append(record_data)
         return wrapped_records
