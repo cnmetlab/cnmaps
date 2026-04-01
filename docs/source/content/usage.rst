@@ -157,6 +157,13 @@
 
 .. image:: ../_static/country-centroids-overview.png
 
+若你想进一步把质心坐标用于标注，也可以先绘制中国省级边界，再按各省会 / 首府的质心位置打点并标注英文名称。下面这个例子里，北京使用五角星强调，其他省会用圆点表示：
+
+.. literalinclude:: ../_examples/province_capitals_labels.py
+   :language: python
+
+.. image:: ../_static/province-capitals-labeled.png
+
 绘制行政边界
 ------------
 前面使用 ``get_adm_maps`` 获取的行政边界地图列表，可以直接传入 ``draw_maps`` 函数进行绘图。

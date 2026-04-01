@@ -106,6 +106,7 @@ def test_docs_draw_boundary_examples():
     _run_example_script("city_centroids_overview.py", "usage", "city-centroids-overview.png")
     _run_example_script("province_centroids_overview.py", "usage", "province-centroids-overview.png")
     _run_example_script("country_centroids_overview.py", "usage", "country-centroids-overview.png")
+    _run_example_script("province_capitals_labels.py", "usage", "province-capitals-labeled.png")
 
 
 def test_docs_union_example():
