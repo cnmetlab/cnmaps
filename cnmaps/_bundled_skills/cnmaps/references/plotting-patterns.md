@@ -66,6 +66,38 @@ draw_map(germany.geometry, ax=ax, linewidth=1.2, color="crimson")
 plt.show()
 ```
 
+## Label Selected Countries On A World Map
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import draw_maps, get_adm_maps
+
+world = get_adm_maps(level="国")
+label_countries = ["中国", "日本", "印度", "德国", "美国"]
+
+fig = plt.figure(figsize=(14, 7))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+ax.set_global()
+
+draw_maps(world, ax=ax, linewidth=0.35, color="#666666")
+
+for country_name in label_countries:
+    record = get_adm_maps(country=country_name, level="国", record="first")
+    ax.scatter(record.longitude, record.latitude, s=10, color="crimson", transform=ccrs.PlateCarree())
+    ax.text(
+        record.longitude,
+        record.latitude,
+        country_name,
+        fontsize=8,
+        ha="center",
+        va="bottom",
+        transform=ccrs.PlateCarree(),
+    )
+
+plt.show()
+```
+
 ## Clip A Contourf Map
 
 ```python
@@ -126,7 +158,9 @@ plt.show()
 - Pass `ax=ax` in examples that build more than one axes.
 - For China-only examples, write `country="中国", level="国"` explicitly.
 - For one foreign country, prefer querying a single `MapRecord` and using `record.geometry`, `record.longitude`, and `record.latitude`.
+- For country, province, city, or district labels, prefer `record.longitude` and `record.latitude` instead of recomputing centroids from geometry.
 - For global maps, `get_adm_maps(level="国")` is the default broad query; add `source="世界银行"` only when the user specifically wants that source.
 - If clipping is involved, create the artist first, clip it second, then draw the boundary on top.
 - For new examples, prefer English fields such as `record.longitude` and `record.latitude`.
+- If a country label lands in an unintuitive place for a very large or fragmented country, explain the whole-geometry centroid rule before trying custom label heuristics.
 - If a world map shows seams or gaps near disputed borders, treat it as a data-semantics issue to explain, not a plotting artifact to hide.

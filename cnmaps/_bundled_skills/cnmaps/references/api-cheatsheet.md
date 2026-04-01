@@ -53,6 +53,13 @@ Useful `MapRecord` fields:
 - `longitude`
 - `latitude`
 
+Centroid and labeling notes:
+
+- `longitude` and `latitude` are already included on `MapRecord` results and are the default coordinates to use for map labels or marker placement.
+- This works for country-level records too: `row = get_adm_maps(country="日本", level="国", record="first")`, then use `row.longitude` and `row.latitude`.
+- If the user wants labels, prefer these fields over manually recomputing `row.geometry.centroid`.
+- For very large or fragmented countries, these coordinates come from the whole-boundary centroid and may not match a hand-tuned label position.
+
 Compatibility notes:
 
 - Legacy Chinese keys still work, but new code should prefer English keys or dot access.
@@ -151,7 +158,7 @@ Use when provider-level dataset paths or metadata are needed.
 
 - If the user wants China only: always write `country="中国", level="国"` explicitly.
 - If the user wants one foreign country: use `country=<Chinese name or ISO3>, level="国", record="first"`.
-- If the user wants to label administrative centers: query records and use `longitude` and `latitude`.
+- If the user wants to label administrative regions or their default center points: query records and use `longitude` and `latitude`.
 - If the user wants actual clipped scientific plots: combine sample loaders, `cartopy`, and `clip_*` helpers.
 - If the user wants global country boundaries: `get_adm_maps(level="国")` is now the correct broad query.
 - If the user asks about seams, gaps, or disputed-border behavior in world maps, explain the source-semantic caveat instead of blaming plotting code first.

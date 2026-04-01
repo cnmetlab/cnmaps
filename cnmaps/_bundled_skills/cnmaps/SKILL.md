@@ -17,6 +17,7 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 - Before writing runnable code, first verify whether the current Python environment can import `cnmaps`.
 - If the task includes plotting, also verify `cartopy` and `matplotlib`.
 - The normal installation command is `pip install -U cnmaps`. The official `cnmaps-data` package is an install dependency and should be pulled in automatically.
+- If CJK labels render as tofu boxes / square boxes in Matplotlib figures, a practical fix is `pip install -U mplfonts` and then `mplfonts init`.
 - If `import cnmaps` works but provider lookup fails, treat that as an environment/data-package problem in the current interpreter and check whether `cnmaps-data` is actually installed there.
 - If plotting imports fail but `cnmaps` itself imports successfully, explain that the current environment is missing plotting dependencies rather than claiming the user's project is broken.
 - If you cannot install packages in the current sandbox, say so clearly and continue with non-executing help: code edits, API guidance, or instructions that the user can run in their real environment.
@@ -53,11 +54,23 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 - `source` is optional. Do not add `source="世界银行"` or `source="高德"` unless the user really wants to filter by source.
 - With `engine=None`, `get_adm_maps` returns `MapRecord` objects.
 - `MapRecord` supports English keys and dot access. Prefer `record.country`, `record.level`, `record.longitude`, `record.latitude`.
+- `MapRecord` returned by `get_adm_maps` already includes centroid coordinates as `record.longitude` and `record.latitude`.
 - Legacy Chinese keys still work for now, but they are a compatibility layer and are planned for removal in `3.x`.
 - `geometry` is only exposed as `geometry`. Do not invent a Chinese alias for it.
 - With `engine="geopandas"`, `get_adm_maps` returns a `GeoDataFrame`.
 - With `only_polygon=True`, `get_adm_maps` returns `MapPolygon` objects instead of records.
 - Official data is now provided by `cnmaps-data`, and `cnmaps` expects `cnmaps-data>=1.1.1`.
+
+## Centroid And Labeling Workflow
+
+- If the user wants to label countries, provinces, cities, or districts on a map, query `MapRecord` rows with `get_adm_maps(..., record="first")` and use `record.longitude` and `record.latitude`.
+- Do not recompute centroids from `record.geometry` unless the user explicitly asks for a different centroid rule. The package already exposes the default centroid coordinates on each record.
+- For multiple labels, the normal pattern is:
+  - query one record per administrative region
+  - draw the boundary from `record.geometry`
+  - place markers or text using `record.longitude` and `record.latitude`
+- This centroid rule applies to country-level records too, so labeling world maps can use the same `record.longitude` / `record.latitude` workflow.
+- For very large or spatially fragmented countries and regions, the exposed centroid is the geometry centroid of the whole boundary, which may not match a user's intuitive “mainland label position”. If label placement looks odd, explain that this is a centroid-semantics issue rather than saying cnmaps has no label coordinates.
 
 ## Data Semantics
 
@@ -80,6 +93,7 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 - Prefer minimal examples that import only what they need.
 - Prefer `country="中国"` over `country="中华人民共和国"` in user-facing snippets unless the longer form is specifically relevant.
 - Prefer English field access in examples: `record.country`, `record.longitude`, `record.latitude`.
+- When labeling administrative regions, prefer `record.longitude` / `record.latitude` over manually calling `record.geometry.centroid`.
 - Keep plotting examples explicit about the `cartopy` projection.
 - If the task is a China-only example, never rely on `level="国"` alone.
 
