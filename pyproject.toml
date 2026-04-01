@@ -11,6 +11,7 @@ exclude = ["**/.DS_Store"]
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
 cnmaps-data = ">=1.1.1"
+mcp = { version = ">=1.8,<2.0", python = ">=3.10,<3.13" }
 shapely = ">=2.0.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"
@@ -37,6 +38,9 @@ pytest-memray = { version = "^1.6.0", markers = "sys_platform != 'win32'" }
 markers = [
     "heavy: 全网格等耗时测试；默认 CI 使用 -m \"not heavy\" 跳过",
 ]
+
+[tool.poetry.scripts]
+cnmaps-mcp = "cnmaps.mcp_server:main"
 
 [build-system]
 requires = ["poetry-core"]

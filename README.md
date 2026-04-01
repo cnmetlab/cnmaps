@@ -180,6 +180,31 @@ plt.show()
 
 针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)
 
+## MCP 集成
+
+`cnmaps` 现在内置了一个 MCP（Model Context Protocol）服务入口，可以让支持 MCP 的 AI 工具直接调用行政边界查询能力。
+
+安装完成后，可以直接启动：
+
+```bash
+cnmaps-mcp
+```
+
+如果你已经安装过 `cnmaps`，同时希望确保数据也是最新版，建议再执行一次：
+
+```bash
+pip install -U cnmaps-data
+```
+
+当前 MCP server 主要提供：
+
+- 查询可用数据提供者
+- 查询行政名称列表
+- 查询行政边界元信息、中心点和 bounding box
+- 直接返回 GeoJSON 边界结果
+
+更完整的接入说明见文档中的 [MCP 集成](https://cnmaps.readthedocs.io/zh_CN/latest/content/mcp.html)。
+
 ## 引用
 
 本项目适用的地图边界的数据源包括：
