@@ -381,5 +381,42 @@ def test_projection():
         plt.close()
 
 
+def test_city_centroid_examples():
+    """绘制城市质心示例图，便于人工检查常见城市与多多边形城市."""
+
+    city_cases = [
+        ("Beijing", "北京市"),
+        ("Shanghai", "上海市"),
+        ("Zhoushan", "舟山市"),
+        ("Sansha", "三沙市"),
+    ]
+
+    for english_name, city_name in city_cases:
+        row = get_adm_maps(city=city_name, record="first")
+        geom = row["geometry"]
+        assert round(row["经度"], 6) == round(geom.centroid.x, 6)
+        assert round(row["纬度"], 6) == round(geom.centroid.y, 6)
+
+        fig = plt.figure(figsize=(6, 5), dpi=200)
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        draw_map(geom, ax=ax, color="#2a6fdb", linewidth=1.0)
+        ax.scatter(
+            [row["经度"]],
+            [row["纬度"]],
+            color="#d62828",
+            s=28,
+            transform=ccrs.PlateCarree(),
+            zorder=5,
+        )
+        ax.set_title(f"{english_name} centroid", fontsize=12)
+        ax.set_extent(geom.get_extent(buffer=0.8), crs=ccrs.PlateCarree())
+        ax.gridlines(draw_labels=False, linewidth=0.4, color="#999999", alpha=0.4, linestyle="--")
+
+        savefp = os.path.join("./tmp", "test_city_centroids", f"{english_name.lower()}-centroid.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+
 if __name__ == "__main__":
     pass
