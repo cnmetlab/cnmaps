@@ -7,6 +7,11 @@ license = "BSD 3-Clause License"
 readme = "PYPI.md"
 homepage = "https://github.com/cnmetlab/cnmaps"
 exclude = ["**/.DS_Store"]
+include = ["cnmaps/_bundled_skills/**/*"]
+packages = [
+    { include = "cnmaps" },
+    { include = "cnmaps_cli" },
+]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
@@ -37,6 +42,9 @@ pytest-memray = { version = "^1.6.0", markers = "sys_platform != 'win32'" }
 markers = [
     "heavy: 全网格等耗时测试；默认 CI 使用 -m \"not heavy\" 跳过",
 ]
+
+[tool.poetry.scripts]
+cnmaps = "cnmaps_cli:main"
 
 [build-system]
 requires = ["poetry-core"]

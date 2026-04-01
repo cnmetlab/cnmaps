@@ -29,6 +29,43 @@ draw_maps(get_adm_maps(country="中国", level="国"), ax=ax, linewidth=1.0, col
 plt.show()
 ```
 
+## Draw One Foreign Country By ISO3
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import draw_map, get_adm_maps
+
+japan = get_adm_maps(country="JPN", level="国", record="first")
+
+fig = plt.figure(figsize=(7, 7))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+
+draw_map(japan.geometry, ax=ax, linewidth=1.0, color="#1f4e79")
+ax.scatter(japan.longitude, japan.latitude, s=16, color="crimson", transform=ccrs.PlateCarree())
+ax.set_extent(japan.geometry.get_extent(buffer=2.0), crs=ccrs.PlateCarree())
+plt.show()
+```
+
+## Highlight One Foreign Country In A World Map
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import draw_map, draw_maps, get_adm_maps
+
+world = get_adm_maps(level="国")
+germany = get_adm_maps(country="德国", level="国", record="first")
+
+fig = plt.figure(figsize=(14, 7))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+ax.set_global()
+
+draw_maps(world, ax=ax, linewidth=0.35, color="#666666")
+draw_map(germany.geometry, ax=ax, linewidth=1.2, color="crimson")
+plt.show()
+```
+
 ## Clip A Contourf Map
 
 ```python
@@ -88,5 +125,8 @@ plt.show()
 - Always be explicit about the projection.
 - Pass `ax=ax` in examples that build more than one axes.
 - For China-only examples, write `country="中国", level="国"` explicitly.
+- For one foreign country, prefer querying a single `MapRecord` and using `record.geometry`, `record.longitude`, and `record.latitude`.
+- For global maps, `get_adm_maps(level="国")` is the default broad query; add `source="世界银行"` only when the user specifically wants that source.
 - If clipping is involved, create the artist first, clip it second, then draw the boundary on top.
 - For new examples, prefer English fields such as `record.longitude` and `record.latitude`.
+- If a world map shows seams or gaps near disputed borders, treat it as a data-semantics issue to explain, not a plotting artifact to hide.

@@ -23,7 +23,16 @@ Important behavior:
 
 - `country="中国"` is supported.
 - `level="国"` without `country` means all country-level records.
+- For `level="国"` queries, `country` may be a Chinese country name, an `ISO3` code such as `JPN`, or a project-defined combined code for special regions.
 - `source` is optional and should only be added when the user wants source filtering.
+
+Foreign and global query patterns:
+
+- One foreign country by Chinese name: `get_adm_maps(country="日本", level="国", record="first")`
+- One foreign country by `ISO3`: `get_adm_maps(country="JPN", level="国", record="first")`
+- All world country/region boundaries: `get_adm_maps(level="国")`
+- World boundaries from a specific source: `get_adm_maps(level="国", source="世界银行")`
+- China only: `get_adm_maps(country="中国", level="国")`
 
 Return shapes:
 
@@ -58,6 +67,7 @@ Good for:
 - listing cities in a province
 - listing districts in a city
 - checking what names are available before querying
+- checking country-level names before a global or foreign-boundary query
 
 ## Drawing APIs
 
@@ -77,6 +87,12 @@ Use for:
 - `GeoDataFrame`
 - a single `MapRecord`
 - a single `MapPolygon`
+
+Rules of thumb:
+
+- For quick country-boundary plots, prefer `draw_map` or `draw_maps`.
+- For highly styled global maps, using `row.geometry` or `MapPolygon` with Cartopy's `ax.add_geometries(...)` is also fine.
+- If you queried a single record with `record="first"`, `draw_map(row.geometry, ax=ax, ...)` is usually the clearest option.
 
 ## Clipping APIs
 
@@ -134,6 +150,8 @@ Use when provider-level dataset paths or metadata are needed.
 ## Rules Of Thumb
 
 - If the user wants China only: always write `country="中国", level="国"` explicitly.
+- If the user wants one foreign country: use `country=<Chinese name or ISO3>, level="国", record="first"`.
 - If the user wants to label administrative centers: query records and use `longitude` and `latitude`.
 - If the user wants actual clipped scientific plots: combine sample loaders, `cartopy`, and `clip_*` helpers.
 - If the user wants global country boundaries: `get_adm_maps(level="国")` is now the correct broad query.
+- If the user asks about seams, gaps, or disputed-border behavior in world maps, explain the source-semantic caveat instead of blaming plotting code first.

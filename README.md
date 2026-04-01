@@ -182,9 +182,9 @@ plt.show()
 
 ## AI Skill
 
-仓库内置了一份面向 AI 编程助手的 `cnmaps` Skill，位置在：
+`cnmaps` 包内自带了一份面向 AI 编程助手的 `cnmaps` Skill，源码位于：
 
-- [`.codex/skills/cnmaps/SKILL.md`](.codex/skills/cnmaps/SKILL.md)
+- [`cnmaps/_bundled_skills/cnmaps/SKILL.md`](cnmaps/_bundled_skills/cnmaps/SKILL.md)
 
 这份 Skill 重点说明：
 
@@ -195,8 +195,22 @@ plt.show()
 
 更细的参考资料在：
 
-- [API 速查](.codex/skills/cnmaps/references/api-cheatsheet.md)
-- [绘图套路](.codex/skills/cnmaps/references/plotting-patterns.md)
+- [API 速查](cnmaps/_bundled_skills/cnmaps/references/api-cheatsheet.md)
+- [绘图套路](cnmaps/_bundled_skills/cnmaps/references/plotting-patterns.md)
+
+如果你已经安装了 `cnmaps`，也可以把这份 AI 指南安装到当前项目目录中，针对不同助手生成对应格式：
+
+```bash
+cnmaps install-skill codex
+cnmaps install-skill cursor
+cnmaps install-skill claudecode
+```
+
+默认安装到当前目录；如需指定其他项目目录，可传 `--dir /path/to/project`。如需覆盖已有安装，可执行：
+
+```bash
+cnmaps install-skill codex --force
+```
 
 ## 引用
 

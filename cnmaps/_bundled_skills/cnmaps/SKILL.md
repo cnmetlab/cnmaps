@@ -11,6 +11,27 @@ Use this skill when an AI needs to help someone write or revise `cnmaps` code. T
 
 For detailed API selection, read [references/api-cheatsheet.md](references/api-cheatsheet.md). For common plotting workflows, read [references/plotting-patterns.md](references/plotting-patterns.md).
 
+## Environment And Setup
+
+- Do not assume the current execution environment already has `cnmaps` installed, even if the user says they use `cnmaps` locally. Sandboxes and project interpreters may differ from the user's main machine.
+- Before writing runnable code, first verify whether the current Python environment can import `cnmaps`.
+- If the task includes plotting, also verify `cartopy` and `matplotlib`.
+- The normal installation command is `pip install -U cnmaps`. The official `cnmaps-data` package is an install dependency and should be pulled in automatically.
+- If `import cnmaps` works but provider lookup fails, treat that as an environment/data-package problem in the current interpreter and check whether `cnmaps-data` is actually installed there.
+- If plotting imports fail but `cnmaps` itself imports successfully, explain that the current environment is missing plotting dependencies rather than claiming the user's project is broken.
+- If you cannot install packages in the current sandbox, say so clearly and continue with non-executing help: code edits, API guidance, or instructions that the user can run in their real environment.
+- When giving setup help, distinguish between:
+  - missing `cnmaps`
+  - missing plotting stack such as `cartopy`
+  - missing provider/data package discovery in the current interpreter
+
+## Recommended Execution Order
+
+- First check whether `cnmaps` imports in the current environment.
+- If plotting is needed, check `cartopy` and `matplotlib`.
+- Only after the environment is confirmed should you run example code that queries or plots.
+- If the environment is not ready and you cannot fix it inside the sandbox, explicitly say that the code is unverified in this environment.
+
 ## Pick The Right API
 
 - Boundary name lookup: `get_adm_names`
@@ -41,8 +62,18 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 ## Data Semantics
 
 - Chinese administrative boundaries come from the official `cnmaps-data` package and are organized around the current China-facing data semantics used by this project.
-- Foreign country and region boundaries also come from `cnmaps-data`.
+- Foreign country and region boundaries also come from `cnmaps-data`, currently organized from the World Bank Admin 0 dataset.
 - Country-level queries support both Chinese names and `ISO3` or project-defined combined codes such as dispute-region codes.
+- Foreign country and region records live in `level="国"` alongside China.
+
+## Foreign Boundary Caveats
+
+- If the user wants one foreign country, prefer `get_adm_maps(country="日本", level="国", record="first")` or an `ISO3` code such as `country="JPN"`.
+- If the user wants all world boundaries, use `get_adm_maps(level="国")`. Add `source="世界银行"` only when the user explicitly wants source filtering or source-specific behavior.
+- `source` is a dataset-source filter inside the administrative index. `provider` selects which installed data package backs the query.
+- China and foreign boundaries do not always share identical cartographic semantics near disputed or unsettled borders.
+- The official data docs explicitly call out special handling for neighboring regions and a visible gap near the China-Tajikistan border. When users ask why seams or gaps appear, explain that this comes from differing source semantics rather than a plotting bug.
+- Do not promise that stitching China and all foreign boundaries yields a politically neutral or gap-free map in every disputed-border area.
 
 ## Coding Style For AI-Generated cnmaps Examples
 
@@ -55,6 +86,8 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 ## Common Mistakes To Avoid
 
 - Do not assume `get_adm_maps(level="国")` returns only China.
+- Do not assume foreign boundaries should always be filtered with `source="世界银行"`. It is often unnecessary unless the user asks for source-specific selection.
+- Do not assume the sandbox Python environment is the same as the user's already-configured local environment.
 - Do not use Chinese keys in new examples unless you are intentionally documenting compatibility behavior.
 - Do not add `source` filtering just because the data exists in multiple directories internally.
 - Do not treat `cnmaps` as a CLI-first tool. It is mainly a Python library that is meant to be composed with `cartopy`, `matplotlib`, and scientific Python code.

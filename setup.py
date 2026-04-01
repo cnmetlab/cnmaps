@@ -41,7 +41,19 @@ setuptools.setup(
     url="https://github.com/cnmetlab/cnmaps",
     include_package_data=True,
     packages=setuptools.find_packages(),
+    package_data={
+        "cnmaps._bundled_skills.cnmaps": [
+            "SKILL.md",
+            "agents/*.yaml",
+            "references/*.md",
+        ]
+    },
     install_requires=required,
+    entry_points={
+        "console_scripts": [
+            "cnmaps=cnmaps_cli:main",
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
     ],
