@@ -634,6 +634,7 @@ def get_adm_maps(
     )
     meta_rows = [row[:7] for row in rows]
     map_polygons = []
+    centroid_coords = []
     for row in rows:
         use_wgs84 = wgs84 if row[5] == "高德" else False
         mapjson = read_mapjson(
@@ -641,12 +642,17 @@ def get_adm_maps(
             wgs84=use_wgs84,
         )
 
-        map_polygons.append(_get_geom(mapjson))
+        geom = _get_geom(mapjson)
+        centroid = geom.centroid
+        centroid_coords.append((centroid.x, centroid.y))
+        map_polygons.append(geom)
 
     gdf = gpd.GeoDataFrame(
         data=meta_rows, columns=["国家", "省/直辖市", "市", "区/县", "级别", "来源", "类型"]
     )
     gdf.set_geometry(map_polygons, inplace=True)
+    gdf["经度"] = [coord[0] for coord in centroid_coords]
+    gdf["纬度"] = [coord[1] for coord in centroid_coords]
 
     if simplify:
         area = gdf["geometry"].area.sum()
