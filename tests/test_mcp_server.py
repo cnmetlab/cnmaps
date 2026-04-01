@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 
 mcp_module = pytest.importorskip("cnmaps.mcp_server")
 
@@ -28,3 +29,27 @@ def test_query_adm_geojson_returns_feature():
 def test_build_server():
     server = build_server()
     assert server is not None
+
+
+def test_render_administrative_map(tmp_path: Path):
+    server = build_server()
+    render_tool = server._tool_manager.get_tool("render_administrative_map")
+    output_path = tmp_path / "china-boundary.png"
+    result = render_tool.fn(country="中国", level="国", output_path=str(output_path))
+    assert result["output_path"] == str(output_path)
+    assert output_path.exists()
+
+
+def test_render_sample_map(tmp_path: Path):
+    server = build_server()
+    render_tool = server._tool_manager.get_tool("render_sample_map")
+    output_path = tmp_path / "china-temp.png"
+    result = render_tool.fn(
+        sample="temp",
+        plot_type="contourf",
+        country="中国",
+        level="国",
+        output_path=str(output_path),
+    )
+    assert result["output_path"] == str(output_path)
+    assert output_path.exists()

@@ -42,9 +42,12 @@ MCP 依赖当前基于官方 Python SDK，因此要求运行环境至少为 Pyth
 
 - ``get_server_info``：获取 ``cnmaps`` 版本、默认 provider 和已发现的数据提供者
 - ``list_data_providers``：列出当前环境中可用的 provider 及其数据目录
+- ``list_sample_datasets``：列出内置科研绘图样例数据
 - ``get_administrative_names``：按国家 / 省 / 市 / 区县条件查询名称列表
 - ``get_administrative_records``：查询边界记录元信息，返回中心点坐标和 bounding box
 - ``get_administrative_geojson``：直接返回 GeoJSON ``Feature`` / ``FeatureCollection``
+- ``render_administrative_map``：直接绘制行政边界图并导出 PNG
+- ``render_sample_map``：直接用内置样例数据绘制裁剪后的科研图并导出 PNG
 
 其中国家级查询支持：
 
@@ -83,3 +86,4 @@ MCP 依赖当前基于官方 Python SDK，因此要求运行环境至少为 Pyth
 - 如果你希望模型查全球国家边界，通常使用 ``level="国"``，并按需再传 ``country`` 或 ``source``。
 - 如果你希望模型直接拿到几何用于后续处理，优先调用 ``get_administrative_geojson``。
 - 如果你只希望模型先确认名称、中心点或范围，不必直接返回大几何，可以先调用 ``get_administrative_records``。
+- 如果你希望模型直接帮你产出可视化结果，可以优先调用 ``render_administrative_map`` 或 ``render_sample_map``。
