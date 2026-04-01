@@ -64,11 +64,22 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 ## Centroid And Labeling Workflow
 
 - If the user wants to label countries, provinces, cities, or districts on a map, query `MapRecord` rows with `get_adm_maps(..., record="first")` and use `record.longitude` and `record.latitude`.
+- For markers, labels, stars, icons, or text placement, do not use `only_polygon=True` unless you also separately query a `MapRecord`.
+- A `MapRecord` may look dictionary-like because it subclasses `dict`, but that does not mean centroid metadata is missing. Check `record.longitude` / `record.latitude` or `record["longitude"]` / `record["latitude"]` before assuming only `geometry` is available.
 - Do not recompute centroids from `record.geometry` unless the user explicitly asks for a different centroid rule. The package already exposes the default centroid coordinates on each record.
+- `only_polygon=True` returns `MapPolygon`, which is geometry-only and does not carry `longitude` / `latitude` metadata fields.
 - For multiple labels, the normal pattern is:
   - query one record per administrative region
   - draw the boundary from `record.geometry`
   - place markers or text using `record.longitude` and `record.latitude`
+- The fallback order for label coordinates should be:
+  - first: `record.longitude` / `record.latitude`
+  - second: `record["longitude"]` / `record["latitude"]`
+  - last resort only: `record.geometry.centroid` or `record["geometry"].centroid`
+- If the user says something like “mark Beijing with a star”, the default pattern is:
+  - `record = get_adm_maps(city="北京市", record="first")`
+  - use `record.longitude` and `record.latitude`
+  - do not switch to `only_polygon=True` and then call `record.centroid`
 - This centroid rule applies to country-level records too, so labeling world maps can use the same `record.longitude` / `record.latitude` workflow.
 - For very large or spatially fragmented countries and regions, the exposed centroid is the geometry centroid of the whole boundary, which may not match a user's intuitive “mainland label position”. If label placement looks odd, explain that this is a centroid-semantics issue rather than saying cnmaps has no label coordinates.
 
@@ -102,6 +113,8 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 - Do not assume `get_adm_maps(level="国")` returns only China.
 - Do not assume foreign boundaries should always be filtered with `source="世界银行"`. It is often unnecessary unless the user asks for source-specific selection.
 - Do not assume the sandbox Python environment is the same as the user's already-configured local environment.
+- Do not use `only_polygon=True` for tasks whose main goal is marker placement or text labeling.
+- Do not see a dict-like result and immediately conclude that `longitude` / `latitude` are unavailable.
 - Do not use Chinese keys in new examples unless you are intentionally documenting compatibility behavior.
 - Do not add `source` filtering just because the data exists in multiple directories internally.
 - Do not treat `cnmaps` as a CLI-first tool. It is mainly a Python library that is meant to be composed with `cartopy`, `matplotlib`, and scientific Python code.

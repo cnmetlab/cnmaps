@@ -98,6 +98,31 @@ for country_name in label_countries:
 plt.show()
 ```
 
+## Mark Beijing With A Star
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import draw_maps, get_adm_maps
+
+fig = plt.figure(figsize=(8, 8))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+
+draw_maps(get_adm_maps(country="中国", level="国"), ax=ax, linewidth=1.0, color="#666666")
+
+beijing = get_adm_maps(city="北京市", record="first")
+ax.scatter(
+    beijing.longitude,
+    beijing.latitude,
+    s=80,
+    marker="*",
+    color="crimson",
+    transform=ccrs.PlateCarree(),
+)
+
+plt.show()
+```
+
 ## Clip A Contourf Map
 
 ```python
@@ -159,6 +184,7 @@ plt.show()
 - For China-only examples, write `country="中国", level="国"` explicitly.
 - For one foreign country, prefer querying a single `MapRecord` and using `record.geometry`, `record.longitude`, and `record.latitude`.
 - For country, province, city, or district labels, prefer `record.longitude` and `record.latitude` instead of recomputing centroids from geometry.
+- If the user mainly wants a star, marker, or text annotation, do not switch to `only_polygon=True`; keep the `MapRecord` and use its metadata coordinates.
 - For global maps, `get_adm_maps(level="国")` is the default broad query; add `source="世界银行"` only when the user specifically wants that source.
 - If clipping is involved, create the artist first, clip it second, then draw the boundary on top.
 - For new examples, prefer English fields such as `record.longitude` and `record.latitude`.

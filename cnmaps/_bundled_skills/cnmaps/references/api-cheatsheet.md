@@ -57,6 +57,10 @@ Centroid and labeling notes:
 
 - `longitude` and `latitude` are already included on `MapRecord` results and are the default coordinates to use for map labels or marker placement.
 - This works for country-level records too: `row = get_adm_maps(country="日本", level="国", record="first")`, then use `row.longitude` and `row.latitude`.
+- For point markers or labels, prefer `record="first"` with the default `only_polygon=False`.
+- `only_polygon=True` returns `MapPolygon`, which is useful for geometry work but does not expose `longitude` and `latitude`.
+- `MapRecord` is dict-like, so `row["longitude"]` and `row["latitude"]` are also valid when dot access is inconvenient.
+- If label code needs a fallback, use geometry centroids only after checking both dot access and key access for `longitude` / `latitude`.
 - If the user wants labels, prefer these fields over manually recomputing `row.geometry.centroid`.
 - For very large or fragmented countries, these coordinates come from the whole-boundary centroid and may not match a hand-tuned label position.
 
