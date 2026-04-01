@@ -1,7 +1,6 @@
 """地图类模块."""
 
 import sqlite3
-import copy
 import re
 from functools import lru_cache
 
@@ -55,6 +54,16 @@ def _build_country_sql(country, level, has_iso3_column=False):
         return "AND (" + " OR ".join(clauses) + ")"
 
     return f"AND country='{escaped_country}'"
+
+
+@lru_cache(maxsize=32)
+def _get_administrative_columns(db):
+    con = sqlite3.connect(db)
+    try:
+        cur = con.cursor()
+        return frozenset(row[1] for row in cur.execute("PRAGMA table_info(ADMINISTRATIVE);"))
+    finally:
+        con.close()
 
 
 def _get_geom(obj):
@@ -111,25 +120,33 @@ class MapPolygon:
          "__add__", "__and__", "__sub__", "get_extent", "to_file",
          "maskout", "make_mask_array", "drop_inner_duplicate",
          "__geo_interface__", "__iter__", "__len__", "__getitem__",
-         "__bool__", "__eq__", "__repr__"}
+         "__bool__", "__eq__", "__repr__", "_last_mask_cache_key", "_last_mask_cache_value"}
     )
 
     def __init__(self, *args, **kwargs):
         """实例化 MapPolygon，参数与 shapely.geometry.MultiPolygon 一致."""
         if not args and not kwargs:
             self._geom = sgeom.MultiPolygon()
+            self._last_mask_cache_key = None
+            self._last_mask_cache_value = None
             return
 
         if len(args) == 1 and not kwargs:
             source = _get_geom(args[0])
             if isinstance(source, sgeom.Polygon):
                 self._geom = sgeom.MultiPolygon([source])
+                self._last_mask_cache_key = None
+                self._last_mask_cache_value = None
                 return
             if isinstance(source, sgeom.MultiPolygon):
                 self._geom = source
+                self._last_mask_cache_key = None
+                self._last_mask_cache_value = None
                 return
 
         self._geom = sgeom.MultiPolygon(*args, **kwargs)
+        self._last_mask_cache_key = None
+        self._last_mask_cache_value = None
 
     @property
     def geom(self):
@@ -312,14 +329,15 @@ class MapPolygon:
             np.ndarray: 遮罩后的数据矩阵
         """
 
-        ndata = copy.deepcopy(data)
+        mask = self.make_mask_array(lons, lats)
 
-        if not isinstance(ndata, np.ma.MaskedArray):
-            ndata = np.ma.MaskedArray(ndata)
+        if isinstance(data, np.ma.MaskedArray):
+            ndata = np.ma.array(data, copy=True, subok=True)
+            ndata.mask = np.ma.getmaskarray(ndata) | mask
+            return ndata
 
-        ndata.mask = self.make_mask_array(lons, lats)
-
-        return ndata
+        ndata = np.array(data, copy=True)
+        return np.ma.MaskedArray(ndata, mask=mask, copy=False)
 
     def make_mask_array(self, lons: np.ndarray, lats: np.ndarray):
         """
@@ -339,7 +357,25 @@ class MapPolygon:
         if lons.shape != lats.shape:
             raise ValueError("x和y的形状不匹配")
 
-        return ~_contains_xy(self._geom, lons, lats)
+        cache_key = (id(lons), id(lats), lons.shape, lats.shape)
+        if cache_key == self._last_mask_cache_key and self._last_mask_cache_value is not None:
+            return self._last_mask_cache_value.copy()
+
+        minx, miny, maxx, maxy = self._geom.bounds
+        within_bounds = (
+            (lons >= minx)
+            & (lons <= maxx)
+            & (lats >= miny)
+            & (lats <= maxy)
+        )
+
+        mask = np.ones(lons.shape, dtype=bool)
+        if np.any(within_bounds):
+            mask[within_bounds] = ~_contains_xy(self._geom, lons[within_bounds], lats[within_bounds])
+
+        self._last_mask_cache_key = cache_key
+        self._last_mask_cache_value = mask.copy()
+        return mask
 
 
 @lru_cache(maxsize=8192)
@@ -401,6 +437,7 @@ def _query_adm_metadata(
     level=None,
     country=None,
     source=None,
+    record="all",
     db=None,
 ):
     if db is None:
@@ -409,7 +446,7 @@ def _query_adm_metadata(
     con = sqlite3.connect(db)
     try:
         cur = con.cursor()
-        columns = {row[1] for row in cur.execute("PRAGMA table_info(ADMINISTRATIVE);")}
+        columns = _get_administrative_columns(db)
         has_iso3_column = "iso3" in columns
 
         province_sql = f"AND province='{province}'" if province else ""
@@ -450,11 +487,13 @@ def _query_adm_metadata(
 
         country_sql = _build_country_sql(country, level, has_iso3_column=has_iso3_column)
 
+        limit_sql = " LIMIT 1" if record == "first" else ""
+
         meta_sql = (
             "SELECT country, province, city, district, level, source, kind, path"
             " FROM ADMINISTRATIVE"
             f" WHERE {level_sql} {country_sql} {province_sql} {city_sql}"
-            f" {district_sql} {source_sql};"
+            f" {district_sql} {source_sql}{limit_sql};"
         )
         rows = tuple(cur.execute(meta_sql))
     finally:
@@ -590,6 +629,7 @@ def get_adm_maps(
         level=level,
         country=country,
         source=source,
+        record=record,
         db=db,
     )
     meta_rows = [row[:7] for row in rows]

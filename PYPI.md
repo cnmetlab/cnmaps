@@ -40,7 +40,7 @@
   <img src="https://app.codacy.com/project/badge/Grade/ef6ab1893b0b47428b287f2f2875021c"/>
  </a>
  
-<a href="https://cnmetlab.github.io/cnmaps/performance/">
+<a href="https://cnmetlab.github.io/cnmaps/performance-v2/">
   <img src="https://img.shields.io/badge/performance-benchmark-yellow"/>
  </a>
 

@@ -25,7 +25,14 @@ districts = get_adm_names(level="区县")
 sample_districts = [random.choice(districts) for _ in range(100)]
 
 map_args = [
-    {"only_polygon": True, "record": "first", "name": "中华人民共和国", "simplify": True}
+    {
+        "country": "中国",
+        "level": "国",
+        "only_polygon": True,
+        "record": "first",
+        "name": "中华人民共和国",
+        "simplify": True,
+    }
 ] + [
     {
         "province": p,
@@ -199,7 +206,7 @@ def test_clip_contourf_with_extent():
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-    map_polygon = get_adm_maps(country="中华人民共和国", level="国", only_polygon=True, record="first", simplify=True)
+    map_polygon = get_adm_maps(country="中国", level="国", only_polygon=True, record="first", simplify=True)
 
     cs = ax.contourf(
         lons,
@@ -262,7 +269,7 @@ def test_clip_scatter_sets_clip_box():
 
     fig = plt.figure(figsize=(6, 6))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
-    map_polygon = get_adm_maps(country="中华人民共和国", level="国", only_polygon=True, record="first", simplify=True)
+    map_polygon = get_adm_maps(country="中国", level="国", only_polygon=True, record="first", simplify=True)
 
     scatter = ax.scatter([80, 120], [25, 45], transform=ccrs.PlateCarree())
     clip_scatter_by_map(scatter, map_polygon, ax=ax, extent=[70, 140, 15, 55], set_extent=True)
@@ -301,7 +308,7 @@ def test_clip_clabel():
 
     lons, lats, data = load_dem()
 
-    map_polygon = get_adm_maps(record="first", only_polygon=True)
+    map_polygon = get_adm_maps(country="中国", level="国", record="first", only_polygon=True)
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
     contours = ax.contour(
@@ -318,7 +325,6 @@ def test_clip_clabel():
     )
     clip_clabels_by_map(clabels, map_polygon)
     draw_map(map_polygon, color="k")
-    ax.coastlines()
 
     savefp = os.path.join("./tmp", "test_clip_clabel", "clipped_clabels.png")
     os.makedirs(os.path.dirname(savefp), exist_ok=True)
