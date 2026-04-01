@@ -104,6 +104,8 @@ def test_docs_draw_boundary_examples():
     _run_example_script("world_countries_borders_globe.py", "usage", "world-countries-borders-globe.png")
     _run_example_script("world_countries_borders_flat.py", "usage", "world-countries-borders-flat.png")
     _run_example_script("city_centroids_overview.py", "usage", "city-centroids-overview.png")
+    _run_example_script("province_centroids_overview.py", "usage", "province-centroids-overview.png")
+    _run_example_script("country_centroids_overview.py", "usage", "country-centroids-overview.png")
 
 
 def test_docs_union_example():

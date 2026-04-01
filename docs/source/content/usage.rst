@@ -145,6 +145,18 @@
 
 .. image:: ../_static/city-centroids-overview.png
 
+同样的写法也适用于省级和国家级边界。下面两段示例分别展示省级和国家级的质心点：
+
+.. literalinclude:: ../_examples/province_centroids_overview.py
+   :language: python
+
+.. image:: ../_static/province-centroids-overview.png
+
+.. literalinclude:: ../_examples/country_centroids_overview.py
+   :language: python
+
+.. image:: ../_static/country-centroids-overview.png
+
 绘制行政边界
 ------------
 前面使用 ``get_adm_maps`` 获取的行政边界地图列表，可以直接传入 ``draw_maps`` 函数进行绘图。
