@@ -12,14 +12,25 @@
 
     In [2]: get_adm_maps(city='北京市')
     Out[2]:
-    [{'国家': '中华人民共和国',
+    [{'country': '中华人民共和国',
+    'province': '北京市',
+    'city': '北京市',
+    'district': None,
+    'level': '市',
+    'source': '高德',
+    'kind': '陆地',
+    'geometry': <MULTIPOLYGON (((117.203 40.081, 117.203 40.081, 117.202 40.081, 117.201 40....>,
+    'longitude': 116.41262547855654,
+    'latitude': 40.18562798032104,
+    '国家': '中华人民共和国',
     '省/直辖市': '北京市',
     '市': '北京市',
     '区/县': None,
     '级别': '市',
     '来源': '高德',
     '类型': '陆地',
-    'geometry': <cnmaps.maps.MapPolygon at 0x7f861690c050>}]
+    '经度': 116.41262547855654,
+    '纬度': 40.18562798032104}]
 
 查询海淀区。
 
@@ -29,14 +40,25 @@
 
     In [2]: get_adm_maps(district='海淀区')
     Out[2]:
-    [{'国家': '中华人民共和国',
+    [{'country': '中华人民共和国',
+    'province': '北京市',
+    'city': '北京市',
+    'district': '海淀区',
+    'level': '区县',
+    'source': '高德',
+    'kind': '陆地',
+    'geometry': <MULTIPOLYGON (((116.043 40.084, 116.043 40.084, 116.043 40.085, 116.043 40....>,
+    'longitude': 116.2269627751591,
+    'latitude': 40.02558182702156,
+    '国家': '中华人民共和国',
     '省/直辖市': '北京市',
     '市': '北京市',
     '区/县': '海淀区',
     '级别': '区县',
     '来源': '高德',
     '类型': '陆地',
-    'geometry': <cnmaps.maps.MapPolygon at 0x7f861af85fd0>}]
+    '经度': 116.2269627751591,
+    '纬度': 40.02558182702156}]
 
 
 查询山西省。
@@ -47,14 +69,25 @@
 
     In [2]: get_adm_maps(province='山西省')
     Out[2]:
-    [{'国家': '中华人民共和国',
+    [{'country': '中华人民共和国',
+    'province': '山西省',
+    'city': None,
+    'district': None,
+    'level': '省',
+    'source': '高德',
+    'kind': '陆地',
+    'geometry': <MULTIPOLYGON (((110.898 34.67, 110.888 34.653, 110.878 34.645, 110.856 34.6...>,
+    'longitude': 112.289474734092,
+    'latitude': 37.57235785367627,
+    '国家': '中华人民共和国',
     '省/直辖市': '山西省',
     '市': None,
     '区/县': None,
     '级别': '省',
     '来源': '高德',
     '类型': '陆地',
-    'geometry': <cnmaps.maps.MapPolygon at 0x7f8618f86790>}]
+    '经度': 112.289474734092,
+    '纬度': 37.57235785367627}]
 
 查询山西省下辖地级市。
 
@@ -71,20 +104,17 @@
 
     In [5]: get_adm_maps(province='山西省', level='市', engine='geopandas')
     Out[5]:
-            国家 省/直辖市    市   区/县 级别  来源  类型                                           geometry
-    0   中华人民共和国   山西省  太原市  None  市  高德  陆地  MULTIPOLYGON (((113.06683 38.05646, 113.06708 ...
-    1   中华人民共和国   山西省  大同市  None  市  高德  陆地  MULTIPOLYGON (((113.57727 39.43812, 113.57460 ...
-    2   中华人民共和国   山西省  阳泉市  None  市  高德  陆地  MULTIPOLYGON (((113.99691 37.70448, 113.99567 ...
-    3   中华人民共和国   山西省  长治市  None  市  高德  陆地  MULTIPOLYGON (((111.99642 36.68713, 111.99480 ...
-    4   中华人民共和国   山西省  晋城市  None  市  高德  陆地  MULTIPOLYGON (((113.46543 35.51493, 113.46300 ...
-    5   中华人民共和国   山西省  朔州市  None  市  高德  陆地  MULTIPOLYGON (((112.62431 40.23685, 112.62429 ...
-    6   中华人民共和国   山西省  晋中市  None  市  高德  陆地  MULTIPOLYGON (((113.06683 38.05646, 113.06903 ...
-    7   中华人民共和国   山西省  运城市  None  市  高德  陆地  MULTIPOLYGON (((110.90373 34.66882, 110.89349 ...
-    8   中华人民共和国   山西省  忻州市  None  市  高德  陆地  MULTIPOLYGON (((111.26944 39.42373, 111.27091 ...
-    9   中华人民共和国   山西省  临汾市  None  市  高德  陆地  MULTIPOLYGON (((110.41054 36.89947, 110.41487 ...
-    10  中华人民共和国   山西省  吕梁市  None  市  高德  陆地  MULTIPOLYGON (((111.41469 36.80403, 111.41071 ...
+                country province city district level source kind   longitude   latitude                                           geometry  国家 省/直辖市    市   区/县 级别  来源  类型          经度         纬度
+    0   中华人民共和国      山西省  太原市     None     市     高德   陆地  112.549248  37.857014  MULTIPOLYGON (((113.06683 38.05646, 113.06708 ...  中华人民共和国   山西省  太原市  None  市  高德  陆地  112.549248  37.857014
+    1   中华人民共和国      山西省  大同市     None     市     高德   陆地  113.295259  40.090311  MULTIPOLYGON (((113.57727 39.43812, 113.57460 ...  中华人民共和国   山西省  大同市  None  市  高德  陆地  113.295259  40.090311
+    2   中华人民共和国      山西省  阳泉市     None     市     高德   陆地  113.583285  37.861188  MULTIPOLYGON (((113.99691 37.70448, 113.99567 ...  中华人民共和国   山西省  阳泉市  None  市  高德  陆地  113.583285  37.861188
+    ...           ...        ...  ...      ...   ...    ...  ...         ...        ...                                                ...   ...   ...   ...   ...  ...  ...         ...        ...
 
 .. note:: ``engine='geopandas'`` 时，返回结果中的 ``geometry`` 列保持为 **原生 Shapely geometry**；默认 ``engine=None`` 的列表 / 字典接口则继续返回 ``MapPolygon``，以兼容历史用法。当你向 ``get_adm_maps`` 传递行政区域的名称时，应传入行政区的正式全称，简称无法识别，如果不知道全称可以通过 ``get_adm_names`` 查询，或者从 `cnmaps-data 数据集索引 <https://github.com/cnmetlab/cnmaps-data/blob/main/docs/dataset-index.md>`_ 查询。
+
+.. warning::
+
+   当前版本仍然兼容 ``record['国家']``、``record['省/直辖市']`` 这类中文 key 的访问方式，但我们计划在未来 ``3.x`` 版本中移除这些中文 key。新代码建议统一使用英文 key 或点号属性访问，例如 ``record['country']``、``record.country``、``record.longitude``。字段的 value 仍然保持中文形式。
 
 假如我们不知道省一级行政区的正式名称，可以执行：
 
@@ -135,34 +165,30 @@
     '简阳市']
 
 查询行政区中心点坐标
-------------------
-``get_adm_maps`` 当前返回的记录里同时包含 ``经度`` 和 ``纬度`` 字段，默认直接使用当前行政区边界几何的质心。这个规则对省、市、区县和国家级边界都通用；像舟山、三沙这类由多个多边形组成的城市，也会按整体 ``MultiPolygon`` 计算一个统一中心点。
+--------------------
+``get_adm_maps`` 当前返回的记录里同时包含 ``longitude`` 和 ``latitude`` 字段，默认直接使用当前行政区边界几何的质心。这个规则对省、市、区县和国家级边界都通用；像舟山、三沙这类由多个多边形组成的城市，也会按整体 ``MultiPolygon`` 计算一个统一中心点。默认列表接口还支持点号访问，因此可以直接写 ``record.longitude`` 和 ``record.latitude``。
 
-下面这个例子把北京、上海、舟山和三沙放在一张 2x2 图里，红点就是查询结果里的 ``经度`` / ``纬度``：
+如果你只是想拿到坐标用于标注、统计或导出，可以直接像下面这样查询：
 
-.. literalinclude:: ../_examples/city_centroids_overview.py
-   :language: python
+.. code:: python
 
-.. image:: ../_static/city-centroids-overview.png
+    from cnmaps import get_adm_maps
 
-同样的写法也适用于省级和国家级边界。下面两段示例分别展示省级和国家级的质心点：
+    china = get_adm_maps(country='中国', level='国', record='first')
+    print(china.longitude, china.latitude)
 
-.. literalinclude:: ../_examples/province_centroids_overview.py
-   :language: python
+    henan = get_adm_maps(province='河南省', record='first')
+    print(henan.longitude, henan.latitude)
 
-.. image:: ../_static/province-centroids-overview.png
+    nanyang = get_adm_maps(city='南阳市', record='first')
+    print(nanyang.longitude, nanyang.latitude)
 
-.. literalinclude:: ../_examples/country_centroids_overview.py
-   :language: python
+    haidian = get_adm_maps(district='海淀区', record='first')
+    print(haidian.longitude, haidian.latitude)
 
-.. image:: ../_static/country-centroids-overview.png
+.. note::
 
-若你想进一步把质心坐标用于标注，也可以先绘制中国省级边界，再按各省会 / 首府的质心位置打点并标注英文名称。下面这个例子里，北京使用五角星强调，其他省会用圆点表示：
-
-.. literalinclude:: ../_examples/province_capitals_labels.py
-   :language: python
-
-.. image:: ../_static/province-capitals-labeled.png
+   这里的 ``longitude`` / ``latitude`` 目前统一来自边界几何的整体质心。对于中国、省级边界以及多数城市，这样通常是直观的；但对像美国这类由本土、海外州或远距离岛屿共同组成、国土跨度很大的国家和地区，整体质心可能并不等同于用户直觉里的“代表位置”，使用时应当谨慎理解。
 
 绘制行政边界
 ------------
@@ -237,8 +263,8 @@
 
 .. image:: ../_static/district-level.png
 
-中国国界与陆上邻国国界（同图）
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+中国与周边国家国界
+^^^^^^^^^^^^^^^^^^
 ``cnmaps-data`` 中的国外国家级边界统一存放在 ``level='国'`` 记录里。若只想查看中国周边，可直接取全部国家级记录后与中国国界同图绘制；在中国周边视角下，远处国家不会出现在当前范围内，无需额外区分“邻国”与“非邻国”。
 
 .. literalinclude:: ../_examples/china_and_neighbors_borders.py
@@ -246,23 +272,46 @@
 
 .. image:: ../_static/china-and-neighbors-borders.png
 
-全球国家边界（正射投影）
-^^^^^^^^^^^^^^^^^^^^^^^^
-绘制全球国家边界时，也可以直接使用 ``level='国'`` 一次取回全部国家级记录；若只需中国国界，再显式传入 ``country='中国'`` 即可。下例配合 **正射投影** 做概览：
+全球国家边界
+^^^^^^^^^^^^
+绘制全球国家边界时，也可以直接使用 ``level='国'`` 一次取回全部国家级记录；若只需中国国界，再显式传入 ``country='中国'`` 即可。
 
-.. literalinclude:: ../_examples/world_countries_borders_globe.py
-   :language: python
-
-.. image:: ../_static/world-countries-borders-globe.png
-
-全球国家边界（平面投影）
-^^^^^^^^^^^^^^^^^^^^^^^
-如果希望直接查看常规平面投影下的全球国家边界，也可以使用同样的数据查询方式。下面这个例子使用 ``PlateCarree`` 投影绘制全球国家边界，并用更醒目的颜色叠加中国国界：
+如果希望先查看最常见、最直观的全球边界展示，可以先从常规平面投影开始。下面这个例子使用 ``PlateCarree`` 投影绘制全球国家边界，并用更醒目的颜色叠加中国国界：
 
 .. literalinclude:: ../_examples/world_countries_borders_flat.py
    :language: python
 
 .. image:: ../_static/world-countries-borders-flat.png
+
+使用行政区中心点辅助制图
+^^^^^^^^^^^^^^^^^^^^^^^^
+前面的 ``longitude`` / ``latitude`` 字段除了可以直接查询，也很适合在地图上做标注或打点。这里集中展示几种常见的制图用法。
+
+下面这个例子把北京、上海、舟山和三沙放在一张 2x2 图里，红点就是查询结果里的 ``longitude`` / ``latitude``：
+
+.. literalinclude:: ../_examples/city_centroids_overview.py
+   :language: python
+
+.. image:: ../_static/city-centroids-overview.png
+
+同样的写法也适用于省级和国家级边界。下面两段示例分别展示省级和国家级的质心点：
+
+.. literalinclude:: ../_examples/province_centroids_overview.py
+   :language: python
+
+.. image:: ../_static/province-centroids-overview.png
+
+.. literalinclude:: ../_examples/country_centroids_overview.py
+   :language: python
+
+.. image:: ../_static/country-centroids-overview.png
+
+若你想进一步把质心坐标用于标注，也可以先绘制中国省级边界，再按各省会 / 首府的质心位置打点并标注英文名称。下面这个例子里，北京使用五角星强调，其他省会用圆点表示：
+
+.. literalinclude:: ../_examples/province_capitals_labels.py
+   :language: python
+
+.. image:: ../_static/province-capitals-labeled.png
 
 合并边界
 ----------

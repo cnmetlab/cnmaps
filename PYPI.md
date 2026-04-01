@@ -1,5 +1,5 @@
 <h4>
-    cnmaps 是一个可以让中国地图画起来更丝滑的地图类python扩展包
+    cnmaps 是一个以中国领土主张为标准开发的地图类 Python 扩展包
 </h4>
 
 <a href="https://github.com/cnmetlab/cnmaps/actions/workflows/python-package.yml">

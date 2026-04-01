@@ -349,20 +349,25 @@ def test_map_load():
         and beijing["区/县"] is None
         and beijing["级别"] == "省"
     )
+    assert isinstance(beijing.longitude, float) and isinstance(beijing.latitude, float)
 
     beijing = get_adm_maps(city="北京市")[0]
     assert beijing["市"] == "北京市" and beijing["区/县"] is None and beijing["级别"] == "市"
-    assert isinstance(beijing["经度"], float) and isinstance(beijing["纬度"], float)
+    assert isinstance(beijing.longitude, float) and isinstance(beijing.latitude, float)
+
+    china = get_adm_maps(country="中国", level="国", record="first")
+    assert isinstance(china.longitude, float) and isinstance(china.latitude, float)
 
     chaoyang = get_adm_maps(district="朝阳区")
     assert len(chaoyang) == 2
     beijing_chaoyang = chaoyang[0]
     assert beijing_chaoyang["区/县"] == "朝阳区" and beijing_chaoyang["级别"] == "区县"
+    assert isinstance(beijing_chaoyang.longitude, float) and isinstance(beijing_chaoyang.latitude, float)
 
     zhoushan = get_adm_maps(city="舟山市", record="first")
     zhoushan_centroid = zhoushan["geometry"].centroid
-    assert round(zhoushan["经度"], 6) == round(zhoushan_centroid.x, 6)
-    assert round(zhoushan["纬度"], 6) == round(zhoushan_centroid.y, 6)
+    assert round(zhoushan.longitude, 6) == round(zhoushan_centroid.x, 6)
+    assert round(zhoushan.latitude, 6) == round(zhoushan_centroid.y, 6)
 
     assert len(get_adm_maps(city="北京市", district="朝阳区")) == 1
     assert len(get_adm_maps(city="北京市", level="区县")) == 16
@@ -374,8 +379,8 @@ def test_map_load():
     assert len(get_adm_maps(province="河南省", level="市", engine="geopandas")) == 18
     assert len(get_adm_maps(city="郑州市", level="区县", engine="geopandas")) == 12
     zhoushan_gdf = get_adm_maps(city="舟山市", record="first", engine="geopandas")
-    assert round(float(zhoushan_gdf["经度"]), 6) == round(zhoushan_centroid.x, 6)
-    assert round(float(zhoushan_gdf["纬度"]), 6) == round(zhoushan_centroid.y, 6)
+    assert round(float(zhoushan_gdf["longitude"]), 6) == round(zhoushan_centroid.x, 6)
+    assert round(float(zhoushan_gdf["latitude"]), 6) == round(zhoushan_centroid.y, 6)
 
     france = get_adm_maps(country="法国", level="国", record="first")
     assert france["国家"] == "法国"
@@ -397,6 +402,32 @@ def test_map_load():
         get_adm_maps(level="郡")
 
     get_adm_maps(only_polygon=True, engine="geopandas")
+
+
+def test_map_record_english_keys_and_legacy_warnings():
+    beijing = get_adm_maps(city="北京市", record="first")
+
+    assert isinstance(beijing["country"], str)
+    assert isinstance(beijing["province"], str)
+    assert isinstance(beijing["city"], str)
+    assert beijing.longitude == beijing["longitude"]
+    assert beijing.latitude == beijing["latitude"]
+
+    with pytest.deprecated_call(match="中文键"):
+        assert beijing["经度"] == beijing["longitude"]
+
+    with pytest.deprecated_call(match="中文键"):
+        assert beijing["国家"] == beijing["country"]
+
+    gdf = get_adm_maps(city="北京市", level="区县", engine="geopandas")
+    assert "country" in gdf.columns
+    assert "province" in gdf.columns
+    assert "city" in gdf.columns
+    assert "district" in gdf.columns
+    assert "longitude" in gdf.columns
+    assert "latitude" in gdf.columns
+    assert "国家" in gdf.columns
+    assert "经度" in gdf.columns
 
 
 def test_map_operator():

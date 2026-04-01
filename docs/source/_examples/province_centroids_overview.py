@@ -25,8 +25,8 @@ for ax, (english_name, province_name) in zip(axes.flat, province_cases):
 
     draw_map(geom, ax=ax, color="#2a6fdb", linewidth=1.0)
     ax.scatter(
-        [row["经度"]],
-        [row["纬度"]],
+        [row.longitude],
+        [row.latitude],
         color="#d62828",
         s=28,
         transform=ccrs.PlateCarree(),

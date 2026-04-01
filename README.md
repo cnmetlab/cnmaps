@@ -48,7 +48,7 @@
 </p>
 
 <h4 align="center">
-    cnmaps 是一个可以让中国地图画起来更丝滑的地图类 python 扩展包
+    cnmaps 是一个以中国领土主张为标准开发的地图类 Python 扩展包
 </h4>
 
 ## 安装

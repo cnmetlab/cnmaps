@@ -394,15 +394,15 @@ def test_city_centroid_examples():
     for english_name, city_name in city_cases:
         row = get_adm_maps(city=city_name, record="first")
         geom = row["geometry"]
-        assert round(row["经度"], 6) == round(geom.centroid.x, 6)
-        assert round(row["纬度"], 6) == round(geom.centroid.y, 6)
+        assert round(row.longitude, 6) == round(geom.centroid.x, 6)
+        assert round(row.latitude, 6) == round(geom.centroid.y, 6)
 
         fig = plt.figure(figsize=(6, 5), dpi=200)
         ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
         draw_map(geom, ax=ax, color="#2a6fdb", linewidth=1.0)
         ax.scatter(
-            [row["经度"]],
-            [row["纬度"]],
+            [row.longitude],
+            [row.latitude],
             color="#d62828",
             s=28,
             transform=ccrs.PlateCarree(),

@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "cnmaps"
 version = "2.0.1"
-description = "A python package to draw china maps more easily"
+description = "A Python package for querying, drawing, and clipping maps aligned to China's territorial claims"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
 readme = "PYPI.md"
