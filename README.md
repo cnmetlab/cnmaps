@@ -180,6 +180,24 @@ plt.show()
 
 针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)
 
+## AI Skill
+
+仓库内置了一份面向 AI 编程助手的 `cnmaps` Skill，位置在：
+
+- [`.codex/skills/cnmaps/SKILL.md`](.codex/skills/cnmaps/SKILL.md)
+
+这份 Skill 重点说明：
+
+- `cnmaps` 的主要查询、绘图、裁剪与样例数据接口
+- `MapRecord`、`MapPolygon`、`GeoDataFrame` 的返回形态
+- `cnmaps` 与 `cartopy`、`matplotlib`、`cnmaps-data` 的配合方式
+- 国家级查询、`country="中国"`、`ISO3`、英文 key 等当前行为与易错点
+
+更细的参考资料在：
+
+- [API 速查](.codex/skills/cnmaps/references/api-cheatsheet.md)
+- [绘图套路](.codex/skills/cnmaps/references/plotting-patterns.md)
+
 ## 引用
 
 本项目适用的地图边界的数据源包括：
