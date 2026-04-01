@@ -1,1 +1,0 @@
-"""Bundled cnmaps Codex skill."""

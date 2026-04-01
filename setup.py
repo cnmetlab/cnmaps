@@ -42,10 +42,14 @@ setuptools.setup(
     include_package_data=True,
     packages=setuptools.find_packages(),
     package_data={
-        "cnmaps._bundled_skills.cnmaps": [
-            "SKILL.md",
-            "agents/*.yaml",
-            "references/*.md",
+        "cnmaps._bundled_skills": [
+            "platforms/codex/cnmaps-python-assistant/SKILL.md",
+            "platforms/codex/cnmaps-python-assistant/agents/*.yaml",
+            "platforms/codex/cnmaps-python-assistant/references/*.md",
+            "platforms/cursor/cnmaps-python-assistant/SKILL.md",
+            "platforms/claudecode/cnmaps-python-assistant/SKILL.md",
+            "shared/cnmaps-python-assistant/references/*.md",
+            "shared/cnmaps-python-assistant/examples/*.py",
         ]
     },
     install_requires=required,
