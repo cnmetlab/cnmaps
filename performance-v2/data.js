@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775033665126,
+  "lastUpdate": 1775034910801,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -917,6 +917,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000010459672893558057",
             "extra": "mean: 37.40759999573129 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "775f8a741862af86f3c24e3703585989e3e704b4",
+          "message": "Add centroid coordinates for administrative areas (#11) (#160)\n\n* Add centroid coordinates for administrative areas (#11)\n\n* Document centroid coordinate examples (#11)\n\n* Add province and country centroid docs examples (#11)\n\n* Add labeled province capital centroid example (#11)\n\n* Refine centroid docs and examples (#11)\n\n* Refresh README and docs examples",
+          "timestamp": "2026-04-01T17:11:33+08:00",
+          "tree_id": "586db10c42a307b883b118aa98f4e015c9814658",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/775f8a741862af86f3c24e3703585989e3e704b4"
+        },
+        "date": 1775034908348,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 47.669052909544114,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00010725017049305535",
+            "extra": "mean: 20.977970799998502 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 180.15209015935227,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00005056547508877935",
+            "extra": "mean: 5.5508653777786146 msec\nrounds: 45"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 196.89251726573144,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007731070404878794",
+            "extra": "mean: 5.078913175000821 msec\nrounds: 40"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.0290041052262238,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03393586389255059",
+            "extra": "mean: 330.1415136000003 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.1670097365811651,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02950716605996697",
+            "extra": "mean: 5.987674853399997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5619.707640349133,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000016010397161878225",
+            "extra": "mean: 177.9451999993853 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 27450.20532854914,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000009168623354293204",
+            "extra": "mean: 36.42959999865525 usec\nrounds: 5"
           }
         ]
       }
