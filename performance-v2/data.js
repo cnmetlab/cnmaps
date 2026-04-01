@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1774979817013,
+  "lastUpdate": 1775014756655,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -276,6 +276,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000009415102826230405",
             "extra": "mean: 32.59700000057819 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "db17107394d450ff3f901a20fb564bad3432d177",
+          "message": "Optimize maskout performance (#158)\n\n* Optimize maskout performance\n\n* Unify country-level test queries\n\n* Speed up first country-level queries\n\n* Make perf benchmarks measure core paths\n\n* Remove coastlines from clip clabel test\n\n* Reset benchmark series with stable workloads\n\n* Point benchmark badges to performance-v2\n\n* Add benchmark sanity logging\n\n* Fix benchmark sanity mask assertions\n\n* Lighten benchmark sanity check\n\n* Cache repeated mask array calculations",
+          "timestamp": "2026-04-01T11:35:34+08:00",
+          "tree_id": "772a4e531e31ed6a670d84bdd3e11375a2dbcfdb",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/db17107394d450ff3f901a20fb564bad3432d177"
+        },
+        "date": 1775014754588,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 66.5357987348877,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007332242348956121",
+            "extra": "mean: 15.029503199991723 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 357.3783209551416,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004589247863425967",
+            "extra": "mean: 2.798155179999071 msec\nrounds: 50"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 386.6366551928126,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000509293830713812",
+            "extra": "mean: 2.5864076428586626 msec\nrounds: 42"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 2.5494552767569596,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04066932298126831",
+            "extra": "mean: 392.2406520000038 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.1528459323785209,
+            "unit": "iter/sec",
+            "range": "stddev: 0.10818066770429798",
+            "extra": "mean: 6.542535901600007 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5861.520408170355,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001649366840650866",
+            "extra": "mean: 170.6041999966601 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 29005.34857392682,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008918104342559144",
+            "extra": "mean: 34.47640001468244 usec\nrounds: 5"
           }
         ]
       }
