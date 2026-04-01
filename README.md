@@ -201,15 +201,23 @@ plt.show()
 如果你已经安装了 `cnmaps`，也可以把这份 AI 指南安装到当前项目目录中，针对不同助手生成对应格式：
 
 ```bash
-cnmaps install-skill codex
-cnmaps install-skill cursor
-cnmaps install-skill claudecode
+cnmaps install-skill codex --mode local
+cnmaps install-skill cursor --mode local
+cnmaps install-skill claudecode --mode local
 ```
 
-默认安装到当前目录；如需指定其他项目目录，可传 `--dir /path/to/project`。如需覆盖已有安装，可执行：
+如果你想安装到当前用户的全局目录，可以使用：
 
 ```bash
-cnmaps install-skill codex --force
+cnmaps install-skill codex --mode global
+cnmaps install-skill cursor --mode global
+cnmaps install-skill claudecode --mode global
+```
+
+`--mode local` 会安装到当前项目目录，`--mode global` 会安装到用户主目录下对应助手的全局路径。`local` 模式下如需指定其他项目目录，可传 `--dir /path/to/project`。如需覆盖已有安装，可执行：
+
+```bash
+cnmaps install-skill codex --mode local --force
 ```
 
 ## 引用
