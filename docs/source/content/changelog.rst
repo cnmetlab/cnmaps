@@ -1,7 +1,7 @@
 版本日志
 ===========
 
-2.0.0
+2.0.1
 -------
 *发布日以 PyPI 为准。*
 
@@ -11,6 +11,7 @@
 * **Cartopy 兼容**：绘图裁剪逻辑同时兼容新版 ``cartopy.mpl.path.shapely_to_path`` 与旧版 ``cartopy.mpl.patch.geos_to_path``，并适配新的 ``GeoContourSet`` 接口。
 * **Python / CI**：项目 Python 版本范围更新为 ``>=3.9,<3.13``，主 CI 覆盖 Python 3.9–3.12 与 macOS / Ubuntu / Windows；绘图测试统一使用 ``MPLBACKEND=Agg``，依赖安装步骤增加自动重试以减少网络抖动导致的偶发失败。
 * **性能**：对样例数据加载、GeoJSON 读取、行政区查询与 ``MapPolygon`` 内部重复多边形清理进行了缓存和热点优化，全量测试耗时显著下降。
+* **性能测试**：重构了 benchmark 项目与性能页面统计口径，并对 ``maskout`` / ``make_mask_array`` 的核心路径进行了针对性优化。
 * 文档：安装说明、贡献者指南、API 参考等与当前工程及 CI 同步（Python/NumPy/Shapely 约束、GitHub Actions、函数签名与返回行为等）。
 
 1.1.7
