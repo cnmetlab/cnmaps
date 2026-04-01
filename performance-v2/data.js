@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775015453754,
+  "lastUpdate": 1775016135764,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -568,6 +568,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000008847540232232364",
             "extra": "mean: 34.46399999802452 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "1be30f37163c3ea9603df7f8db6c81ca0110098f",
+          "message": "chore(deps): bump numpy from 1.26.4 to 2.0.2 (#157)\n\nBumps [numpy](https://github.com/numpy/numpy) from 1.26.4 to 2.0.2.\n- [Release notes](https://github.com/numpy/numpy/releases)\n- [Changelog](https://github.com/numpy/numpy/blob/main/doc/RELEASE_WALKTHROUGH.rst)\n- [Commits](https://github.com/numpy/numpy/compare/v1.26.4...v2.0.2)\n\n---\nupdated-dependencies:\n- dependency-name: numpy\n  dependency-version: 2.0.2\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-04-01T11:58:29+08:00",
+          "tree_id": "10c80e920250a3b62d590872cdc7a36b109220ab",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/1be30f37163c3ea9603df7f8db6c81ca0110098f"
+        },
+        "date": 1775016132413,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 73.51478016126747,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00015677533176841144",
+            "extra": "mean: 13.602706799997577 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 360.6717524116564,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000376217826490515",
+            "extra": "mean: 2.77260415686405 msec\nrounds: 51"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 389.89286783703295,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00006660164564671114",
+            "extra": "mean: 2.564807111111299 msec\nrounds: 45"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.0761330445580306,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03344557530823497",
+            "extra": "mean: 325.08346859999904 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.16332260711120317,
+            "unit": "iter/sec",
+            "range": "stddev: 0.11161169738498447",
+            "extra": "mean: 6.122851071799997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5792.004485143876,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000026969428365136015",
+            "extra": "mean: 172.65180000549663 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 28796.203505099154,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000780356323251405",
+            "extra": "mean: 34.72680000413675 usec\nrounds: 5"
           }
         ]
       }
