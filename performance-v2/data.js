@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775133357423,
+  "lastUpdate": 1775134775746,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -2881,6 +2881,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000009845373747210585",
             "extra": "mean: 35.75679999130443 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "a2fcfa63ee5aab6f0cdc8e0b9d52814dbb0f4e35",
+          "message": "Bump cnmaps to 2.1.0 and require cnmaps-data 1.1.2 (#171)\n\n* Bump cnmaps to 2.1.0 and require cnmaps-data 1.1.2\n\n* Expand cnmaps CI to Python 3.14\n\n* Relax Python constraints for 3.14 support\n\n* Slim dependencies and fix 3.13+ GIS stack\n\n* Refine dependency matrix for modern Python\n\n* Pin geopandas below 1.0 to avoid pyogrio build on 3.14\n\n* Drop Python 3.14 support and correct changelog entries\n\n* Raise Python 3.13 dependency floors for binary wheels",
+          "timestamp": "2026-04-02T20:55:50+08:00",
+          "tree_id": "0257f53e7779a663852378b2ce08e85948aa0ac0",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/a2fcfa63ee5aab6f0cdc8e0b9d52814dbb0f4e35"
+        },
+        "date": 1775134773650,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 44.300031853494566,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00024296160448714844",
+            "extra": "mean: 22.57334720000017 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 166.18832060820998,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00023171472819628647",
+            "extra": "mean: 6.017270024393028 msec\nrounds: 41"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 180.66552958051602,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00017590104972372563",
+            "extra": "mean: 5.53509018749665 msec\nrounds: 16"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.0015769384761235,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0237017760338899",
+            "extra": "mean: 333.15821000000483 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.14538515555381135,
+            "unit": "iter/sec",
+            "range": "stddev: 0.2077668610035418",
+            "extra": "mean: 6.878281322400005 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5689.745031144054,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000023892608179571755",
+            "extra": "mean: 175.75480000004973 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 27329.1246460668,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008334429422881757",
+            "extra": "mean: 36.59100000277249 usec\nrounds: 5"
           }
         ]
       }
