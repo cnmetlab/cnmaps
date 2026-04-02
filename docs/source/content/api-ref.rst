@@ -304,6 +304,23 @@ drawing模块主要存放与绘图相关的函数
         若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
 
 
+.. py:function:: clip_imshow_by_map(image, map_polygon, ax=None, extent=None, set_extent=False)
+    :module: cnmaps.drawing
+
+    对 ``imshow`` 图像按地图边界裁剪，常用于山地阴影图（hillshade）或 RGB 栅格底图。
+
+    :param image:
+        ``ax.imshow()`` 的返回值。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
+    :param ax:
+        坐标轴；默认优先使用 ``image.axes``，拿不到时再回退到当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
+
+
 .. py:function:: clip_streamplot_by_map(streamplot, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 

@@ -5,6 +5,7 @@ import uuid
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+from matplotlib.colors import LightSource
 from matplotlib.patches import FancyArrowPatch
 
 from cnmaps import (
@@ -12,6 +13,7 @@ from cnmaps import (
     get_adm_names,
     clip_clabels_by_map,
     clip_contours_by_map,
+    clip_imshow_by_map,
     clip_streamplot_by_map,
     draw_map,
     draw_maps,
@@ -178,6 +180,42 @@ def test_clip_pcolormesh():
         draw_map(map_polygon, linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
         savefp = os.path.join("./tmp", "test_clip_pcolormesh", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+
+def test_clip_imshow():
+    """测试剪切 imshow / hillshade 图."""
+
+    lons, lats, dem = load_dem()
+    hillshade = LightSource(azdeg=315, altdeg=45).shade(
+        dem,
+        cmap=plt.cm.Greys,
+        vert_exag=0.8,
+        blend_mode="overlay",
+    )
+
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        image = ax.imshow(
+            hillshade,
+            extent=[lons.min(), lons.max(), lats.min(), lats.max()],
+            origin="lower",
+            transform=ccrs.PlateCarree(),
+        )
+
+        clip_imshow_by_map(image, map_polygon)
+        assert image.get_clip_path() is not None
+
+        draw_map(map_polygon, linewidth=1)
+        ax.set_extent(map_polygon.get_extent(buffer=1))
+        savefp = os.path.join("./tmp", "test_clip_imshow", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()
