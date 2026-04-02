@@ -267,6 +267,34 @@ draw_map(china, ax=ax, color="black", linewidth=1.0)
 plt.show()
 ```
 
+## Clip Streamlines
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import clip_streamplot_by_map, draw_map, get_adm_maps
+from cnmaps.sample import load_wind
+
+lons, lats, u, v = load_wind()
+china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True)
+
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+stream = ax.streamplot(
+    lons[0, :],
+    lats[:, 0],
+    u,
+    v,
+    transform=ccrs.PlateCarree(),
+    density=1.1,
+    color="#1f77b4",
+)
+
+clip_streamplot_by_map(stream, china)
+draw_map(china, ax=ax, color="black", linewidth=1.0)
+plt.show()
+```
+
 ## Clip Scatter Points
 
 ```python

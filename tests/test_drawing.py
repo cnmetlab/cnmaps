@@ -5,12 +5,14 @@ import uuid
 import numpy as np
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+from matplotlib.patches import FancyArrowPatch
 
 from cnmaps import (
     get_adm_maps,
     get_adm_names,
     clip_clabels_by_map,
     clip_contours_by_map,
+    clip_streamplot_by_map,
     draw_map,
     draw_maps,
     clip_pcolormesh_by_map,
@@ -103,6 +105,49 @@ def test_clip_scatter():
         draw_map(map_polygon, linewidth=1)
         ax.set_extent(map_polygon.get_extent(buffer=1))
         savefp = os.path.join("./tmp", "test_clip_scatter", f"{name}.png")
+        os.makedirs(os.path.dirname(savefp), exist_ok=True)
+        plt.savefig(savefp, bbox_inches="tight")
+        plt.close()
+
+
+def test_clip_streamplot():
+    """测试剪切流线图."""
+
+    lons, lats, u, v = load_wind()
+
+    for map_arg in map_args:
+        name = map_arg["name"]
+
+        fig = plt.figure(figsize=(10, 10))
+        ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+        map_polygon = get_adm_maps(**map_arg)
+
+        streamplot = ax.streamplot(
+            lons[0, :],
+            lats[:, 0],
+            u,
+            v,
+            transform=ccrs.PlateCarree(),
+            density=2.0,
+            color="#1f77b4",
+        )
+
+        arrow_count = len(streamplot.arrows.get_paths())
+        arrow_patches = [
+            patch for patch in ax.patches if isinstance(patch, FancyArrowPatch)
+        ][-arrow_count:]
+        before_clip_paths = [patch.get_clip_path() for patch in arrow_patches]
+
+        clip_streamplot_by_map(streamplot, map_polygon)
+
+        after_clip_paths = [patch.get_clip_path() for patch in arrow_patches]
+        assert arrow_patches
+        assert all(clip_path is not None for clip_path in after_clip_paths)
+        assert any(before is not after for before, after in zip(before_clip_paths, after_clip_paths))
+
+        draw_map(map_polygon, linewidth=1)
+        ax.set_extent(map_polygon.get_extent(buffer=1))
+        savefp = os.path.join("./tmp", "test_clip_streamplot", f"{name}.png")
         os.makedirs(os.path.dirname(savefp), exist_ok=True)
         plt.savefig(savefp, bbox_inches="tight")
         plt.close()

@@ -304,6 +304,23 @@ drawing模块主要存放与绘图相关的函数
         若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
 
 
+.. py:function:: clip_streamplot_by_map(streamplot, map_polygon, ax=None, extent=None, set_extent=False)
+    :module: cnmaps.drawing
+
+    对流线图 ``streamplot`` 按地图边界裁剪。
+
+    :param streamplot:
+        ``ax.streamplot()`` 的返回值。
+    :param map_polygon:
+        地图边界对象；支持单个 ``MapPolygon``、列表或 ``GeoDataFrame``。
+    :param ax:
+        坐标轴；默认优先使用 ``streamplot.lines.axes``，拿不到时再回退到当前轴。
+    :param extent:
+        可选的经纬度范围 ``[left, right, lower, upper]``。
+    :param bool set_extent:
+        若为 ``True`` 且同时传入 ``extent``，则自动设置坐标范围。
+
+
 .. py:function:: clip_scatter_by_map(scatter, map_polygon, ax=None, extent=None, set_extent=False)
     :module: cnmaps.drawing
 

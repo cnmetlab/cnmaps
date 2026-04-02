@@ -103,6 +103,25 @@ def _set_clip_box_if_possible(artist, ax):
         artist.set_clip_box(ax.bbox)
 
 
+def _resolve_streamplot_arrow_patches(streamplot, ax):
+    arrow_patches = getattr(streamplot, "_cnmaps_arrow_patches", None)
+    if arrow_patches is not None:
+        return arrow_patches
+
+    arrows = getattr(streamplot, "arrows", None)
+    arrow_count = len(arrows.get_paths()) if arrows is not None else 0
+    if arrow_count <= 0:
+        return []
+
+    candidates = [patch for patch in ax.patches if isinstance(patch, mpatches.FancyArrowPatch)]
+    if len(candidates) < arrow_count:
+        return []
+
+    arrow_patches = candidates[-arrow_count:]
+    streamplot._cnmaps_arrow_patches = arrow_patches
+    return arrow_patches
+
+
 def _resolve_axes(artist=None, ax=None):
     if ax is not None:
         return ax
@@ -199,6 +218,38 @@ def clip_scatter_by_map(scatter, map_polygon: MapPolygon, ax=None, extent=None, 
 
     scatter.set_clip_path(clip)
     _set_clip_box_if_possible(scatter, ax)
+
+
+def clip_streamplot_by_map(streamplot, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
+    """
+    使用边界几何裁剪 `ax.streamplot()` 返回的流线对象。
+
+    参数:
+        streamplot: `ax.streamplot()` 的返回对象。
+        map_polygon (MapPolygon): 地图边界对象。
+        ax (GeoAxes, 可选): 目标坐标轴。
+        extent (tuple, 可选): 可选裁剪范围。
+        set_extent (bool, 可选): 是否同步设置坐标轴范围。
+    """
+    ax = _resolve_axes(getattr(streamplot, "lines", None), ax=ax)
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
+
+    lines = getattr(streamplot, "lines", None)
+    arrows = getattr(streamplot, "arrows", None)
+
+    if lines is not None:
+        lines.set_clip_path(clip)
+        _set_clip_box_if_possible(lines, ax)
+
+    if arrows is not None:
+        arrows.set_clip_path(clip)
+        _set_clip_box_if_possible(arrows, ax)
+
+    for arrow_patch in _resolve_streamplot_arrow_patches(streamplot, ax):
+        arrow_patch.set_clip_path(clip)
+        _set_clip_box_if_possible(arrow_patch, ax)
 
 
 def clip_clabels_by_map(
