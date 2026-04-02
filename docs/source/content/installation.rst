@@ -1,7 +1,7 @@
 安装
 =====
 
-**Python 版本**：需要 **Python 3.9 及以上、3.13 以下**。项目根目录 :file:`pyproject.toml` 中 ``python`` 字段为 ``>=3.9`` 且 ``<3.13`` （与 PyPI 元数据一致；详见 `PyPI <https://pypi.org/project/cnmaps/>`_）。
+**Python 版本**：需要 **Python 3.9 及以上**。项目根目录 :file:`pyproject.toml` 中 ``python`` 字段为 ``>=3.9`` （当前不对 Python 3 的上限做额外限制；详见 `PyPI <https://pypi.org/project/cnmaps/>`_）。
 
 **多平台**：本项目已在 macOS、Linux、Windows 等环境经过测试，可在上述平台正常使用。
 

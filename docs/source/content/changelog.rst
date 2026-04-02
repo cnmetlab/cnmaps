@@ -32,7 +32,7 @@
 * **数据提供者机制**：运行时默认通过已安装的 ``cnmaps-data`` 或兼容 ``cnmaps.data_providers`` entry point 协议的第三方数据包提供数据，不再回退到仓库内置数据目录。
 * **Shapely 2.0**：本版本最重要的变更是将依赖与实现全面对齐 Shapely 2.x（``pyproject.toml`` 中为 ``shapely>=2.0.0``），在保留 ``MapPolygon`` 等既有 API 的前提下，消除此前与 Shapely 2.0 迁移相关的兼容性问题；该项变更对应 `Issue 106 <https://github.com/cnmetlab/cnmaps/issues/106>`_。
 * **Cartopy 兼容**：绘图裁剪逻辑同时兼容新版 ``cartopy.mpl.path.shapely_to_path`` 与旧版 ``cartopy.mpl.patch.geos_to_path``，并适配新的 ``GeoContourSet`` 接口。
-* **Python / CI**：项目 Python 版本范围更新为 ``>=3.9,<3.13``，主 CI 覆盖 Python 3.9–3.12 与 macOS / Ubuntu / Windows；绘图测试统一使用 ``MPLBACKEND=Agg``，依赖安装步骤增加自动重试以减少网络抖动导致的偶发失败。
+* **Python / CI**：项目 Python 版本范围更新为 ``>=3.9,<4.0``，主 CI 覆盖 Python 3.9–3.14 与 macOS / Ubuntu / Windows；绘图测试统一使用 ``MPLBACKEND=Agg``，依赖安装步骤增加自动重试以减少网络抖动导致的偶发失败。
 * **性能**：对样例数据加载、GeoJSON 读取、行政区查询与 ``MapPolygon`` 内部重复多边形清理进行了缓存和热点优化，全量测试耗时显著下降。
 * 文档：安装说明、贡献者指南、API 参考等与当前工程及 CI 同步（Python/NumPy/Shapely 约束、GitHub Actions、函数签名与返回行为等）。
 
