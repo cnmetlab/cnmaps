@@ -64,7 +64,7 @@ cnmaps 的文档（当前 Sphinx 工程）源码位于主仓库的 ``docs/`` 目
 -----------
 主分支与 Pull Request 使用 **GitHub Actions**，主要包括：
 
-* ``python-package.yml`` ：在 macOS / Ubuntu / Windows 上对 Python ``3.9–3.12`` 执行 flake8，并运行主单元测试。工作流统一设置 ``MPLBACKEND=Agg`` ，以避免不同平台图形后端差异影响绘图测试。
+* ``python-package.yml`` ：在 macOS / Ubuntu / Windows 上对 Python ``3.9–3.14`` 执行 flake8，并运行主单元测试。工作流统一设置 ``MPLBACKEND=Agg`` ，以避免不同平台图形后端差异影响绘图测试。
 * ``perf-test.yml`` ：在 Ubuntu、Python ``3.9`` 上对 ``tests/test_perf.py`` 运行带 **pytest-benchmark** 与 **memray** 的测试，并将基准结果推送到 ``gh-pages`` ；随后对主测试文件运行 **pytest-cov** 并通过 Codecov 上传覆盖率（需仓库配置 ``CODECOV_TOKEN`` ）。依赖安装步骤带自动重试，以降低网络抖动导致的偶发失败。
 * ``pypi-publish.yml`` ：在发布 Release 时向 PyPI 发布。
 

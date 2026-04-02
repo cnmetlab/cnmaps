@@ -15,7 +15,6 @@ from shapely.geometry import mapping
 from shapely import wkb
 from shapely.strtree import STRtree
 import fiona
-import geojson
 import orjson
 
 try:
@@ -606,8 +605,8 @@ class MapPolygon:
             feature = mapping(self)
             feature.update({"properties": meta})
 
-            with open(savefp, "w") as f:
-                geojson.dump(feature, f)
+            with open(savefp, "wb") as f:
+                f.write(orjson.dumps(feature))
 
     def maskout(self, lons: np.ndarray, lats: np.ndarray, data: np.ndarray):
         """

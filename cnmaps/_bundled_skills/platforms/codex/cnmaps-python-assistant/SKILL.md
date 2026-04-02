@@ -63,7 +63,7 @@ If the user is mixing `cnmaps` with scientific Python or GIS tooling and the res
 - `geometry` is only exposed as `geometry`. Do not invent a Chinese alias for it.
 - With `engine="geopandas"`, `get_adm_maps` returns a `GeoDataFrame`.
 - With `only_polygon=True`, `get_adm_maps` returns `MapPolygon` objects instead of records.
-- Official data is now provided by `cnmaps-data`, and `cnmaps` expects `cnmaps-data>=1.1.1`.
+- Official data is now provided by `cnmaps-data`, and `cnmaps` expects `cnmaps-data>=1.1.2`.
 
 ## Centroid And Labeling Workflow
 
