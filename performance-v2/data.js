@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775101361701,
+  "lastUpdate": 1775101613077,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -1339,6 +1339,75 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000007649333018723231",
             "extra": "mean: 35.43820000118103 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "committer": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "id": "e9f7887e89adf08a55481f8f51e064dae742a40b",
+          "message": "Add cnmaps AI skill definition [skip ci]",
+          "timestamp": "2026-04-01T10:58:05Z",
+          "url": "https://github.com/cnmetlab/cnmaps/pull/163/commits/e9f7887e89adf08a55481f8f51e064dae742a40b"
+        },
+        "date": 1775101610999,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 50.15049109215238,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0004114893156664118",
+            "extra": "mean: 19.9399842000048 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 189.95146162384026,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00016719884066464312",
+            "extra": "mean: 5.264502791667347 msec\nrounds: 48"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 202.63042561864174,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00012085252278349624",
+            "extra": "mean: 4.935093024391305 msec\nrounds: 41"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.248046515528779,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0338160828647293",
+            "extra": "mean: 307.8773642000016 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.17603291223762943,
+            "unit": "iter/sec",
+            "range": "stddev: 0.04284442798913321",
+            "extra": "mean: 5.680755872799997 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5859.727498979178,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000011636121452949357",
+            "extra": "mean: 170.65640000737403 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 31293.223776355775,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000007467065605627406",
+            "extra": "mean: 31.955799988736544 usec\nrounds: 5"
           }
         ]
       }
