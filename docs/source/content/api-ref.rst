@@ -171,7 +171,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
     :param bool wgs84:
         ``True`` 为 WGS84，``False`` 为 GCJ02（火星坐标）。
     :param bool simplify:
-        是否对几何做简化。默认为 ``False``。
+        是否对几何做简化。默认为 ``False``。当你需要把按边界裁剪后的结果导出为 ``EPS`` / ``PS``，且遇到文件无法被正常打开或转换的问题时，可以优先尝试 ``simplify=True``；详见 :doc:`faq`。
     :param str provider:
         数据提供者名称。默认为官方 ``'cnmaps-data'``；传入其他名称时，会按已安装 provider 的 ``name`` 进行匹配。
 
