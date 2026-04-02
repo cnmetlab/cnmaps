@@ -1,6 +1,20 @@
 版本日志
 ===========
 
+2.1.0
+-------
+*发布日以 PyPI 为准。*
+
+* **版本与数据依赖**：主包版本提升到 ``2.1.0`` ，并将官方数据包依赖提升到 ``cnmaps-data>=1.1.2`` 。
+* **行政区记录增强**：``get_adm_maps`` 返回的 ``MapRecord`` 现在显式提供 ``longitude`` / ``latitude`` 中心点坐标字段，便于直接做标注、打点和文本放置；相关文档、示例和技能说明同步补全。
+* **多名称批量筛选**：``get_adm_maps`` / ``get_adm_names`` 支持在同一 ``level`` 下使用 ``province`` / ``city`` / ``district`` / ``country`` 的多值筛选，一次查询可返回多个精确命名对象，但仍不支持在单次调用中混合 ``国`` / ``省`` / ``市`` / ``区县`` 层级。
+* **命令行工具扩展**：新增 ``cnmaps export`` 子命令，可直接按照接近 ``get_adm_maps`` 的筛选规则导出 GeoJSON / Shapefile；文档新增独立“命令行工具”章节，并补充 CLI 相关测试。
+* **外部边界规范与校验**：新增 ``validate_boundary_file(...)``、``read_boundary_file(...)`` 和 ``cnmaps check-boundary`` ，为自定义 GeoJSON / Shapefile 接入 ``MapPolygon`` 工作流提供统一的 boundary spec、校验入口与读取入口。
+* **绘图裁剪能力扩展**：新增 ``clip_streamplot_by_map(...)`` 与 ``clip_imshow_by_map(...)`` ，分别支持对 ``streamplot`` 流线图和 ``imshow`` 图像对象（包括 hillshade）按行政区边界裁剪。
+* **EPS / PS 导出经验沉淀**：新增“常见问题”文档，记录复杂边界裁剪后导出 ``EPS`` / ``PS`` 可能失效的场景，并补充 ``simplify=True`` 的 workaround 与相关技能说明。
+* **AI Skill 体系上线**：主包内置 bundled skill 结构，支持通过 ``cnmaps install-skill`` 安装到 Codex、Cursor、Claude Code 等助手环境；同时补充共享 references / examples，使 AI 更稳定地理解 ``cnmaps`` 的查询、绘图、裁剪、遮罩、导出与能力边界。
+* **文档与示例重构**：整体刷新 README 与 Sphinx 文档，新增 CLI、FAQ、数据来源、国家中心点、世界地图与能力边界等内容，补充大量静态示例图和可运行示例脚本，并统一本地文档构建脚本。
+
 2.0.1
 -------
 *发布日以 PyPI 为准。*

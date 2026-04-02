@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cnmaps"
-version = "2.0.1"
+version = "2.1.0"
 description = "A Python package for querying, drawing, and clipping maps aligned to China's territorial claims"
 authors = ["Clarmy <clarmyleewt@gmail.com>"]
 license = "BSD 3-Clause License"
@@ -15,7 +15,7 @@ packages = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-cnmaps-data = ">=1.1.1"
+cnmaps-data = ">=1.1.2"
 shapely = ">=2.0.0"
 geojson = ">=2.5.0"
 fiona = ">=1.8.20"

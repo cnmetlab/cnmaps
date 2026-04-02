@@ -23,7 +23,7 @@ try:
 except ModuleNotFoundError:
     pass
 
-__version__ = "2.0.1"
+__version__ = "2.1.0"
 
 if cartopy is not None:
     CARTOPY_DIGIT_VERSION = re.match(r"(\d*\.\d*\.\d*)", cartopy.__version__).group(1)

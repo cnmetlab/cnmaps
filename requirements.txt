@@ -1,4 +1,4 @@
-cnmaps-data>=1.1.1
+cnmaps-data>=1.1.2
 matplotlib>=3.4.2
 numpy>=1.21.5,<2.0
 Shapely>=2.0.0
