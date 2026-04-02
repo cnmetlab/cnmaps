@@ -113,16 +113,16 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
     获取行政名称（内部调用 ``get_adm_maps`` 再抽取名称字段）。
 
-    :param str province:
-        省/自治区/直辖市/行政特区中文名，必须为全称。默认为 ``None``。
-    :param str city:
-        地级市中文名，必须为全称。默认为 ``None``。
-    :param str district:
-        区/县中文名，必须为全称。默认为 ``None``。
+    :param str | list[str] province:
+        省/自治区/直辖市/行政特区中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
+    :param str | list[str] city:
+        地级市中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
+    :param str | list[str] district:
+        区/县中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
     :param str level:
         边界等级，请使用 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一（与 ``get_adm_maps`` 的 ``level`` 含义一致）。默认为 ``'省'``。
-    :param str country:
-        国家名称。国家级查询可传中文名、``ISO3`` 或组合码；不传时不做国家过滤。
+    :param str | list[str] country:
+        国家名称。国家级查询可传中文名、``ISO3`` 或组合码；也支持传入名称或代码列表做批量过滤；不传时不做国家过滤。
         
         从 ``2.0.0`` 开始，``'中国'`` 也会自动视为 ``'中华人民共和国'`` 的别称。
     :param str source:
@@ -138,6 +138,7 @@ maps模块主要存放与地图边界对象相关的类和函数。
     .. note::
 
         从 ``2.0.0`` 开始，国家级查询里传入 ``country='中国'`` 会自动等价于 ``country='中华人民共和国'``。
+        一次查询仍然只对应一个 ``level`` ；列表过滤只是在该等级下批量选择多个名称，不支持在同一次调用里混合 ``国``、``省``、``市``、``区县`` 结果。下同。
 
 
 .. py:function:: get_adm_maps(province: str = None, city: str = None, district: str = None, level: str = None, country: str = None, source: str = None, db: str = None, engine: str = None, record: str = 'all', only_polygon: bool = False, wgs84: bool = True, simplify: bool = False, provider: str = None, *args, **kwargs)
@@ -145,16 +146,16 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
     获取行政地图的边界对象。
 
-    :param str province:
-        省/自治区/直辖市/行政特区中文名，必须为全称。默认为 ``None``。
-    :param str city:
-        地级市中文名，必须为全称。默认为 ``None``。
-    :param str district:
-        区/县中文名，必须为全称。默认为 ``None``。
+    :param str | list[str] province:
+        省/自治区/直辖市/行政特区中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
+    :param str | list[str] city:
+        地级市中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
+    :param str | list[str] district:
+        区/县中文名，必须为全称；也支持传入名称列表进行批量过滤。默认为 ``None``。
     :param str level:
         边界等级，须为 ``'国'``、``'省'``、``'市'``、``'区县'`` 之一；也可使用 ``'区'``、``'县'``、``'区/县'`` 等写法（内部归一为 ``'区县'``）。若为 ``None``，则根据是否传入 ``province`` / ``city`` / ``district`` 自动推断等级。国界查询使用 ``level='国'`` （全国陆地与南海诸岛等为多条记录，常见用法为 ``record='first'`` 等）。
-    :param str country:
-        国家名称。国家级查询可传中文名、``ISO3`` 或组合码；不传时不做国家过滤。
+    :param str | list[str] country:
+        国家名称。国家级查询可传中文名、``ISO3`` 或组合码；也支持传入名称或代码列表做批量过滤；不传时不做国家过滤。
         
         从 ``2.0.0`` 开始，``'中国'`` 也会自动视为 ``'中华人民共和国'`` 的别称。
     :param str source:
@@ -186,9 +187,6 @@ maps模块主要存放与地图边界对象相关的类和函数。
 
     :rtype: list or geopandas.GeoDataFrame
 
-    .. note::
-
-        从 ``2.0.0`` 开始，国家级查询里传入 ``country='中国'`` 会自动等价于 ``country='中华人民共和国'``。
 
 
 .. py:function:: get_available_data_providers()

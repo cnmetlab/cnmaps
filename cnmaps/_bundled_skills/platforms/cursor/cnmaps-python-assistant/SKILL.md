@@ -21,6 +21,7 @@ Use this skill when helping with Python code that uses `cnmaps`, especially for 
 - First decide whether the task is about boundary lookup, map drawing, centroid labeling, clipping plotted artists, or boundary-guided raster workflows.
 - Treat `cnmaps` as a Python library, not as a unified CLI tool.
 - Prefer real package APIs over guessed names.
+- If the user already knows several exact province, city, district, or country names, prefer one batch `get_adm_maps(...)` query with a list filter over many separate calls.
 - When plotting is involved, reason about projections, axes objects, geometry objects, and how labels or artists are placed.
 - When mask or clip workflows are involved, clearly separate boundary retrieval from the downstream raster-processing step.
 - If uncertain about API details, return types, or object semantics, read the supporting reference files before guessing.

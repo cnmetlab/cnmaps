@@ -164,6 +164,23 @@
     '崇州市',
     '简阳市']
 
+如果你已经明确知道多个名称，也可以直接一次性批量查询。例如：
+
+.. code:: python
+
+    from cnmaps import get_adm_maps
+
+    jingjin = get_adm_maps(province=['北京市', '天津市'], level='省')
+    henan_cities = get_adm_maps(province='河南省', city=['郑州市', '洛阳市'], level='市')
+    east_asia = get_adm_maps(country=['中国', 'JPN', 'KOR'], level='国')
+
+需要注意的是，一次调用仍然只对应一个行政等级。也就是说，像日本（国级）和四川省（省级）这样的混合查询，不能在同一个 ``get_adm_maps(...)`` 调用里直接返回，而应拆成两次查询。
+
+如果你希望把多个查询结果直接画出来，也可以参考下面这个最小示例：
+
+.. literalinclude:: ../../../cnmaps/_bundled_skills/shared/cnmaps-python-assistant/examples/multi-region-selection-example.py
+   :language: python
+
 查询行政区中心点坐标
 --------------------
 ``get_adm_maps`` 当前返回的记录里同时包含 ``longitude`` 和 ``latitude`` 字段，默认直接使用当前行政区边界几何的质心。这个规则对省、市、区县和国家级边界都通用；像舟山、三沙这类由多个多边形组成的城市，也会按整体 ``MultiPolygon`` 计算一个统一中心点。默认列表接口还支持点号访问，因此可以直接写 ``record.longitude`` 和 ``record.latitude``。

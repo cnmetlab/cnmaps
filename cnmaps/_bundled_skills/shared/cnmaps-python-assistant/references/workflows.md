@@ -14,6 +14,8 @@
 - Libraries involved: mostly `cnmaps`; plotting libraries only if visualization is needed.
 - Watch for `level='国'` semantics and explicit `country='中国'` when China-only behavior is intended.
 - Watch for formal-name matching: if the user gives an abbreviated place name, use `get_adm_names(...)` or the dataset index to resolve the full name first.
+- If the user already knows several exact names, prefer one batch query such as `get_adm_maps(province=["北京市", "天津市"], level="省")` or `get_adm_maps(country=["JPN", "KOR"], level="国")` instead of multiple separate calls.
+- A single query still maps to one administrative level. If the task mixes levels such as one country and one province, use separate `get_adm_maps(...)` calls.
 
 ## Overlay Boundaries on Cartopy Maps
 

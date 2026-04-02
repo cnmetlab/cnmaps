@@ -3,6 +3,7 @@
 import sqlite3
 import re
 import warnings
+from collections.abc import Iterable
 from functools import lru_cache
 
 import numpy as np
@@ -102,22 +103,76 @@ def _escape_sql_literal(value):
     return str(value).replace("'", "''")
 
 
+def _normalize_filter_values(value, *, field_name):
+    if value is None:
+        return None
+
+    if isinstance(value, str):
+        normalized = value.strip()
+        if not normalized:
+            raise ValueError(f"{field_name} 参数不能为空字符串")
+        return [normalized]
+
+    if isinstance(value, Iterable):
+        values = []
+        for item in value:
+            normalized = str(item).strip()
+            if not normalized:
+                raise ValueError(f"{field_name} 参数中不能包含空字符串")
+            values.append(normalized)
+        if not values:
+            raise ValueError(f"{field_name} 参数不能为空序列")
+        return values
+
+    normalized = str(value).strip()
+    if not normalized:
+        raise ValueError(f"{field_name} 参数不能为空字符串")
+    return [normalized]
+
+
+def _build_scalar_filter_sql(column, value, *, field_name):
+    values = _normalize_filter_values(value, field_name=field_name)
+    if not values:
+        return ""
+    if len(values) == 1:
+        return f"AND {column}='{_escape_sql_literal(values[0])}'"
+
+    clauses = [f"{column}='{_escape_sql_literal(item)}'" for item in values]
+    return "AND (" + " OR ".join(clauses) + ")"
+
+
+def _canonicalize_filter_argument(value, *, field_name):
+    values = _normalize_filter_values(value, field_name=field_name)
+    if values is None:
+        return None
+    if len(values) == 1:
+        return values[0]
+    return tuple(values)
+
+
 def _build_country_sql(country, level, has_iso3_column=False):
     if not country:
         return ""
 
-    country_value = _COUNTRY_ALIASES.get(str(country).strip(), str(country).strip())
-    escaped_country = _escape_sql_literal(country_value)
+    country_values = [
+        _COUNTRY_ALIASES.get(item, item)
+        for item in _normalize_filter_values(country, field_name="country")
+    ]
+    clauses = []
+    for country_value in country_values:
+        escaped_country = _escape_sql_literal(country_value)
 
-    if level == "国" and _COUNTRY_CODE_PATTERN.fullmatch(country_value):
-        country_code = country_value.upper()
-        clauses = [f"country='{escaped_country}'"]
-        if has_iso3_column:
-            clauses.append(f"UPPER(iso3)='{country_code}'")
-        clauses.append(f"UPPER(path) LIKE '%/{country_code}.GEOJSON'")
-        return "AND (" + " OR ".join(clauses) + ")"
+        if level == "国" and _COUNTRY_CODE_PATTERN.fullmatch(country_value):
+            country_code = country_value.upper()
+            country_clauses = [f"country='{escaped_country}'"]
+            if has_iso3_column:
+                country_clauses.append(f"UPPER(iso3)='{country_code}'")
+            country_clauses.append(f"UPPER(path) LIKE '%/{country_code}.GEOJSON'")
+            clauses.append("(" + " OR ".join(country_clauses) + ")")
+        else:
+            clauses.append(f"country='{escaped_country}'")
 
-    return f"AND country='{escaped_country}'"
+    return "AND (" + " OR ".join(clauses) + ")"
 
 
 @lru_cache(maxsize=32)
@@ -533,10 +588,10 @@ def _query_adm_metadata(
         columns = _get_administrative_columns(db)
         has_iso3_column = "iso3" in columns
 
-        province_sql = f"AND province='{province}'" if province else ""
-        city_sql = f"AND city='{city}'" if city else ""
-        district_sql = f"AND district='{district}'" if district else ""
-        source_sql = f"AND source='{_escape_sql_literal(source)}'" if source else ""
+        province_sql = _build_scalar_filter_sql("province", province, field_name="province")
+        city_sql = _build_scalar_filter_sql("city", city, field_name="city")
+        district_sql = _build_scalar_filter_sql("district", district, field_name="district")
+        source_sql = _build_scalar_filter_sql("source", source, field_name="source")
 
         if not any([province, city, district, level, country]):
             country = "中华人民共和国"
@@ -712,12 +767,12 @@ def get_adm_maps(
     if db is None:
         db = data_provider.get_index_db("administrative")
     rows = _query_adm_metadata(
-        province=province,
-        city=city,
-        district=district,
+        province=_canonicalize_filter_argument(province, field_name="province"),
+        city=_canonicalize_filter_argument(city, field_name="city"),
+        district=_canonicalize_filter_argument(district, field_name="district"),
         level=level,
-        country=country,
-        source=source,
+        country=_canonicalize_filter_argument(country, field_name="country"),
+        source=_canonicalize_filter_argument(source, field_name="source"),
         record=record,
         db=db,
     )

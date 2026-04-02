@@ -665,6 +665,34 @@ def test_get_adm_names():
     )
 
 
+def test_get_adm_maps_supports_multi_name_filters():
+    provinces = get_adm_maps(province=["北京市", "天津市"], level="省")
+    assert {record.province for record in provinces} == {"北京市", "天津市"}
+
+    cities = get_adm_maps(province="河南省", city=["郑州市", "洛阳市"], level="市")
+    assert {record.city for record in cities} == {"郑州市", "洛阳市"}
+
+    districts = get_adm_maps(city="北京市", district=["朝阳区", "海淀区"], level="区县")
+    assert {record.district for record in districts} == {"朝阳区", "海淀区"}
+
+    countries = get_adm_maps(country=["中国", "JPN"], level="国")
+    assert {"中华人民共和国", "日本"}.issubset({record.country for record in countries})
+
+
+def test_get_adm_maps_multi_name_filters_support_first_and_geopandas():
+    province = get_adm_maps(province=["北京市", "天津市"], level="省", record="first")
+    assert province.province in {"北京市", "天津市"}
+
+    gdf = get_adm_maps(province=["北京市", "天津市"], level="省", engine="geopandas")
+    assert set(gdf["province"]) == {"北京市", "天津市"}
+
+
+def test_get_adm_names_supports_multi_name_filters():
+    district_names = get_adm_names(city=["北京市", "天津市"], level="区县")
+    assert "朝阳区" in district_names
+    assert "和平区" in district_names
+
+
 def test_regions():
     """测试区域组合."""
     AERAS = {
