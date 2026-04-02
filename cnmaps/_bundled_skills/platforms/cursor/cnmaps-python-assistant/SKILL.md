@@ -1,16 +1,16 @@
 ---
 name: cnmaps-python-assistant
-description: Use when the user is writing or debugging Python code with cnmaps, Chinese province/city/district boundaries, country-level boundary plotting, Cartopy administrative overlays, raster masking to an administrative region, or scientific map workflows that combine cnmaps with cartopy, matplotlib, or xarray.
+description: Use when the user is writing or debugging Python code with cnmaps, including compliant boundary data aligned with China's territorial claims, China province/city/district boundaries, and global country or region boundary plotting, Cartopy administrative overlays, raster masking to an administrative region, or scientific map workflows that combine cnmaps with cartopy, matplotlib, or xarray.
 ---
 
 # cnmaps Skill Overview
 
-Use this skill when helping with Python code that uses `cnmaps`, especially for administrative boundary lookup, boundary-guided plotting, scientific map workflows, and cases where `cnmaps` must work together with `cartopy`, `matplotlib`, NumPy, or xarray.
+Use this skill when helping with Python code that uses `cnmaps`, especially for compliant boundary data aligned with China's territorial claims, administrative boundary lookup, boundary-guided plotting, scientific map workflows, and cases where `cnmaps` must work together with `cartopy`, `matplotlib`, NumPy, or xarray.
 
 ## When to Use This Skill
 
 - The user mentions `cnmaps` directly.
-- The user wants to draw Chinese province, city, district, or country boundaries.
+- The user wants to draw Chinese province, city, district, or global country and region boundaries.
 - The user wants to overlay boundaries on a `cartopy` map.
 - The user wants to constrain gridded data to an administrative region.
 - The user needs help choosing among `cnmaps` querying, plotting, clipping, or centroid-labeling APIs.
@@ -27,7 +27,7 @@ Use this skill when helping with Python code that uses `cnmaps`, especially for 
 
 ## cnmaps Knowledge Model
 
-`cnmaps` provides administrative boundaries, geometry wrappers, plotting helpers, clipping helpers, centroid coordinates on records, and sample scientific map data. It is commonly used with `cartopy` and `matplotlib`, and sometimes participates in workflows that also use NumPy or xarray.
+`cnmaps` provides compliant boundary data aligned with China's territorial claims, including China administrative boundaries and global country or region boundaries, plus geometry wrappers, plotting helpers, clipping helpers, centroid coordinates on records, and sample scientific map data. It is commonly used with `cartopy` and `matplotlib`, and sometimes participates in workflows that also use NumPy or xarray.
 
 ## How to Work with Supporting Files
 

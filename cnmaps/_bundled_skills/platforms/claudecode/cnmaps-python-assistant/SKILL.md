@@ -1,16 +1,16 @@
 ---
 name: cnmaps-python-assistant
-description: Use when the user is writing or debugging Python code with cnmaps, Chinese province/city/district boundaries, country-level boundary plotting, Cartopy administrative overlays, raster masking to an administrative region, or scientific map workflows that combine cnmaps with cartopy, matplotlib, or xarray.
+description: Use when the user is writing or debugging Python code with cnmaps, including compliant boundary data aligned with China's territorial claims, China province/city/district boundaries, and global country or region boundary plotting, Cartopy administrative overlays, raster masking to an administrative region, or scientific map workflows that combine cnmaps with cartopy, matplotlib, or xarray.
 ---
 
 # cnmaps Skill Overview
 
-Use this guidance when helping with Python code that uses `cnmaps`, especially for Chinese administrative boundaries, country-level boundaries, Cartopy overlays, Matplotlib map rendering, raster masking ideas, and workflows that combine `cnmaps` with `cartopy`, `matplotlib`, or `xarray`.
+Use this guidance when helping with Python code that uses `cnmaps`, especially for compliant boundary data aligned with China's territorial claims, Chinese administrative boundaries, global country or region boundaries, Cartopy overlays, Matplotlib map rendering, raster masking ideas, and workflows that combine `cnmaps` with `cartopy`, `matplotlib`, or `xarray`.
 
 ## When to Use This Skill
 
 - The user mentions `cnmaps` directly.
-- The user wants to draw China, province, city, district, or country boundaries.
+- The user wants to draw China, province, city, district, or global country and region boundaries.
 - The user wants to overlay administrative boundaries on a `cartopy` map.
 - The user wants to mask, clip, or constrain raster-like scientific data to an administrative boundary.
 - The user needs help deciding which `cnmaps` function to use for querying boundaries, plotting, clipping, or centroid labeling.
@@ -26,7 +26,7 @@ Use this guidance when helping with Python code that uses `cnmaps`, especially f
 
 ## cnmaps Knowledge Model
 
-Treat `cnmaps` as a Python function library for querying administrative boundaries, retrieving geometries and centroid coordinates, drawing boundaries, and helping boundary-guided scientific plotting workflows. Do not describe it as a CLI-first tool. Many useful tasks require combining it with `cartopy`, `matplotlib`, NumPy, or xarray rather than expecting one black-box command.
+Treat `cnmaps` as a Python function library for querying compliant boundary data aligned with China's territorial claims, retrieving geometries and centroid coordinates, drawing boundaries, and helping boundary-guided scientific plotting workflows. It is not limited to China-only maps: it also supports global country and region boundaries. Do not describe it as a CLI-first tool. Many useful tasks require combining it with `cartopy`, `matplotlib`, NumPy, or xarray rather than expecting one black-box command.
 
 ## How to Work with Supporting Files
 

@@ -1,13 +1,13 @@
 ---
 name: cnmaps
-description: Use when writing, reviewing, or explaining Python code that uses cnmaps for administrative boundary queries, centroid lookup, Cartopy plotting, map clipping, or sample scientific map rendering. Also use when choosing among get_adm_maps, get_adm_names, draw_map, draw_maps, clip_* helpers, sample loaders, and provider APIs, especially when a task mixes cnmaps with cartopy or matplotlib.
+description: Use when writing, reviewing, or explaining Python code that uses cnmaps for compliant boundary queries aligned with China's territorial claims, including both China administrative boundaries and global country or region boundaries, centroid lookup, Cartopy plotting, map clipping, or sample scientific map rendering. Also use when choosing among get_adm_maps, get_adm_names, draw_map, draw_maps, clip_* helpers, sample loaders, and provider APIs, especially when a task mixes cnmaps with cartopy or matplotlib.
 ---
 
 # cnmaps
 
 ## Overview
 
-Use this skill when an AI needs to help someone write or revise `cnmaps` code. The goal is to choose the right `cnmaps` APIs, pass the right parameters, understand the return values, and combine `cnmaps` with `cartopy` and `matplotlib` in a way that matches the current package behavior.
+Use this skill when an AI needs to help someone write or revise `cnmaps` code. The goal is to choose the right `cnmaps` APIs, pass the right parameters, understand the return values, and combine `cnmaps` with `cartopy` and `matplotlib` in a way that matches the current package behavior. Do not frame `cnmaps` as a China-only boundary package: it provides boundary data aligned with China's territorial claims, including China administrative boundaries and global country or region boundaries.
 
 For detailed API selection, read [references/api-cheatsheet.md](references/api-cheatsheet.md). For common plotting workflows, read [references/plotting-patterns.md](references/plotting-patterns.md).
 If the user is mixing `cnmaps` with scientific Python or GIS tooling and the responsibility boundary is unclear, also read [references/capability-boundaries.md](references/capability-boundaries.md).
