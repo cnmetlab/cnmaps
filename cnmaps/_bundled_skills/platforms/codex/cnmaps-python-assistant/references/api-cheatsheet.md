@@ -20,7 +20,7 @@ Common filters:
 - `only_polygon=True` for `MapPolygon`
 - `engine="geopandas"` for `GeoDataFrame`
 - `wgs84=True` for WGS84 output, `False` for GCJ02
-- `simplify=True` when the user explicitly wants simplified geometries
+- `simplify=True` when the user explicitly wants simplified geometries, or when complex clipping geometries need a lighter path for EPS/PS export workflows
 - `provider` to choose a specific installed data provider
 
 Important behavior:
@@ -166,6 +166,7 @@ Important clipping behavior:
 - `extent=[left, right, lower, upper]` clips to the intersection of the administrative boundary and a rectangular geographic window.
 - `set_extent=True` with `extent=...` also calls `ax.set_extent(..., crs=ccrs.PlateCarree())`.
 - In multi-axes workflows, clipping helpers usually infer the correct `ax` from the artist object, so passing `ax=` is often optional.
+- If the user is exporting clipped `contourf` results to EPS/PS and the output becomes unreadable in downstream PostScript tools, prefer querying the clipping boundary with `simplify=True` before calling `clip_contours_by_map(...)`.
 
 ## Sample Data APIs
 
@@ -199,6 +200,7 @@ Use when provider-level dataset paths or metadata are needed.
 - If the user wants exact regions from different administrative levels, split the task into multiple queries instead of forcing one mixed-level call.
 - If the user wants to label administrative regions or their default center points: query records and use `longitude` and `latitude`.
 - If the user wants actual clipped scientific plots: combine sample loaders, `cartopy`, and `clip_*` helpers.
+- If the user wants clipped scientific plots specifically for EPS/PS export, consider `simplify=True` on the clipping boundary to reduce path complexity.
 - If the user wants a raster mask array rather than a plotted figure: use `MapPolygon.make_mask_array(...)` or `MapPolygon.maskout(...)`.
 - If the user wants exported vector output: query `only_polygon=True` and use `map_polygon.to_file(...)`.
 - If the user wants global country boundaries: `get_adm_maps(level="国")` is now the correct broad query.

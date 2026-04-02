@@ -143,6 +143,34 @@ draw_map(china, ax=ax, color="black", linewidth=1.0)
 plt.show()
 ```
 
+If the user needs to export a clipped `contourf` figure to EPS/PS and the file becomes unreadable after clipping by a complex national boundary, keep the same workflow but query the clipping geometry with `simplify=True` first:
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from cnmaps import clip_contours_by_map, draw_map, get_adm_maps
+from cnmaps.sample import load_temp
+
+lons, lats, data = load_temp()
+china = get_adm_maps(
+    country="中国",
+    level="国",
+    record="first",
+    only_polygon=True,
+    simplify=True,
+)
+
+fig = plt.figure(figsize=(8, 6))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+cs = ax.contourf(lons, lats, data, transform=ccrs.PlateCarree())
+
+clip_contours_by_map(cs, china, ax=ax)
+draw_map(china, ax=ax, color="black", linewidth=1.0)
+fig.savefig("china-clipped.eps", bbox_inches="tight")
+```
+
+Use this as a workaround for EPS/PS export compatibility, not as a default requirement for every clipped plot.
+
 ## Clip A Contourf Map On Multiple Axes
 
 ```python
