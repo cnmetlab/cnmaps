@@ -223,6 +223,31 @@ cnmaps export ./henan.shp --province 河南省 --level 省 --record first
 
 输出格式默认按文件后缀推断：`.geojson` / `.json` 对应 GeoJSON，`.shp` 对应 ESRI Shapefile。
 
+### 检查并读取自定义边界文件
+
+如果你有自己的 `GeoJSON` 或 `Shapefile`，也可以先把它整理成符合 `cnmaps boundary spec` 的结构，再交给 `cnmaps` 检查和读取。
+
+```bash
+cnmaps check-boundary ./my-boundary.geojson
+cnmaps check-boundary ./my-boundary.shp --json  # 将检查结果以 JSON 输出
+```
+
+检查通过后，就可以在 Python 代码中读取为 `MapPolygon`，继续用于 `make_mask_array(...)`、`maskout(...)` 或 `clip_*`：
+
+```python
+from cnmaps import read_boundary_file
+
+boundary = read_boundary_file("./my-boundary.geojson")
+```
+
+如果你的原始 `shp` / `geojson` 还不符合这套规范，推荐先安装 `cnmaps` 自带的 AI Skill，再向 AI 发送类似下面的提示词：
+
+```text
+帮我把 <path/filename.shp> 转为符合 cnmaps 可识别格式的 shapefile/geojson 文件，并通过 cnmaps 的 check-boundary 检查。
+```
+
+这样 AI 会更容易按 `cnmaps boundary spec` 整理文件结构；整理完成后，再执行 `cnmaps check-boundary ...` 验证即可。
+
 ## 使用指南
 
 针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)

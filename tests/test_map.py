@@ -11,13 +11,16 @@ from geopandas import GeoDataFrame
 from shapely.geometry.base import BaseGeometry
 
 from cnmaps import (
+    BoundarySpecError,
     get_adm_maps,
     get_available_data_providers,
     get_data_provider,
+    read_boundary_file,
     read_mapjson,
     get_adm_names,
     MapNotFoundError,
     MapPolygon,
+    validate_boundary_file,
 )
 from cnmaps.sample import load_dem
 import cnmaps.provider as provider_module
@@ -147,6 +150,52 @@ def test_mappolygon_to_file():
 
     fiona.open("./tmp/test_mappolygon_to_file/heilongjiang.geojson")
     fiona.open("./tmp/test_mappolygon_to_file/heilongjiang.shp")
+
+
+def test_validate_boundary_file_and_read_boundary_file(tmp_path):
+    import geopandas as gpd
+
+    geojson_path = tmp_path / "custom-boundary.geojson"
+    gdf = gpd.GeoDataFrame(
+        {"name": ["part-a", "part-b"]},
+        geometry=[
+            sgeom.Polygon([(113.0, 34.0), (114.0, 34.0), (114.0, 35.0), (113.0, 34.0)]),
+            sgeom.Polygon([(114.0, 34.0), (115.0, 34.0), (115.0, 35.0), (114.0, 34.0)]),
+        ],
+        crs="EPSG:4326",
+    )
+    gdf.to_file(geojson_path, driver="GeoJSON")
+
+    result = validate_boundary_file(geojson_path)
+    assert result.ok is True
+    assert result.feature_count == 2
+    assert result.geometry_types == ("Polygon",)
+    assert "读取时会先合并为一个统一边界" in result.warnings[0]
+
+    boundary = read_boundary_file(geojson_path)
+    assert isinstance(boundary, MapPolygon)
+    assert boundary.geom.geom_type == "MultiPolygon"
+    assert pytest.approx(boundary.geom.area) == 1.0
+
+
+def test_validate_boundary_file_rejects_non_wgs84_or_non_polygon(tmp_path):
+    import geopandas as gpd
+
+    shp_path = tmp_path / "invalid-boundary.shp"
+    gdf = gpd.GeoDataFrame(
+        {"name": ["line-feature"]},
+        geometry=[sgeom.LineString([(0, 0), (1, 1)])],
+        crs="EPSG:3857",
+    )
+    gdf.to_file(shp_path, driver="ESRI Shapefile")
+
+    result = validate_boundary_file(shp_path)
+    assert result.ok is False
+    assert any("WGS84" in error for error in result.errors)
+    assert any("Polygon / MultiPolygon" in error for error in result.errors)
+
+    with pytest.raises(BoundarySpecError):
+        read_boundary_file(shp_path)
 
 
 def test_not_found():

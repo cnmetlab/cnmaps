@@ -32,6 +32,7 @@
 - Important: be explicit about what `cnmaps` handles directly versus what remains a downstream raster-processing step.
 - If the user wants a boolean-like mask array, use `MapPolygon.make_mask_array(lons, lats)`.
 - If the user wants masked data back, use `MapPolygon.maskout(lons, lats, data)`.
+- If the user wants to use a custom GeoJSON or Shapefile instead of built-in administrative boundaries, first validate it against the cnmaps boundary spec, then load it with `read_boundary_file(...)` and continue with the same `MapPolygon`-based masking workflow.
 
 ## Matplotlib Artist Clipping
 
