@@ -52,6 +52,8 @@ If the user is mixing `cnmaps` with scientific Python or GIS tooling and the res
 
 - `country="中国"` is a supported alias for `中华人民共和国`.
 - `level="国"` no longer means "China only". If the user wants China, write `country="中国", level="国"`.
+- `province`, `city`, `district`, and `country` can be either a single name/code or a list/tuple of names/codes for batch filtering.
+- One `get_adm_maps(...)` call still corresponds to one administrative level. Batch filters work within that `level`, but do not mix `国` / `省` / `市` / `区县` records in one query.
 - `source` is optional. Do not add `source="世界银行"` or `source="高德"` unless the user really wants to filter by source.
 - With `engine=None`, `get_adm_maps` returns `MapRecord` objects.
 - `MapRecord` supports English keys and dot access. Prefer `record.country`, `record.level`, `record.longitude`, `record.latitude`.
@@ -104,6 +106,8 @@ If the user is mixing `cnmaps` with scientific Python or GIS tooling and the res
 
 - Prefer minimal examples that import only what they need.
 - Prefer `country="中国"` over `country="中华人民共和国"` in user-facing snippets unless the longer form is specifically relevant.
+- If the user wants several named regions at once, prefer one `get_adm_maps(...)` call with a list filter such as `province=["北京市", "天津市"]` instead of multiple separate queries.
+- If the user wants mixed levels such as one country and one province in the same task, use separate queries rather than forcing one mixed-level `get_adm_maps(...)` call.
 - Prefer English field access in examples: `record.country`, `record.longitude`, `record.latitude`.
 - When labeling administrative regions, prefer `record.longitude` / `record.latitude` over manually calling `record.geometry.centroid`.
 - Keep plotting examples explicit about the `cartopy` projection.
@@ -112,6 +116,8 @@ If the user is mixing `cnmaps` with scientific Python or GIS tooling and the res
 ## Common Mistakes To Avoid
 
 - Do not assume `get_adm_maps(level="国")` returns only China.
+- Do not split a simple multi-region lookup into many separate queries when a list filter on `province`, `city`, `district`, or `country` would work.
+- Do not claim that one `get_adm_maps(...)` call can return mixed `国` / `省` / `市` / `区县` levels together.
 - Do not assume foreign boundaries should always be filtered with `source="世界银行"`. It is often unnecessary unless the user asks for source-specific selection.
 - Do not assume the sandbox Python environment is the same as the user's already-configured local environment.
 - Do not use `only_polygon=True` for tasks whose main goal is marker placement or text labeling.

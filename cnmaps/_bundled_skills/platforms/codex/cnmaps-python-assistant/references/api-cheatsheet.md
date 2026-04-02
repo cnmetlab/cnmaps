@@ -26,7 +26,9 @@ Common filters:
 Important behavior:
 
 - Administrative names should use the full formal Chinese name. If the user only has a short name, prefer `get_adm_names(...)` first.
+- `province`, `city`, `district`, `country`, and `source` accept either a single value or a list/tuple of values for batch filtering.
 - If `level` is omitted, `get_adm_maps` infers it from the filters that were passed.
+- A single `get_adm_maps(...)` call still queries one `level` at a time. List filters can batch-select multiple names within that level, but they do not mix country/province/city/district levels in one result set.
 - `level` accepts `国` / `省` / `市` / `区县`; district-level aliases such as `区`, `县`, and `区/县` are normalized internally to `区县`.
 - `country="中国"` is supported.
 - `level="国"` without `country` means all country-level records.
@@ -38,9 +40,14 @@ Foreign and global query patterns:
 
 - One foreign country by Chinese name: `get_adm_maps(country="日本", level="国", record="first")`
 - One foreign country by `ISO3`: `get_adm_maps(country="JPN", level="国", record="first")`
+- Several foreign countries at once: `get_adm_maps(country=["JPN", "KOR", "DEU"], level="国")`
 - All world country/region boundaries: `get_adm_maps(level="国")`
 - World boundaries from a specific source: `get_adm_maps(level="国", source="世界银行")`
 - China only: `get_adm_maps(country="中国", level="国")`
+- Several provinces at once: `get_adm_maps(province=["北京市", "天津市"], level="省")`
+- Several cities in one province: `get_adm_maps(province="河南省", city=["郑州市", "洛阳市"], level="市")`
+- Several districts in one city: `get_adm_maps(city="北京市", district=["朝阳区", "海淀区"], level="区县")`
+- Mixed levels are not supported in one call: if the user wants `日本` and `四川省`, query them separately because `国` and `省` records cannot be returned together from one `get_adm_maps(...)` call.
 
 Return shapes:
 
@@ -95,6 +102,7 @@ Good for:
 - checking what names are available before querying
 - checking country-level names before a global or foreign-boundary query
 - resolving a user's abbreviated or ambiguous region name before calling `get_adm_maps`
+- batch-filtering names after the user already knows several exact region names
 
 ## Drawing APIs
 
@@ -187,6 +195,8 @@ Use when provider-level dataset paths or metadata are needed.
 
 - If the user wants China only: always write `country="中国", level="国"` explicitly.
 - If the user wants one foreign country: use `country=<Chinese name or ISO3>, level="国", record="first"`.
+- If the user wants several exact regions at once: pass a list on `province`, `city`, `district`, or `country` instead of writing several separate queries.
+- If the user wants exact regions from different administrative levels, split the task into multiple queries instead of forcing one mixed-level call.
 - If the user wants to label administrative regions or their default center points: query records and use `longitude` and `latitude`.
 - If the user wants actual clipped scientific plots: combine sample loaders, `cartopy`, and `clip_*` helpers.
 - If the user wants a raster mask array rather than a plotted figure: use `MapPolygon.make_mask_array(...)` or `MapPolygon.maskout(...)`.

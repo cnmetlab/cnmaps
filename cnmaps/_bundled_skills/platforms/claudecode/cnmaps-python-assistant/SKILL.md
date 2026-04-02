@@ -20,6 +20,7 @@ Use this guidance when helping with Python code that uses `cnmaps`, especially f
 
 - First classify the task as one of: boundary lookup, overlay plotting, raster mask/clip workflow, centroid labeling, or multi-library integration.
 - Prefer real `cnmaps` APIs over guessed names. Use the supporting reference files before inferring missing details.
+- If the user already knows several exact province, city, district, or country names, prefer one batch `get_adm_maps(...)` query with a list filter over many separate calls.
 - When the task involves plotting, reason about the full stack: `cnmaps` objects, `cartopy` projection, Matplotlib axes, and how geometries are passed through.
 - When the task involves raster clipping or masking, be explicit that `cnmaps` mainly provides boundary and geometry-side helpers; the full raster workflow may also involve NumPy, xarray, or Matplotlib objects.
 - When the environment may not be ready, distinguish missing `cnmaps`, missing plotting dependencies, and missing data-provider discovery.
