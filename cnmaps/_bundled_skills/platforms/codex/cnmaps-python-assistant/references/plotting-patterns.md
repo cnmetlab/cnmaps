@@ -267,6 +267,39 @@ draw_map(china, ax=ax, color="black", linewidth=1.0)
 plt.show()
 ```
 
+## Clip Hillshade Or Imshow Images
+
+```python
+import cartopy.crs as ccrs
+import matplotlib.pyplot as plt
+from matplotlib.colors import LightSource
+from cnmaps import clip_imshow_by_map, draw_map, get_adm_maps
+from cnmaps.sample import load_dem
+
+lons, lats, dem = load_dem()
+hillshade = LightSource(azdeg=315, altdeg=45).shade(
+    dem,
+    cmap=plt.cm.Greys,
+    vert_exag=0.8,
+    blend_mode="overlay",
+)
+china = get_adm_maps(country="中国", level="国", record="first", only_polygon=True)
+
+fig = plt.figure(figsize=(10, 10))
+ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+image = ax.imshow(
+    hillshade,
+    extent=[lons.min(), lons.max(), lats.min(), lats.max()],
+    origin="lower",
+    transform=ccrs.PlateCarree(),
+)
+
+clip_imshow_by_map(image, china)
+draw_map(china, ax=ax, color="black", linewidth=1.0)
+ax.set_extent(china.get_extent(), crs=ccrs.PlateCarree())
+plt.show()
+```
+
 ## Clip Streamlines
 
 ```python

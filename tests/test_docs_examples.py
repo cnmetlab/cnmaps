@@ -5,10 +5,12 @@ import sys
 import cartopy.crs as ccrs
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LightSource
 
 from cnmaps import (
     clip_clabels_by_map,
     clip_contours_by_map,
+    clip_imshow_by_map,
     clip_pcolormesh_by_map,
     clip_quiver_by_map,
     clip_scatter_by_map,
@@ -124,7 +126,7 @@ def test_docs_union_example():
 
 
 def test_docs_clip_examples():
-    """覆盖 usage.rst 中 contourf、pcolormesh、quiver、scatter、clabel 裁剪示例。"""
+    """覆盖 usage.rst 中 contourf、imshow、pcolormesh、quiver、scatter、clabel 裁剪示例。"""
 
     china = get_adm_maps(country="中国", record="first", only_polygon=True)
 
@@ -145,6 +147,25 @@ def test_docs_clip_examples():
     clip_contours_by_map(cs, china, ax=ax)
     draw_map(china, ax=ax, color="k", linewidth=1)
     _savefig(fig, "usage", "clip-china-contourf.png")
+
+    fig = plt.figure(figsize=(10, 10))
+    ax = fig.add_subplot(111, projection=ccrs.PlateCarree())
+    hillshade = LightSource(azdeg=315, altdeg=45).shade(
+        dem,
+        cmap=plt.cm.Greys,
+        vert_exag=0.8,
+        blend_mode="overlay",
+    )
+    image = ax.imshow(
+        hillshade,
+        extent=[lons_dem.min(), lons_dem.max(), lats_dem.min(), lats_dem.max()],
+        origin="lower",
+        transform=ccrs.PlateCarree(),
+    )
+    clip_imshow_by_map(image, china, ax=ax)
+    draw_map(china, ax=ax, color="k", linewidth=1)
+    ax.set_extent(china.get_extent())
+    _savefig(fig, "usage", "clip-china-hillshade.png")
 
     fig = plt.figure(figsize=(10, 10))
     ax = fig.add_subplot(111, projection=ccrs.PlateCarree())

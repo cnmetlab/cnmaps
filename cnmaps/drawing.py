@@ -180,6 +180,26 @@ def clip_pcolormesh_by_map(mesh, map_polygon: MapPolygon, ax=None, extent=None, 
     _set_clip_box_if_possible(mesh, ax)
 
 
+def clip_imshow_by_map(image, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
+    """
+    使用边界几何裁剪 `ax.imshow()` 返回的图像对象。
+
+    参数:
+        image: `ax.imshow()` 的返回对象。
+        map_polygon (MapPolygon): 地图边界对象。
+        ax (GeoAxes, 可选): 目标坐标轴。
+        extent (tuple, 可选): 可选裁剪范围。
+        set_extent (bool, 可选): 是否同步设置坐标轴范围。
+    """
+    ax = _resolve_axes(image, ax=ax)
+
+    clip = _make_clip_path(map_polygon, ax=ax, extent=extent)
+    _set_extent_if_needed(ax, extent=extent, set_extent=set_extent)
+
+    image.set_clip_path(clip)
+    _set_clip_box_if_possible(image, ax)
+
+
 def clip_quiver_by_map(quiver, map_polygon: MapPolygon, ax=None, extent=None, set_extent=False):
     """
     使用边界几何裁剪 `ax.quiver()` 返回的箭矢对象。

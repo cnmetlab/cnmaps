@@ -42,6 +42,7 @@ If the user is mixing `cnmaps` with scientific Python or GIS tooling and the res
 - Draw multiple records or polygons: `draw_maps`
 - Clip `contourf`: `clip_contours_by_map`
 - Clip `pcolormesh`: `clip_pcolormesh_by_map`
+- Clip `imshow` / hillshade images: `clip_imshow_by_map`
 - Clip `quiver`: `clip_quiver_by_map`
 - Clip `scatter`: `clip_scatter_by_map`
 - Clip contour labels: `clip_clabels_by_map`

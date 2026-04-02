@@ -161,6 +161,10 @@ Use after `ax.pcolormesh`.
 
 Use after `ax.quiver`.
 
+### `clip_imshow_by_map(image, map_polygon, ax=None, extent=None, set_extent=False)`
+
+Use after `ax.imshow`, especially for hillshade or RGB image layers created from DEM data.
+
 ### `clip_streamplot_by_map(streamplot, map_polygon, ax=None, extent=None, set_extent=False)`
 
 Use after `ax.streamplot`.
