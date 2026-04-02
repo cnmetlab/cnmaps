@@ -161,6 +161,10 @@ Use after `ax.pcolormesh`.
 
 Use after `ax.quiver`.
 
+### `clip_streamplot_by_map(streamplot, map_polygon, ax=None, extent=None, set_extent=False)`
+
+Use after `ax.streamplot`.
+
 ### `clip_scatter_by_map(scatter, map_polygon, ax=None, extent=None, set_extent=False)`
 
 Use after `ax.scatter`.
