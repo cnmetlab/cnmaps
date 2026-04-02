@@ -26,7 +26,7 @@ Use this guidance when helping with Python code that uses `cnmaps`, especially f
 
 ## cnmaps Knowledge Model
 
-Treat `cnmaps` as a Python function library for querying administrative boundaries, retrieving geometries and centroid coordinates, drawing boundaries, and helping boundary-aware scientific plotting workflows. Do not describe it as a CLI-first tool. Many useful tasks require combining it with `cartopy`, `matplotlib`, NumPy, or xarray rather than expecting one black-box command.
+Treat `cnmaps` as a Python function library for querying administrative boundaries, retrieving geometries and centroid coordinates, drawing boundaries, and helping boundary-guided scientific plotting workflows. Do not describe it as a CLI-first tool. Many useful tasks require combining it with `cartopy`, `matplotlib`, NumPy, or xarray rather than expecting one black-box command.
 
 ## How to Work with Supporting Files
 
@@ -34,6 +34,7 @@ Treat `cnmaps` as a Python function library for querying administrative boundari
 - Read `references/workflows.md` when you need to choose a task-specific approach.
 - Read `references/return-types.md` when you need to reason about what `get_adm_maps` or related APIs return and how those objects connect to downstream libraries.
 - Read `references/common-pitfalls.md` when you need to avoid API hallucinations or common integration mistakes.
+- Read `references/capability-boundaries.md` when you need to explain what `cnmaps` handles directly versus what still belongs to Cartopy, Matplotlib, NumPy, xarray, or external GIS tools.
 - Prefer the files in `examples/` when producing runnable code for users.
 
 ## Output Requirements

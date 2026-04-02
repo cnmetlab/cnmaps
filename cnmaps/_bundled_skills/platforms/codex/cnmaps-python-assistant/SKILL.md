@@ -10,6 +10,7 @@ description: Use when writing, reviewing, or explaining Python code that uses cn
 Use this skill when an AI needs to help someone write or revise `cnmaps` code. The goal is to choose the right `cnmaps` APIs, pass the right parameters, understand the return values, and combine `cnmaps` with `cartopy` and `matplotlib` in a way that matches the current package behavior.
 
 For detailed API selection, read [references/api-cheatsheet.md](references/api-cheatsheet.md). For common plotting workflows, read [references/plotting-patterns.md](references/plotting-patterns.md).
+If the user is mixing `cnmaps` with scientific Python or GIS tooling and the responsibility boundary is unclear, also read [references/capability-boundaries.md](references/capability-boundaries.md).
 
 ## Environment And Setup
 
@@ -124,3 +125,4 @@ For detailed API selection, read [references/api-cheatsheet.md](references/api-c
 
 - Load [references/api-cheatsheet.md](references/api-cheatsheet.md) when choosing which query, drawing, clipping, or provider API to use.
 - Load [references/plotting-patterns.md](references/plotting-patterns.md) when the user wants actual `cartopy`/`matplotlib` code, especially for clipping workflows or centroid-based labels.
+- Load [references/capability-boundaries.md](references/capability-boundaries.md) when the user asks about raster masking, vector export, provider behavior, GeoPandas integration, or what `cnmaps` does versus what Cartopy / Matplotlib / NumPy / xarray do.

@@ -16,15 +16,23 @@ Common filters:
 - `source`
 - `provider`
 - `record="first"` for a single match
+- `record="all"` for all matches
 - `only_polygon=True` for `MapPolygon`
 - `engine="geopandas"` for `GeoDataFrame`
+- `wgs84=True` for WGS84 output, `False` for GCJ02
+- `simplify=True` when the user explicitly wants simplified geometries
+- `provider` to choose a specific installed data provider
 
 Important behavior:
 
+- Administrative names should use the full formal Chinese name. If the user only has a short name, prefer `get_adm_names(...)` first.
+- If `level` is omitted, `get_adm_maps` infers it from the filters that were passed.
+- `level` accepts `国` / `省` / `市` / `区县`; district-level aliases such as `区`, `县`, and `区/县` are normalized internally to `区县`.
 - `country="中国"` is supported.
 - `level="国"` without `country` means all country-level records.
 - For `level="国"` queries, `country` may be a Chinese country name, an `ISO3` code such as `JPN`, or a project-defined combined code for special regions.
 - `source` is optional and should only be added when the user wants source filtering.
+- China country-level queries may return multiple records such as the mainland boundary and South China Sea components, so `record="first"` is a common pattern when the user wants one boundary object.
 
 Foreign and global query patterns:
 
@@ -69,6 +77,13 @@ Compatibility notes:
 - Legacy Chinese keys still work, but new code should prefer English keys or dot access.
 - `geometry` only has the English key.
 
+Useful `MapPolygon` methods:
+
+- `map_polygon.get_extent(buffer=...)` for `ax.set_extent(...)`
+- `map_polygon.make_mask_array(lons, lats)` to build a raster mask
+- `map_polygon.maskout(lons, lats, data)` to mask raster-like data
+- `map_polygon.to_file(path, engine="GeoJSON")` to export GeoJSON or Shapefile output
+
 ### `get_adm_names(...)`
 
 Use when the task only needs supported names, not geometries.
@@ -79,6 +94,7 @@ Good for:
 - listing districts in a city
 - checking what names are available before querying
 - checking country-level names before a global or foreign-boundary query
+- resolving a user's abbreviated or ambiguous region name before calling `get_adm_maps`
 
 ## Drawing APIs
 
@@ -104,6 +120,8 @@ Rules of thumb:
 - For quick country-boundary plots, prefer `draw_map` or `draw_maps`.
 - For highly styled global maps, using `row.geometry` or `MapPolygon` with Cartopy's `ax.add_geometries(...)` is also fine.
 - If you queried a single record with `record="first"`, `draw_map(row.geometry, ax=ax, ...)` is usually the clearest option.
+- `draw_map(..., autoscale=True)` autos-scales by default; this is convenient for one geometry, but user code may still call `ax.set_extent(...)` explicitly for tighter framing.
+- `draw_maps(...)` accepts a `GeoDataFrame`, `MapRecord`, `MapPolygon`, or lists of those geometry-bearing objects.
 
 ## Clipping APIs
 
@@ -133,6 +151,13 @@ Typical order for contour labels:
 2. `clip_contours_by_map`
 3. create labels with `ax.clabel`
 4. `clip_clabels_by_map`
+
+Important clipping behavior:
+
+- `clip_*_by_map` accepts a single `MapPolygon`, a list of `MapPolygon`, or a `GeoDataFrame`.
+- `extent=[left, right, lower, upper]` clips to the intersection of the administrative boundary and a rectangular geographic window.
+- `set_extent=True` with `extent=...` also calls `ax.set_extent(..., crs=ccrs.PlateCarree())`.
+- In multi-axes workflows, clipping helpers usually infer the correct `ax` from the artist object, so passing `ax=` is often optional.
 
 ## Sample Data APIs
 
@@ -164,5 +189,7 @@ Use when provider-level dataset paths or metadata are needed.
 - If the user wants one foreign country: use `country=<Chinese name or ISO3>, level="国", record="first"`.
 - If the user wants to label administrative regions or their default center points: query records and use `longitude` and `latitude`.
 - If the user wants actual clipped scientific plots: combine sample loaders, `cartopy`, and `clip_*` helpers.
+- If the user wants a raster mask array rather than a plotted figure: use `MapPolygon.make_mask_array(...)` or `MapPolygon.maskout(...)`.
+- If the user wants exported vector output: query `only_polygon=True` and use `map_polygon.to_file(...)`.
 - If the user wants global country boundaries: `get_adm_maps(level="国")` is now the correct broad query.
 - If the user asks about seams, gaps, or disputed-border behavior in world maps, explain the source-semantic caveat instead of blaming plotting code first.

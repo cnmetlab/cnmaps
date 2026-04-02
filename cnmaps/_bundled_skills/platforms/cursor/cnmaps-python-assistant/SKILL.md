@@ -5,7 +5,7 @@ description: Use when the user is writing or debugging Python code with cnmaps, 
 
 # cnmaps Skill Overview
 
-Use this skill when helping with Python code that uses `cnmaps`, especially for administrative boundary lookup, boundary-aware plotting, scientific map workflows, and cases where `cnmaps` must work together with `cartopy`, `matplotlib`, NumPy, or xarray.
+Use this skill when helping with Python code that uses `cnmaps`, especially for administrative boundary lookup, boundary-guided plotting, scientific map workflows, and cases where `cnmaps` must work together with `cartopy`, `matplotlib`, NumPy, or xarray.
 
 ## When to Use This Skill
 
@@ -18,7 +18,7 @@ Use this skill when helping with Python code that uses `cnmaps`, especially for 
 
 ## What Cursor Agent Should Do
 
-- First decide whether the task is about boundary lookup, map drawing, centroid labeling, clipping plotted artists, or boundary-aware raster workflows.
+- First decide whether the task is about boundary lookup, map drawing, centroid labeling, clipping plotted artists, or boundary-guided raster workflows.
 - Treat `cnmaps` as a Python library, not as a unified CLI tool.
 - Prefer real package APIs over guessed names.
 - When plotting is involved, reason about projections, axes objects, geometry objects, and how labels or artists are placed.
@@ -35,6 +35,7 @@ Use this skill when helping with Python code that uses `cnmaps`, especially for 
 - Read `references/workflows.md` for task-specific workflows.
 - Read `references/return-types.md` before wiring `cnmaps` objects into other libraries.
 - Read `references/common-pitfalls.md` to avoid common hallucinations and integration mistakes.
+- Read `references/capability-boundaries.md` when you need to separate `cnmaps` responsibilities from Cartopy, Matplotlib, NumPy, xarray, or GIS export tooling.
 - Prefer the files in `examples/` when writing runnable code for users.
 
 ## Output Requirements

@@ -105,6 +105,7 @@ def _resolve_install_root(workspace: Path, scope: str) -> Path:
 
 def install_codex_skill(workspace: Path, force: bool = False, scope: str = "local") -> list[Path]:
     source_dir = get_codex_skill_source_dir()
+    shared_dir = get_shared_skill_support_dir()
     install_root = _resolve_install_root(workspace, scope)
     target_dir = install_root / ".agents" / "skills" / SKILL_NAME
     legacy_target_dir = install_root / ".codex" / "skills" / SKILL_NAME
@@ -123,9 +124,28 @@ def install_codex_skill(workspace: Path, force: bool = False, scope: str = "loca
 
     target_dir.parent.mkdir(parents=True, exist_ok=True)
     _copy_skill_tree(source_dir, target_dir)
+    _copy_tree_contents(shared_dir / "references", target_dir / "references")
+    _copy_tree_contents(shared_dir / "examples", target_dir / "examples")
 
     agents_path = workspace / "AGENTS.md"
-    written_paths = [target_dir]
+    written_paths = [
+        target_dir / "SKILL.md",
+        target_dir / "references" / "api-cheatsheet.md",
+        target_dir / "references" / "plotting-patterns.md",
+        target_dir / "references" / "capability-boundaries.md",
+        target_dir / "references" / "api-overview.md",
+        target_dir / "references" / "workflows.md",
+        target_dir / "references" / "return-types.md",
+        target_dir / "references" / "common-pitfalls.md",
+        target_dir / "examples" / "plot-boundary-example.py",
+        target_dir / "examples" / "mask-raster-example.py",
+        target_dir / "examples" / "province-selection-example.py",
+        target_dir / "examples" / "clip-pcolormesh-example.py",
+        target_dir / "examples" / "clip-quiver-example.py",
+        target_dir / "examples" / "clip-clabels-example.py",
+        target_dir / "examples" / "country-centroids-overview.py",
+        target_dir / "examples" / "vector-export-example.py",
+    ]
     if scope == "local":
         existing = _read_text(agents_path) if agents_path.exists() else ""
         block = (
@@ -134,7 +154,8 @@ def install_codex_skill(workspace: Path, force: bool = False, scope: str = "loca
             f"- [`.agents/skills/{SKILL_NAME}/SKILL.md`](.agents/skills/{SKILL_NAME}/SKILL.md)\n\n"
             "Additional references:\n\n"
             f"- [API cheatsheet](.agents/skills/{SKILL_NAME}/references/api-cheatsheet.md)\n"
-            f"- [Plotting patterns](.agents/skills/{SKILL_NAME}/references/plotting-patterns.md)"
+            f"- [Plotting patterns](.agents/skills/{SKILL_NAME}/references/plotting-patterns.md)\n"
+            f"- [Capability boundaries](.agents/skills/{SKILL_NAME}/references/capability-boundaries.md)"
         )
         agents_path.write_text(
             _replace_or_append_marked_block(existing, CODEX_MARKER_START, CODEX_MARKER_END, block),
@@ -181,9 +202,15 @@ def install_cursor_skill(workspace: Path, force: bool = False, scope: str = "loc
         skill_root / "references" / "workflows.md",
         skill_root / "references" / "return-types.md",
         skill_root / "references" / "common-pitfalls.md",
+        skill_root / "references" / "capability-boundaries.md",
         skill_root / "examples" / "plot-boundary-example.py",
         skill_root / "examples" / "mask-raster-example.py",
         skill_root / "examples" / "province-selection-example.py",
+        skill_root / "examples" / "clip-pcolormesh-example.py",
+        skill_root / "examples" / "clip-quiver-example.py",
+        skill_root / "examples" / "clip-clabels-example.py",
+        skill_root / "examples" / "country-centroids-overview.py",
+        skill_root / "examples" / "vector-export-example.py",
     ]
 
 
@@ -218,9 +245,15 @@ def install_claudecode_skill(workspace: Path, force: bool = False, scope: str = 
         skill_root / "references" / "workflows.md",
         skill_root / "references" / "return-types.md",
         skill_root / "references" / "common-pitfalls.md",
+        skill_root / "references" / "capability-boundaries.md",
         skill_root / "examples" / "plot-boundary-example.py",
         skill_root / "examples" / "mask-raster-example.py",
         skill_root / "examples" / "province-selection-example.py",
+        skill_root / "examples" / "clip-pcolormesh-example.py",
+        skill_root / "examples" / "clip-quiver-example.py",
+        skill_root / "examples" / "clip-clabels-example.py",
+        skill_root / "examples" / "country-centroids-overview.py",
+        skill_root / "examples" / "vector-export-example.py",
     ]
 
 
