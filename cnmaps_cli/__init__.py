@@ -6,6 +6,7 @@ import argparse
 import json
 import shutil
 from pathlib import Path
+from typing import Optional
 
 
 SKILL_NAME = "cnmaps-python-assistant"
@@ -282,7 +283,7 @@ _EXPORTABLE_COLUMNS = (
 )
 
 
-def _normalize_export_engine(engine: str | None, output_path: Path) -> str:
+def _normalize_export_engine(engine: Optional[str], output_path: Path) -> str:
     if engine is None:
         suffix = output_path.suffix.lower()
         if suffix in {".geojson", ".json"}:
@@ -315,7 +316,7 @@ def export_adm_maps(
     record: str = "all",
     wgs84: bool = True,
     simplify: bool = False,
-    engine: str | None = None,
+    engine: Optional[str] = None,
     encoding: str = "utf-8",
 ) -> Path:
     from cnmaps import get_adm_maps
@@ -462,7 +463,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 

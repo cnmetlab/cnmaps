@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import shapely.geometry as sgeom
@@ -44,10 +45,10 @@ class BoundaryCheckResult:
 
     path: str
     passed: bool
-    driver: str | None
+    driver: Optional[str]
     feature_count: int
     geometry_types: tuple[str, ...]
-    crs: str | None
+    crs: Optional[str]
     errors: tuple[str, ...] = ()
     warnings: tuple[str, ...] = ()
 
