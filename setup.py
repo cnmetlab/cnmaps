@@ -41,7 +41,23 @@ setuptools.setup(
     url="https://github.com/cnmetlab/cnmaps",
     include_package_data=True,
     packages=setuptools.find_packages(),
+    package_data={
+        "cnmaps._bundled_skills": [
+            "platforms/codex/cnmaps-python-assistant/SKILL.md",
+            "platforms/codex/cnmaps-python-assistant/agents/*.yaml",
+            "platforms/codex/cnmaps-python-assistant/references/*.md",
+            "platforms/cursor/cnmaps-python-assistant/SKILL.md",
+            "platforms/claudecode/cnmaps-python-assistant/SKILL.md",
+            "shared/cnmaps-python-assistant/references/*.md",
+            "shared/cnmaps-python-assistant/examples/*.py",
+        ]
+    },
     install_requires=required,
+    entry_points={
+        "console_scripts": [
+            "cnmaps=cnmaps_cli:main",
+        ]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
     ],

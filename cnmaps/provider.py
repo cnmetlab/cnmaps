@@ -17,7 +17,12 @@ DEFAULT_DATA_PROVIDER = "cnmaps-data"
 
 @dataclass(frozen=True)
 class FileSystemDataProvider:
-    """File-system backed data provider."""
+    """文件系统型 `cnmaps` 数据提供者。
+
+    该对象描述一个已安装数据包的根目录及其 `manifest.json` 元信息，
+    用于解析行政区边界索引、GeoJSON 数据文件和样例数据文件。
+    用户通常通过 :func:`get_data_provider` 获取该对象，而不是手动实例化。
+    """
 
     root_dir: Path
     manifest_path: Path
@@ -26,6 +31,7 @@ class FileSystemDataProvider:
 
     @cached_property
     def manifest(self) -> dict:
+        """返回 provider 的 `manifest.json` 内容。"""
         with self.manifest_path.open(encoding="utf-8") as f:
             return json.load(f)
 
@@ -33,10 +39,12 @@ class FileSystemDataProvider:
         return self.manifest["datasets"][dataset]
 
     def get_dataset_root(self, dataset: str) -> str:
+        """返回指定数据集根目录的绝对路径。"""
         dataset_meta = self._dataset_meta(dataset)
         return str((self.root_dir / dataset_meta["root"]).resolve())
 
     def get_index_db(self, dataset: str = "administrative") -> str:
+        """返回指定数据集索引数据库的绝对路径。"""
         dataset_meta = self._dataset_meta(dataset)
         index_db = dataset_meta.get("index_db")
         if index_db is None:
@@ -44,6 +52,7 @@ class FileSystemDataProvider:
         return str((self.root_dir / index_db).resolve())
 
     def resolve_dataset_path(self, dataset: str, relative_path: str) -> str:
+        """将数据集内相对路径解析为绝对路径。"""
         relative = Path(relative_path)
         relative_parts = relative.parts
         if relative_parts and relative_parts[0] == dataset:
@@ -51,6 +60,7 @@ class FileSystemDataProvider:
         return str((Path(self.get_dataset_root(dataset)) / relative).resolve())
 
     def get_sample_path(self, filename: str) -> str:
+        """返回样例数据文件的绝对路径。"""
         return str((Path(self.get_dataset_root("sample")) / filename).resolve())
 
 
@@ -122,13 +132,27 @@ def _discover_data_providers():
 
 
 def get_available_data_providers():
-    """Return discovered data-provider names."""
+    """返回当前环境中已发现的 `cnmaps` 数据提供者名称。
+
+    Returns:
+        tuple[str, ...]: provider 名称元组，按名称排序。
+    """
 
     return tuple(sorted(_discover_data_providers()))
 
 
 def get_data_provider(provider: str = None):
-    """Return the requested data provider for cnmaps."""
+    """返回指定名称的数据提供者对象。
+
+    Args:
+        provider (str, optional): provider 名称。默认为官方 `cnmaps-data`。
+
+    Returns:
+        FileSystemDataProvider | object: 匹配到的 provider 对象。
+
+    Raises:
+        ImportError: 当前环境中未发现对应名称的 provider。
+    """
 
     provider_name = provider or DEFAULT_DATA_PROVIDER
     providers = _discover_data_providers()

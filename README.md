@@ -82,6 +82,41 @@ conda install -c conda-forge cnmaps
 poetry install
 ```
 
+## AI Skill
+
+`cnmaps` 支持安装 AI Skill 描述，可以让 AI 更快、更准确地理解 `cnmaps` 的常用 API、绘图套路和能力边界。对于习惯用 vibe coding 方式开发、让 AI 协助写科研绘图代码、或希望减少 API 试错成本的用户来说，这份 Skill 可以显著改善上下文质量，让 AI 可以具备流畅使用 `cnmaps` 各种函数功能的能力。
+
+> Note
+> AI Skill 能力仅支持 `2.1.x` 及以上版本。
+
+如果你已经安装了 `cnmaps`，也可以把这份 AI 指南安装到当前项目目录中，针对不同助手生成对应格式：
+
+```bash
+cnmaps install-skill codex --mode local
+cnmaps install-skill cursor --mode local
+cnmaps install-skill claudecode --mode local
+```
+
+如果你想安装到当前用户的全局目录，可以使用：
+
+```bash
+cnmaps install-skill codex --mode global
+cnmaps install-skill cursor --mode global
+cnmaps install-skill claudecode --mode global
+```
+
+`local` 模式下如需指定其他项目目录，可传 `--dir /path/to/project`。如需覆盖已有安装，可执行：
+
+```bash
+cnmaps install-skill codex --mode local --force
+```
+
+> Note
+> `--mode local` 会安装到当前项目目录，只会在该安装目录下生效；如果切换到其他项目目录，需要在新的目录里重新安装。`--mode global` 会安装到用户主目录下对应助手的全局路径，通常是 `$HOME/.claude`、`$HOME/.cursor`、`$HOME/.agents` 等目录，因此跨项目目录也可以生效。`cnmaps` 版本更新后，尤其是 Skill 定义本身有更新时，通常也推荐追加 `--force` 重新安装一遍，使本地 Skill 描述与当前版本保持同步。
+
+> Tip
+> 目前 Cursor 兼容 Claude Code 的 Skill 定义格式，所以通常来说，如果你已经按 `claudecode` 模式安装了 Skill，Cursor 也往往可以自动识别这一份定义。
+
 ## 快速开始
 
 ### 绘制国界
@@ -185,5 +220,6 @@ plt.show()
 本项目适用的地图边界的数据源包括：
 
 1. GaryBikini/ChinaAdminDivisonSHP: v2.0, 2021, DOI: 10.5281/zenodo.4167299
+2. The World Bank Administrative Level 0 Boundaries（用于全球国家和地区边界数据）
 
 海拔高度地形数据来自ASTER数字高程模型，并对原始数据进行了稀释。

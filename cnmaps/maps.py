@@ -24,13 +24,19 @@ from .provider import get_data_provider
 
 
 class MapNotFoundError(Exception):
-    """地图无法找到的错误"""
+    """查询条件未命中任何边界记录时抛出的异常。"""
 
     pass
 
 
 class MapRecord(dict):
-    """支持点号访问的地图记录对象。"""
+    """支持点号访问的地图记录对象。
+
+    `get_adm_maps(..., engine=None, only_polygon=False)` 返回的记录对象。
+    推荐优先使用英文字段和点号访问，例如 `record.country`、
+    `record.geometry`、`record.longitude`。旧版中文 key 仍可访问，
+    但仅作为兼容层，未来版本会逐步移除。
+    """
 
     def __getitem__(self, key):
         if key in _LEGACY_RECORD_KEY_ALIASES:
@@ -167,10 +173,12 @@ def _as_mappolygon_result(geom):
 
 class MapPolygon:
     """
-    地图多边形类
+    地图多边形类。
 
-    该类内部持有一个 shapely.geometry.MultiPolygon 实例（组合而非继承），
-    兼容 Shapely 2.0+，并实现加号(合并)、减号(剪切)、逻辑与(交集)运算符支持.
+    该类内部组合了一个 `shapely.geometry.MultiPolygon`，对外保持
+    `cnmaps` 历史接口习惯，同时兼容 Shapely 2.x。它既可以直接作为
+    `get_adm_maps(..., only_polygon=True)` 的返回值，也可以像 Shapely
+    几何一样参与绘图、空间关系判断和几何运算。
     """
 
     _OWN_ATTRS = frozenset(
@@ -301,32 +309,33 @@ class MapPolygon:
         return MapPolygon(polygons)
 
     def union(self, other):
-        """并集."""
+        """返回当前边界与 `other` 的并集结果。"""
         other_geom = _get_geom(other)
         union_result = self._geom.union(other_geom)
         return _as_mappolygon_result(union_result)
 
     def difference(self, other):
-        """差集."""
+        """返回当前边界减去 `other` 后的差集结果。"""
         other_geom = _get_geom(other)
         difference_result = self._geom.difference(other_geom)
         return _as_mappolygon_result(difference_result)
 
     def intersection(self, other):
-        """交集."""
+        """返回当前边界与 `other` 的交集结果。"""
         other_geom = _get_geom(other)
         intersection_result = self._geom.intersection(other_geom)
         return _as_mappolygon_result(intersection_result)
 
     def get_extent(self, buffer=2):
         """
-        获取范围坐标
+        获取适合传给 `ax.set_extent(...)` 的范围坐标。
 
         参数:
-            buffer (int, 可选): 外扩缓冲边缘, 单位为°, 该值越大, 所取的范围越大. 默认为 2.
+            buffer (int | float, 可选): 在几何边界外额外扩展的经纬度缓冲，
+                单位为度。默认为 2。
 
         返回值:
-            tuple: 坐标范围点, 该值可直接传入ax.set_extent使用
+            tuple: `(left, right, lower, upper)`。
         """
         left, lower, right, upper = self.buffer(buffer).bounds
         return (left, right, lower, upper)
@@ -339,14 +348,15 @@ class MapPolygon:
         encoding: str = "utf-8",
     ):
         """
-        存储为文件
+        将当前边界写出为 GeoJSON 或 Shapefile。
 
         参数:
-            savefp (str): 保存路径
-            engine (str, 可选): 存储引擎，支持的选项为'ESRI Shapefile'和'GeoJSON'.
-                                    默认为 'GeoJSON'.
-            meta (dict, 可选): 元信息. 默认为 {'id': 0, 'name': 'unknown'}.
-            encoding (str, 可选): 编码类型. 默认为 'utf-8'.
+            savefp (str): 保存路径。
+            engine (str, 可选): 存储格式，支持 `'ESRI Shapefile'` 和 `'GeoJSON'`。
+                默认为 `'GeoJSON'`。
+            meta (dict, 可选): 写入到属性字段中的元信息。
+                默认为 `{'id': None, 'name': None}`。
+            encoding (str, 可选): 输出编码。默认为 `'utf-8'`。
         """
 
         if engine.lower() == "esri shapefile":
@@ -376,7 +386,7 @@ class MapPolygon:
 
     def maskout(self, lons: np.ndarray, lats: np.ndarray, data: np.ndarray):
         """
-        对边界以外的数据进行遮罩处理
+        对边界外的数据进行遮罩处理。
 
         Args:
             lons (np.ndarray): 经度矩阵
@@ -384,7 +394,7 @@ class MapPolygon:
             data (np.ndarray): 数据矩阵
 
         Returns:
-            np.ndarray: 遮罩后的数据矩阵
+            np.ma.MaskedArray: 边界外位置被 mask 的数组。
         """
 
         mask = self.make_mask_array(lons, lats)
@@ -399,12 +409,17 @@ class MapPolygon:
 
     def make_mask_array(self, lons: np.ndarray, lats: np.ndarray):
         """
-        生成边界以外的遮罩（掩膜）数组
+        生成边界以外的布尔遮罩数组。
+
         Args:
             lons (np.ndarray): 经度矩阵（2维）
             lats (np.ndarray): 纬度矩阵（2维）
+
         Returns:
-            np.ndarray: 遮罩（掩膜）数组
+            np.ndarray: 与输入同形状的布尔数组，边界外为 `True`。
+
+        Raises:
+            ValueError: 输入不是同形状的二维数组。
         """
         lons = np.atleast_1d(lons)
         lats = np.atleast_1d(lats)
@@ -483,6 +498,17 @@ def _read_mapjson_cached(fp, wgs84=True):
 
 
 def read_mapjson(fp, wgs84=True):
+    """读取 GeoJSON 边界文件并返回 `MapPolygon` 或线几何。
+
+    Args:
+        fp (str): GeoJSON 文件路径。
+        wgs84 (bool, optional): 当源数据为高德 GCJ02 坐标时，是否转换为 WGS84。
+            默认为 `True`。
+
+    Returns:
+        MapPolygon | shapely.geometry.MultiLineString:
+            解析后的边界几何对象。
+    """
     geom = _clone_geometry(_read_mapjson_cached(fp, wgs84=wgs84))
     return _ensure_mappolygon(geom)
 
@@ -573,7 +599,7 @@ def get_adm_names(
     provider: str = None,
 ):
     """
-    获取行政名称
+    获取行政区名称列表。
 
     参数:
         province (str, 可选): 省/自治区/直辖市/行政特区中文名, 必须为全称
@@ -581,18 +607,20 @@ def get_adm_names(
         city (str, 可选): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
         district (str, 可选): 区/县中文名, 必须为全称. Defaults to None.
-        level (str, 可选): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
-                               其中'省'级包括直辖市、特区等;
-                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
-                               比如北京市的省级和市级都是'北京市';
-                               '区'和'县'属于同一级别的不同表达形式.
-                               Defaults to '省'.
-        country (str, 可选): 国家名称。国家级查询可传中文名、ISO3 或组合码；不传时不做国家过滤。
+        level (str, 可选): 边界等级，支持 `'国'`、`'省'`、`'市'`、`'区县'`
+            以及 `'区'`、`'县'`、`'区/县'` 等同义写法。默认为 `'省'`。
+        country (str, 可选): 国家名称。国家级查询可传中文名、`ISO3`
+            或项目使用的组合码；从 `2.0.0` 开始，`'中国'` 会自动视为
+            `中华人民共和国` 的别称。
         source (str, 可选): 数据源过滤条件；不传时不做来源过滤。
         provider (str, 可选): 数据提供者名称；默认为官方 ``cnmaps-data``。
 
     返回值:
-        list: 名称列表
+        list[str]: 名称列表。
+
+    说明:
+        该函数内部基于 :func:`get_adm_maps` 查询元信息后提取对应名称字段，
+        适合“先看有哪些名称可选，再决定具体查哪一个”的场景。
     """
     data = get_adm_maps(
         province=province,
@@ -633,7 +661,7 @@ def get_adm_maps(
     **kwargs,
 ):
     """
-    获取行政地图的边界对象
+    获取行政区边界记录、边界几何或 GeoDataFrame。
 
     参数:
         province (str, 可选): 省/自治区/直辖市/行政特区中文名, 必须为全称
@@ -641,39 +669,42 @@ def get_adm_maps(
         city (str, 可选): 地级市中文名, 必须为全称, 例如查找北京市应输入'北京市'而非'北京'.
                               Defaults to None.
         district (str, 可选): 区/县中文名, 必须为全称. Defaults to None.
-        level (str, 可选): 边界等级, 目前支持的等级包括'省', '市', '区', '县'.
-                               其中'省'级包括直辖市、特区等;
-                               '市'级为地级市, 若为直辖市, 则名称与'省'级相同,
-                               比如北京市的省级和市级都是'北京市';
-                               '区'和'县'属于同一级别的不同表达形式.
-                               Defaults to '省'.
-        country (str, 可选): 国家名称。国家级查询可传中文名、ISO3 或组合码；不传时不做国家过滤。
+        level (str, 可选): 边界等级，支持 `'国'`、`'省'`、`'市'`、`'区县'`
+            以及 `'区'`、`'县'`、`'区/县'` 等同义写法。若为 `None`，
+            会根据 `province/city/district/country` 自动推断。
+        country (str, 可选): 国家名称。国家级查询可传中文名、`ISO3`
+            或项目使用的组合码；不传时不做国家过滤。
+            从 `2.0.0` 开始，`'中国'` 会自动视为 `中华人民共和国` 的别称。
         source (str, 可选): 数据源过滤条件；不传时不做来源过滤。
         db (str, 可选): sqlite db文件路径. 若未指定则使用所选 provider 的索引库。
-        engine (str, 可选): 输出引擎, 默认为None, 输出为列表,
-                                目前支持'geopandas', 若为geopandas,
-                                则返回GeoDataFrame对象.
-                                Defaults to None.
-        record (str, 可选): 返回记录的形式, 选项包括'all'和'first'。
-                                若为'first', 则无论查询结果又几条，仅返回第一条记录,
-                                若为'all', 则返回全部数据, 若engine==None则返回list,
-                                若engine=='geopandas', 则返回GeoDataFrame对象
-                                Defaults to 'all'.
-        only_polygon (bool, 可选): 是否仅返回地图边界对象(MapPolygon),
-                                若为True则返回结果为MapPolygon对象或以MapPolygon对象组合的list,
-                                若为False, 则返回的结果包含元信息, MapPolygon对象存储在
-                                'geometry'键中.
-                                Defaults to False.
-        wgs84 (bool, 可选): 是否使用 WGS84 坐标系, 若为 True 则转为 WGS84 坐标,
-                                若为 False 则使用高德默认的 GCJ02 火星坐标。Defaults to True.
-        simplify  (bool, 可选): 是否对边界进行简化, 若为 True 则进行简化处理, 否则不做简化。Defaults to True.
+        engine (str, 可选): 输出引擎。`None` 时返回 `MapRecord` 列表或单条记录，
+            `'geopandas'` 时返回 `GeoDataFrame` 或单行 `Series`。
+        record (str, 可选): 返回记录形式，支持 `'all'` 和 `'first'`。
+        only_polygon (bool, 可选): 是否仅返回 `MapPolygon` 结果。
+            为 `True` 时不返回元信息，仅返回边界几何。
+        wgs84 (bool, 可选): 是否尽可能输出 WGS84 坐标。
+            对高德来源数据为 `True` 时会执行 GCJ02 -> WGS84 转换；
+            其他来源数据保持其原始坐标语义。
+        simplify (bool, 可选): 是否对边界进行简化。默认为 `False`。
         provider (str, 可选): 数据提供者名称；默认为官方 ``cnmaps-data``。
 
-    异常:
-        ValueError: 当传入的等级
-
     返回值:
-        gpd.GeoDataFrame | list: 根据输入参数查找到的地图边界的元信息及边界对象
+        geopandas.GeoDataFrame | pandas.Series | MapRecord | list[MapRecord] | MapPolygon | list[MapPolygon]:
+            根据参数组合返回 GeoDataFrame、MapRecord 或 MapPolygon 结果。
+
+            - `engine is None` 且 `only_polygon=False`：返回 `MapRecord` 或其列表
+            - `engine is None` 且 `only_polygon=True`：返回 `MapPolygon` 或其列表
+            - `engine == 'geopandas'` 且 `record == 'all'`：返回 `GeoDataFrame`
+            - `engine == 'geopandas'` 且 `record == 'first'`：返回单行 `Series`
+
+    异常:
+        ValueError: `level` 不在支持范围内。
+        MapNotFoundError: 未找到符合条件的边界记录。
+
+    说明:
+        - `level='国'` 且不传 `country` 时，会返回全部国家/地区级记录，而不再仅指中国。
+        - `MapRecord` 推荐使用英文字段和点号访问，例如 `record.geometry`、
+          `record.longitude`、`record.latitude`。
     """
     import geopandas as gpd
 
