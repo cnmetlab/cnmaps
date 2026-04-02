@@ -211,6 +211,18 @@ plt.show()
 
 ![world-countries-borders-flat](static/images/world-countries-borders-flat.png)
 
+### 命令行导出矢量边界
+
+如果你希望直接在命令行里按筛选条件导出边界文件，可以使用 `cnmaps export`。它支持与 `get_adm_maps` 接近的筛选方式，例如 `country`、`province`、`city`、`district`、`level`、`source`、`provider`、`record`、`simplify` 等。
+
+```bash
+cnmaps export ./jingjin.geojson --province 北京市 天津市 --level 省
+cnmaps export ./east-asia.geojson --country 中国 JPN KOR --level 国
+cnmaps export ./henan.shp --province 河南省 --level 省 --record first
+```
+
+输出格式默认按文件后缀推断：`.geojson` / `.json` 对应 GeoJSON，`.shp` 对应 ESRI Shapefile。
+
 ## 使用指南
 
 针对本项目更多的使用方法，我们还有一份更详细的文档：[cnmaps使用指南](https://cnmaps.readthedocs.io/zh_CN/latest/index.html)

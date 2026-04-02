@@ -192,6 +192,25 @@ Use when the user wants to see what providers are installed.
 
 Use when provider-level dataset paths or metadata are needed.
 
+## CLI Export
+
+### `cnmaps export <output> [filters...]`
+
+Use when the user wants to export administrative boundaries directly from the terminal instead of writing Python code first.
+
+Useful patterns:
+
+- `cnmaps export ./jingjin.geojson --province 北京市 天津市 --level 省`
+- `cnmaps export ./east-asia.geojson --country 中国 JPN KOR --level 国`
+- `cnmaps export ./henan.shp --province 河南省 --level 省 --record first`
+
+Rules:
+
+- Filter semantics are close to `get_adm_maps(...)`: `country`, `province`, `city`, `district`, `level`, `source`, `provider`, `record`, `simplify`, and coordinate mode are all supported.
+- Multi-name filters are passed as repeated values after one flag, for example `--province 北京市 天津市`.
+- Output format is inferred from the destination suffix unless `--engine` is provided explicitly.
+- Default coordinates are WGS84; use `--gcj02` only when the user explicitly wants GCJ02 export.
+
 ## Rules Of Thumb
 
 - If the user wants China only: always write `country="中国", level="国"` explicitly.

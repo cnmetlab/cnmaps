@@ -371,3 +371,38 @@ sample模块主要存放示例数据
 
     :return:
         ``(lons, lats, u, v)``
+
+cli
+==========
+
+命令行工具目前主要包括 ``install-skill`` 与 ``export`` 两个子命令。
+
+.. program:: cnmaps
+
+.. option:: install-skill {codex,cursor,claudecode} [--dir DIR] [--mode {local,global}] [--force]
+
+    安装 ``cnmaps`` 自带的 AI Skill 描述。
+
+    - ``codex`` / ``cursor`` / ``claudecode``：目标助手类型
+    - ``--dir DIR``：本地安装时指定项目目录，默认是当前目录
+    - ``--mode local``：安装到当前项目目录
+    - ``--mode global``：安装到用户主目录下的全局目录
+    - ``--force``：覆盖已有安装
+
+.. option:: export OUTPUT [--country ...] [--province ...] [--city ...] [--district ...] [--level ...] [--source ...] [--provider ...] [--record {all,first}] [--engine ENGINE] [--encoding ENCODING] [--gcj02] [--simplify]
+
+    直接在命令行里完成“查询边界 + 导出文件”。
+
+    - ``OUTPUT``：目标输出路径；默认按后缀推断格式，其中 ``.geojson`` / ``.json`` 对应 GeoJSON，``.shp`` 对应 ESRI Shapefile
+    - ``--country``、``--province``、``--city``、``--district``：边界筛选条件，均支持多个值
+    - ``--level``：行政等级，例如 ``国``、``省``、``市``、``区县``
+    - ``--source``：数据源筛选
+    - ``--provider``：数据提供者名称
+    - ``--record all``：导出所有匹配记录
+    - ``--record first``：只导出第一条匹配记录
+    - ``--engine``：显式指定导出格式
+    - ``--encoding``：指定输出编码
+    - ``--gcj02``：导出 GCJ02 坐标，而不是默认的 WGS84
+    - ``--simplify``：导出前先简化几何
+
+    其中各类筛选规则尽量与 ``get_adm_maps`` 保持一致；如果需要多个名称筛选，可在同一个参数后依次写出多个值。
