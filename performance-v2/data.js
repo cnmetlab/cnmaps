@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775113724154,
+  "lastUpdate": 1775115532885,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -1972,6 +1972,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000007610895164933706",
             "extra": "mean: 30.410199997277232 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "clarmyleewt@outlook.com",
+            "name": "Wentao Li",
+            "username": "Clarmy"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "be03bec1ffef35af5fd980c8cdbe958936ba0687",
+          "message": "Add boundary spec check workflow for #84 (#168)\n\n* Add boundary spec check workflow for #84\n\n* Fix Python 3.9 typing and cover CLI tests in CI",
+          "timestamp": "2026-04-02T15:35:08+08:00",
+          "tree_id": "c82ec2281a832b6e6858c922c75d9a112f40b94b",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/be03bec1ffef35af5fd980c8cdbe958936ba0687"
+        },
+        "date": 1775115530232,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 46.31991645147959,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0002890026474093437",
+            "extra": "mean: 21.58898539999541 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 179.99759379215638,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00011988048072764886",
+            "extra": "mean: 5.555629822222524 msec\nrounds: 45"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 198.8884630962937,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00004671911009707526",
+            "extra": "mean: 5.027943725000483 msec\nrounds: 40"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.045900334594397,
+            "unit": "iter/sec",
+            "range": "stddev: 0.036130634324644605",
+            "extra": "mean: 328.3101514000009 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.16474996031788797,
+            "unit": "iter/sec",
+            "range": "stddev: 0.07158852608391685",
+            "extra": "mean: 6.0698041934 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5723.724954187772,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000014029976086098052",
+            "extra": "mean: 174.71140000679952 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 28508.22176615128,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008065323533397784",
+            "extra": "mean: 35.07760000616145 usec\nrounds: 5"
           }
         ]
       }
