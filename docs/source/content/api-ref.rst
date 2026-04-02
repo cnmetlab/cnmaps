@@ -108,6 +108,44 @@ maps模块主要存放与地图边界对象相关的类和函数。
         cnmaps.maps.MapPolygon
 
 
+.. py:function:: validate_boundary_file(fp, allow_multi_feature=True)
+    :module: cnmaps.maps
+
+    检查一个外部 ``GeoJSON`` / ``Shapefile`` 是否符合 ``cnmaps boundary spec``。
+
+    当前规范要求：
+
+    - 文件格式为 ``.geojson`` / ``.json`` / ``.shp``
+    - CRS 必须明确且等价为 WGS84（``EPSG:4326``）
+    - 几何必须全部为 ``Polygon`` 或 ``MultiPolygon``
+    - 不能包含空几何或无效几何
+
+    :param fp:
+        待检查的边界文件路径。
+    :param bool allow_multi_feature:
+        是否允许文件包含多个 feature。默认为 ``True``；若允许，读取时会先合并为一个统一边界。
+
+    :return:
+        结构化检查结果对象，包含是否通过、geometry 类型、CRS、错误列表与警告列表等信息。
+
+
+.. py:function:: read_boundary_file(fp, dissolve=True)
+    :module: cnmaps.maps
+
+    读取一个符合 ``cnmaps boundary spec`` 的外部 ``GeoJSON`` / ``Shapefile`` 文件，并将其转换为 ``MapPolygon``。
+
+    :param fp:
+        边界文件路径。
+    :param bool dissolve:
+        是否在读取时先将多个 feature 合并为一个统一边界。默认为 ``True``。
+
+    :return:
+        可直接用于 ``make_mask_array``、``maskout``、``clip_*`` 等工作流的 ``MapPolygon``。
+
+    :raises BoundarySpecError:
+        当文件不符合 ``cnmaps boundary spec`` 时抛出。
+
+
 .. py:function:: get_adm_names(province: str = None, city: str = None, district: str = None, level: str = '省', country: str = None, source: str = None, provider: str = None)
     :module: cnmaps.maps
 
@@ -406,3 +444,12 @@ cli
     - ``--simplify``：导出前先简化几何
 
     其中各类筛选规则尽量与 ``get_adm_maps`` 保持一致；如果需要多个名称筛选，可在同一个参数后依次写出多个值。
+
+.. option:: check-boundary PATH [--json]
+
+    检查一个外部边界文件是否符合 ``cnmaps boundary spec``。
+
+    - ``PATH``：待检查的 ``GeoJSON`` / ``Shapefile`` 文件路径
+    - ``--json``：输出结构化 JSON 检查结果；这只是检查结果的输出格式，与输入文件格式无关
+
+    若检查通过，文件即可进一步通过 ``read_boundary_file(...)`` 读取并转换为 ``MapPolygon``。

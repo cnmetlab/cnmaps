@@ -676,3 +676,45 @@ cnmaps 支持将查询到的矢量边界输出为 GeoJSON 或 ESRI Shapefile 文
 
     china.to_file('./china.geojson')  # 默认为 geojson 格式文件
     china.to_file('./china.shp', engine='ESRI Shapefile')  # 也可以指定 shapefile 格式文件
+
+
+读取自定义边界文件
+--------------------
+
+除了内置行政边界以外，``cnmaps`` 也支持读取“符合 ``cnmaps boundary spec`` 的外部 GeoJSON / Shapefile 文件”，并将其转换为 ``MapPolygon``，继续用于 ``make_mask_array``、``maskout``、``clip_*`` 等工作流。
+
+当前这套 boundary spec 的核心要求是：
+
+- 文件格式为 ``.geojson`` / ``.json`` / ``.shp``
+- CRS 必须明确且等价为 WGS84（``EPSG:4326``）
+- 几何必须全部为 ``Polygon`` 或 ``MultiPolygon``
+- 不能包含空几何或无效几何
+
+如果文件包含多个 feature，``cnmaps`` 会在读取时先将它们合并为一个统一边界。
+
+推荐先用命令行检查文件是否符合规范：
+
+.. code:: bash
+
+    cnmaps check-boundary ./my-boundary.geojson
+    cnmaps check-boundary ./my-boundary.shp --json  # 将检查结果以 JSON 输出
+
+检查通过后，就可以在 Python 代码中读取并继续做掩膜：
+
+.. code:: python
+
+    from cnmaps import read_boundary_file
+
+    boundary = read_boundary_file("./my-boundary.geojson")
+    mask = boundary.make_mask_array(lons, lats)
+    masked = boundary.maskout(lons, lats, data)
+
+如果你的原始 ``shp`` / ``geojson`` 还不符合这套规范，推荐先借助 AI 或 GIS 工具把它整理为符合 ``cnmaps boundary spec`` 的结构，再交给 ``cnmaps`` 检查和读取。
+
+如果你希望借助 AI 来完成这一步，推荐先按 :doc:`installation` 中的说明安装 ``cnmaps`` 自带的 AI Skill，再向 AI 发送类似下面的提示词：
+
+.. code:: text
+
+    帮我把 <path/filename.shp> 转为符合 cnmaps 可识别格式的 shapefile/geojson 文件，并通过 cnmaps 的 check-boundary 检查。
+
+这样 AI 会更容易按照 ``cnmaps boundary spec`` 去整理文件结构；整理完成后，再执行 ``cnmaps check-boundary ...`` 验证是否通过即可。

@@ -4,7 +4,10 @@ import sqlite3
 import re
 import warnings
 from collections.abc import Iterable
+from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import shapely.geometry as sgeom
@@ -28,6 +31,30 @@ class MapNotFoundError(Exception):
     """查询条件未命中任何边界记录时抛出的异常。"""
 
     pass
+
+
+class BoundarySpecError(ValueError):
+    """外部边界文件不符合 cnmaps boundary spec 时抛出的异常。"""
+
+    pass
+
+
+@dataclass(frozen=True)
+class BoundaryCheckResult:
+    """Structured result for validating an external boundary file."""
+
+    path: str
+    passed: bool
+    driver: Optional[str]
+    feature_count: int
+    geometry_types: tuple[str, ...]
+    crs: Optional[str]
+    errors: tuple[str, ...] = ()
+    warnings: tuple[str, ...] = ()
+
+    @property
+    def ok(self) -> bool:
+        return self.passed
 
 
 class MapRecord(dict):
@@ -206,6 +233,149 @@ def _clone_geometry(geom):
     if geom is None:
         return None
     return wkb.loads(geom.wkb)
+
+
+def _is_supported_boundary_suffix(path: Path) -> bool:
+    return path.suffix.lower() in {".geojson", ".json", ".shp"}
+
+
+def validate_boundary_file(fp, *, allow_multi_feature=True) -> BoundaryCheckResult:
+    """
+    检查外部 GeoJSON / Shapefile 是否符合 cnmaps boundary spec。
+
+    当前规范要求：
+        - 文件格式为 GeoJSON / Shapefile
+        - CRS 必须明确且可等价为 WGS84 (EPSG:4326)
+        - 所有几何都必须是 Polygon / MultiPolygon
+        - 不能包含空几何
+        - 几何必须有效
+    """
+    import geopandas as gpd
+    from pyproj import CRS
+
+    path = Path(fp).expanduser().resolve()
+    errors = []
+    warnings_list = []
+
+    if not path.exists():
+        return BoundaryCheckResult(
+            path=str(path),
+            passed=False,
+            driver=None,
+            feature_count=0,
+            geometry_types=(),
+            crs=None,
+            errors=(f"文件不存在: {path}",),
+        )
+
+    if not _is_supported_boundary_suffix(path):
+        errors.append("仅支持符合 cnmaps boundary spec 的 .geojson/.json 或 .shp 文件")
+
+    try:
+        gdf = gpd.read_file(path)
+    except Exception as exc:
+        return BoundaryCheckResult(
+            path=str(path),
+            passed=False,
+            driver=None,
+            feature_count=0,
+            geometry_types=(),
+            crs=None,
+            errors=(f"无法读取边界文件: {exc}",),
+        )
+
+    driver = getattr(gdf, "_driver", None)
+    feature_count = len(gdf)
+    if feature_count == 0:
+        errors.append("文件中不包含任何 feature")
+
+    if not allow_multi_feature and feature_count > 1:
+        errors.append("文件包含多个 feature；当前模式下只允许单个 feature")
+    elif feature_count > 1:
+        warnings_list.append("文件包含多个 feature；读取时会先合并为一个统一边界")
+
+    if gdf.crs is None:
+        errors.append("文件缺少 CRS 定义；cnmaps boundary spec 要求显式声明 WGS84 (EPSG:4326)")
+        crs_text = None
+    else:
+        crs_text = str(gdf.crs)
+        try:
+            if not CRS.from_user_input(gdf.crs).equals(CRS.from_epsg(4326)):
+                errors.append("文件 CRS 不是 WGS84 (EPSG:4326)")
+        except Exception as exc:
+            errors.append(f"无法解析 CRS: {exc}")
+
+    if "geometry" not in gdf:
+        errors.append("文件中缺少 geometry 列")
+        geometry_types = ()
+    else:
+        geometries = gdf.geometry
+        if geometries.isna().any():
+            errors.append("文件包含空几何")
+
+        non_null_geometries = [geom for geom in geometries if geom is not None]
+        geometry_types = tuple(sorted({geom.geom_type for geom in non_null_geometries}))
+
+        unsupported = sorted(
+            {
+                geom_type
+                for geom_type in geometry_types
+                if geom_type not in {"Polygon", "MultiPolygon"}
+            }
+        )
+        if unsupported:
+            errors.append(
+                "仅支持 Polygon / MultiPolygon 面几何，当前检测到: " + ", ".join(unsupported)
+            )
+
+        invalid_count = sum(1 for geom in non_null_geometries if not geom.is_valid)
+        if invalid_count:
+            errors.append(f"文件中包含 {invalid_count} 个无效几何")
+
+        empty_count = sum(1 for geom in non_null_geometries if geom.is_empty)
+        if empty_count:
+            errors.append(f"文件中包含 {empty_count} 个空几何")
+
+    return BoundaryCheckResult(
+        path=str(path),
+        passed=not errors,
+        driver=driver,
+        feature_count=feature_count,
+        geometry_types=geometry_types,
+        crs=crs_text,
+        errors=tuple(errors),
+        warnings=tuple(warnings_list),
+    )
+
+
+def read_boundary_file(fp, *, dissolve=True) -> "MapPolygon":
+    """
+    读取符合 cnmaps boundary spec 的外部边界文件并返回 MapPolygon。
+
+    当前支持 GeoJSON / Shapefile，要求输入文件：
+        - CRS 为 WGS84 (EPSG:4326)
+        - 仅包含 Polygon / MultiPolygon
+        - 不包含空几何和无效几何
+    """
+    import geopandas as gpd
+    from shapely.ops import unary_union
+
+    result = validate_boundary_file(fp)
+    if not result.ok:
+        raise BoundarySpecError(" ; ".join(result.errors))
+
+    gdf = gpd.read_file(Path(fp).expanduser().resolve())
+    geometries = [geom for geom in gdf.geometry if geom is not None and not geom.is_empty]
+
+    if dissolve:
+        merged = unary_union(geometries)
+        return _as_mappolygon_result(merged)
+
+    polygons = []
+    for geom in geometries:
+        normalized = _as_mappolygon_result(geom)
+        polygons.extend(list(normalized.geom.geoms))
+    return MapPolygon(polygons)
 
 
 def _as_mappolygon_result(geom):

@@ -104,6 +104,22 @@ Good for:
 - resolving a user's abbreviated or ambiguous region name before calling `get_adm_maps`
 - batch-filtering names after the user already knows several exact region names
 
+### `validate_boundary_file(fp, allow_multi_feature=True)`
+
+Use when the user has an external GeoJSON or Shapefile and wants to know whether it matches the cnmaps boundary spec before using it for masking or clipping.
+
+Current boundary spec:
+
+- file suffix must be `.geojson`, `.json`, or `.shp`
+- CRS must be WGS84 / `EPSG:4326`
+- geometries must all be `Polygon` or `MultiPolygon`
+- empty or invalid geometries are rejected
+- multiple features are allowed, but they are treated as one combined boundary when read
+
+### `read_boundary_file(fp, dissolve=True)`
+
+Use when the user already has an external boundary file that matches the cnmaps boundary spec and wants a `MapPolygon` for `make_mask_array(...)`, `maskout(...)`, or `clip_*`.
+
 ## Drawing APIs
 
 ### `draw_map(map_polygon, ax=None, **kwargs)`
@@ -211,6 +227,15 @@ Rules:
 - Output format is inferred from the destination suffix unless `--engine` is provided explicitly.
 - Default coordinates are WGS84; use `--gcj02` only when the user explicitly wants GCJ02 export.
 
+### `cnmaps check-boundary <path> [--json]`
+
+Use when the user has an external GeoJSON or Shapefile and wants a direct terminal check before reading it with `read_boundary_file(...)`.
+
+Rules:
+
+- Prefer this command when the user is unsure whether an external file already matches the cnmaps boundary spec.
+- `--json` is useful when AI or another script will consume the result and decide how to rewrite the file; it changes the check result output format, not the input file format.
+
 ## Rules Of Thumb
 
 - If the user wants China only: always write `country="中国", level="国"` explicitly.
@@ -222,5 +247,6 @@ Rules:
 - If the user wants clipped scientific plots specifically for EPS/PS export, consider `simplify=True` on the clipping boundary to reduce path complexity.
 - If the user wants a raster mask array rather than a plotted figure: use `MapPolygon.make_mask_array(...)` or `MapPolygon.maskout(...)`.
 - If the user wants exported vector output: query `only_polygon=True` and use `map_polygon.to_file(...)`.
+- If the user wants to use a custom GeoJSON or Shapefile for masking, do not assume arbitrary files will work directly; first validate them against the cnmaps boundary spec, then read them with `read_boundary_file(...)`.
 - If the user wants global country boundaries: `get_adm_maps(level="国")` is now the correct broad query.
 - If the user asks about seams, gaps, or disputed-border behavior in world maps, explain the source-semantic caveat instead of blaming plotting code first.

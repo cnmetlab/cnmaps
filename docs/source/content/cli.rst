@@ -19,6 +19,7 @@
 
 - ``install-skill``
 - ``export``
+- ``check-boundary``
 
 如果你想查看命令行程序自动生成的帮助信息，也可以执行：
 
@@ -27,6 +28,7 @@
    cnmaps -h
    cnmaps install-skill -h
    cnmaps export -h
+   cnmaps check-boundary -h
 
 这些帮助信息由参数定义自动生成，通常会与当前版本保持同步；不过你通常不需要先看它们，本页已经给出常见用法与参数说明。
 
@@ -169,3 +171,40 @@
 - 想在 shell 里直接把边界筛选并导出
 - 不想为了简单导出任务专门写一段 Python 脚本
 - 想把 ``get_adm_maps`` 的筛选逻辑复用到命令行工作流中
+
+``check-boundary`` 子命令
+---------------------------
+
+``check-boundary`` 用于检查一个外部 ``GeoJSON`` / ``Shapefile`` 是否符合 ``cnmaps boundary spec``，从而可以被 ``read_boundary_file(...)`` 稳定读取并转换为 ``MapPolygon``。
+
+命令形式：
+
+.. code-block:: bash
+
+   cnmaps check-boundary <path> [--json]
+
+位置参数：
+
+- ``<path>``：待检查的边界文件路径
+
+常用参数：
+
+- ``--json``：以 JSON 形式输出结构化检查结果，便于脚本或 AI 消费；这只是检查结果的输出格式，与输入文件本身是 ``shp`` 还是 ``geojson`` 无关
+
+当前规范要求：
+
+- 文件格式为 ``.geojson`` / ``.json`` / ``.shp``
+- CRS 必须明确且等价为 WGS84（``EPSG:4326``）
+- 几何必须全部为 ``Polygon`` 或 ``MultiPolygon``
+- 不能包含空几何或无效几何
+
+如果文件包含多个 feature，``cnmaps`` 在读取时会先将它们合并为一个统一边界。
+
+常见示例：
+
+.. code-block:: bash
+
+   cnmaps check-boundary ./my-boundary.geojson
+   cnmaps check-boundary ./my-boundary.shp --json  # 将检查结果以 JSON 输出
+
+如果检查通过，就可以继续在 Python 代码中调用 ``read_boundary_file(...)`` 读取，并进一步执行 ``make_mask_array(...)``、``maskout(...)`` 或 ``clip_*`` 等操作。

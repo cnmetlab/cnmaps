@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import json
 import shutil
 from pathlib import Path
+from typing import Optional
 
 
 SKILL_NAME = "cnmaps-python-assistant"
@@ -281,7 +283,7 @@ _EXPORTABLE_COLUMNS = (
 )
 
 
-def _normalize_export_engine(engine: str | None, output_path: Path) -> str:
+def _normalize_export_engine(engine: Optional[str], output_path: Path) -> str:
     if engine is None:
         suffix = output_path.suffix.lower()
         if suffix in {".geojson", ".json"}:
@@ -314,7 +316,7 @@ def export_adm_maps(
     record: str = "all",
     wgs84: bool = True,
     simplify: bool = False,
-    engine: str | None = None,
+    engine: Optional[str] = None,
     encoding: str = "utf-8",
 ) -> Path:
     from cnmaps import get_adm_maps
@@ -347,6 +349,23 @@ def export_adm_maps(
     output.parent.mkdir(parents=True, exist_ok=True)
     gdf.to_file(output, driver=driver, encoding=encoding)
     return output
+
+
+def check_boundary_file(path: Path) -> tuple[bool, dict]:
+    from cnmaps import validate_boundary_file
+
+    result = validate_boundary_file(path)
+    payload = {
+        "path": result.path,
+        "passed": result.passed,
+        "driver": result.driver,
+        "feature_count": result.feature_count,
+        "geometry_types": list(result.geometry_types),
+        "crs": result.crs,
+        "errors": list(result.errors),
+        "warnings": list(result.warnings),
+    }
+    return result.passed, payload
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -430,10 +449,21 @@ def build_parser() -> argparse.ArgumentParser:
         help="Simplify geometries before export.",
     )
 
+    check_parser = subparsers.add_parser(
+        "check-boundary",
+        help="Validate whether an external GeoJSON or Shapefile matches the cnmaps boundary spec.",
+    )
+    check_parser.add_argument("path", type=Path, help="Boundary file path to validate.")
+    check_parser.add_argument(
+        "--json",
+        action="store_true",
+        help="Emit the validation result as JSON.",
+    )
+
     return parser
 
 
-def main(argv: list[str] | None = None) -> int:
+def main(argv=None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
 
@@ -477,6 +507,27 @@ def main(argv: list[str] | None = None) -> int:
             parser.exit(1, f"{exc}\n")
 
         parser.exit(0, f"Exported administrative boundaries to {output}\n")
+
+    if args.command == "check-boundary":
+        passed, payload = check_boundary_file(args.path.expanduser().resolve())
+        if args.json:
+            parser.exit(0 if passed else 1, json.dumps(payload, ensure_ascii=False, indent=2) + "\n")
+
+        lines = [
+            f"Boundary spec check: {'PASS' if passed else 'FAIL'}",
+            f"- path: {payload['path']}",
+            f"- feature_count: {payload['feature_count']}",
+            f"- geometry_types: {', '.join(payload['geometry_types']) if payload['geometry_types'] else '(none)'}",
+            f"- crs: {payload['crs'] or '(missing)'}",
+        ]
+        if payload["warnings"]:
+            lines.append("- warnings:")
+            lines.extend(f"  - {item}" for item in payload["warnings"])
+        if payload["errors"]:
+            lines.append("- errors:")
+            lines.extend(f"  - {item}" for item in payload["errors"])
+
+        parser.exit(0 if passed else 1, "\n".join(lines) + "\n")
 
     parser.print_help()
     return 1
