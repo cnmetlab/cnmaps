@@ -21,7 +21,7 @@ shapely = [
     { version = ">=2.1.2", python = ">=3.14" },
 ]
 fiona = ">=1.8.20"
-geopandas = ">=0.10.2"
+geopandas = ">=0.10.2,<1.0.0"
 cartopy = [
     { version = ">=0.22.0", python = "<3.13", extras = ["plotting"] },
     { version = ">=0.24.1", python = ">=3.13", extras = ["plotting"] },
