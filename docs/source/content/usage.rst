@@ -148,6 +148,15 @@
     '甘孜藏族自治州',
     '凉山彝族自治州']
 
+如果你已经明确知道多个名称，也可以直接一次性批量查询。例如：
+
+.. code:: python
+
+    from cnmaps import get_adm_maps
+
+    jingjin = get_adm_maps(province=['北京市', '天津市'], level='省')
+    henan_cities = get_adm_maps(province='河南省', city=['郑州市', '洛阳市'], level='市')
+
 知道了市的名称以后，可以继续下探到区县，以成都市为例：
 
 .. code:: python
