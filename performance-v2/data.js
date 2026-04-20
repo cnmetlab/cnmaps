@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1775678965903,
+  "lastUpdate": 1776666300204,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -3023,6 +3023,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000009110092477133179",
             "extra": "mean: 36.518600006729685 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "849d2202b3ffedc537e88ae96ac182253792dfde",
+          "message": "chore(deps): bump geopandas from 0.14.4 to 1.0.1 (#174)\n\nBumps [geopandas](https://github.com/geopandas/geopandas) from 0.14.4 to 1.0.1.\n- [Release notes](https://github.com/geopandas/geopandas/releases)\n- [Changelog](https://github.com/geopandas/geopandas/blob/main/CHANGELOG.md)\n- [Commits](https://github.com/geopandas/geopandas/compare/v0.14.4...v1.0.1)\n\n---\nupdated-dependencies:\n- dependency-name: geopandas\n  dependency-version: 1.0.1\n  dependency-type: direct:production\n  update-type: version-update:semver-major\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-04-20T14:21:22+08:00",
+          "tree_id": "718b842fdf359941778cc95d78dc6d0b349847d7",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/849d2202b3ffedc537e88ae96ac182253792dfde"
+        },
+        "date": 1776666297720,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 49.89353667249708,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00009055386479456557",
+            "extra": "mean: 20.042676200006326 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 183.29244628743146,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000647229336531265",
+            "extra": "mean: 5.455762199997277 msec\nrounds: 45"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 198.83683681570568,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007068446886067562",
+            "extra": "mean: 5.0292491874976974 msec\nrounds: 16"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.077734619669523,
+            "unit": "iter/sec",
+            "range": "stddev: 0.01872063233518762",
+            "extra": "mean: 324.9143034000042 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.16623254938318036,
+            "unit": "iter/sec",
+            "range": "stddev: 0.042331535930187056",
+            "extra": "mean: 6.015669035400004 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5820.958944831182,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001387106674991453",
+            "extra": "mean: 171.79299999838804 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 27168.745073014008,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00000976474729662327",
+            "extra": "mean: 36.807000003591384 usec\nrounds: 5"
           }
         ]
       }
