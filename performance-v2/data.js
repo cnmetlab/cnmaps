@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776666300204,
+  "lastUpdate": 1776888590667,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -3096,6 +3096,75 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.00000976474729662327",
             "extra": "mean: 36.807000003591384 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "committer": {
+            "name": "cnmetlab",
+            "username": "cnmetlab"
+          },
+          "id": "359b11661c393068d8dded78c224b47b5425cc61",
+          "message": "chore(deps): update sphinx requirement from >=5.0.1 to >=7.4.7",
+          "timestamp": "2026-04-20T06:21:28Z",
+          "url": "https://github.com/cnmetlab/cnmaps/pull/175/commits/359b11661c393068d8dded78c224b47b5425cc61"
+        },
+        "date": 1776888587703,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 58.08850413284475,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0008072772610620463",
+            "extra": "mean: 17.215110199998662 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 271.44489676875423,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00005097903247068215",
+            "extra": "mean: 3.6839889491527513 msec\nrounds: 59"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 288.5737916219322,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0000451864012498847",
+            "extra": "mean: 3.465318157894689 msec\nrounds: 19"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 5.110104331528453,
+            "unit": "iter/sec",
+            "range": "stddev: 0.018904086704725123",
+            "extra": "mean: 195.69072079999899 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.1712670317457102,
+            "unit": "iter/sec",
+            "range": "stddev: 0.024916665997491386",
+            "extra": "mean: 5.838835354400001 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 9423.649591464133,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000017272653384635408",
+            "extra": "mean: 106.11599999492682 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 42066.296467953776,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000006424130451365741",
+            "extra": "mean: 23.77200000864832 usec\nrounds: 5"
           }
         ]
       }
