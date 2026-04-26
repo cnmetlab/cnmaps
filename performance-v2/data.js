@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1776889048757,
+  "lastUpdate": 1777188790764,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -3234,6 +3234,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000010346478198710602",
             "extra": "mean: 37.20739999835132 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "da5eff192a9fb9c937e0632456c7b4916ebbb2a3",
+          "message": "chore(deps): update sphinx-rtd-theme requirement from >=1.0.0 to >=3.1.0 (#176)\n\nUpdates the requirements on [sphinx-rtd-theme](https://github.com/readthedocs/sphinx_rtd_theme) to permit the latest version.\n- [Changelog](https://github.com/readthedocs/sphinx_rtd_theme/blob/master/docs/changelog.rst)\n- [Commits](https://github.com/readthedocs/sphinx_rtd_theme/compare/1.0.0...3.1.0)\n\n---\nupdated-dependencies:\n- dependency-name: sphinx-rtd-theme\n  dependency-version: 3.1.0\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-04-26T15:29:27+08:00",
+          "tree_id": "b8c8a88978b975a14b52bf075b89d5d271b55765",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/da5eff192a9fb9c937e0632456c7b4916ebbb2a3"
+        },
+        "date": 1777188788642,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 47.91330099685262,
+            "unit": "iter/sec",
+            "range": "stddev: 0.0001894269349325228",
+            "extra": "mean: 20.871031199993695 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 173.11493845150832,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00009511353422142592",
+            "extra": "mean: 5.776509000002404 msec\nrounds: 42"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 190.7512674288023,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00015091439093393685",
+            "extra": "mean: 5.242429125003056 msec\nrounds: 16"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 2.998080169769387,
+            "unit": "iter/sec",
+            "range": "stddev: 0.020756302556073657",
+            "extra": "mean: 333.546784400005 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.15244005966738927,
+            "unit": "iter/sec",
+            "range": "stddev: 0.034147371914099445",
+            "extra": "mean: 6.559955448600005 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5605.305757986894,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000020367923175226175",
+            "extra": "mean: 178.4024000073714 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 27945.13810877002,
+            "unit": "iter/sec",
+            "range": "stddev: 0.000008859509465292195",
+            "extra": "mean: 35.78439999500915 usec\nrounds: 5"
           }
         ]
       }
