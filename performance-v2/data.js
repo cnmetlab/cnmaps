@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1777188839000,
+  "lastUpdate": 1777370511401,
   "repoUrl": "https://github.com/cnmetlab/cnmaps",
   "entries": {
     "cnmaps Benchmark": [
@@ -3376,6 +3376,79 @@ window.BENCHMARK_DATA = {
             "unit": "iter/sec",
             "range": "stddev: 0.000007913198375580135",
             "extra": "mean: 23.193199990600988 usec\nrounds: 5"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "name": "dependabot[bot]",
+            "username": "dependabot[bot]"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "6f7b41e98735ba7a0ee3076cd08c0edbc9e9d3c5",
+          "message": "chore(deps): update sphinx requirement from >=5.0.1 to >=7.4.7 (#175)\n\nUpdates the requirements on [sphinx](https://github.com/sphinx-doc/sphinx) to permit the latest version.\n- [Release notes](https://github.com/sphinx-doc/sphinx/releases)\n- [Changelog](https://github.com/sphinx-doc/sphinx/blob/v7.4.7/CHANGES.rst)\n- [Commits](https://github.com/sphinx-doc/sphinx/compare/v5.0.1...v7.4.7)\n\n---\nupdated-dependencies:\n- dependency-name: sphinx\n  dependency-version: 7.4.7\n  dependency-type: direct:production\n...\n\nSigned-off-by: dependabot[bot] <support@github.com>\nCo-authored-by: dependabot[bot] <49699333+dependabot[bot]@users.noreply.github.com>",
+          "timestamp": "2026-04-28T17:58:02+08:00",
+          "tree_id": "bcd95992443bb57ec36286366ab018652d81b420",
+          "url": "https://github.com/cnmetlab/cnmaps/commit/6f7b41e98735ba7a0ee3076cd08c0edbc9e9d3c5"
+        },
+        "date": 1777370508084,
+        "tool": "pytest",
+        "benches": [
+          {
+            "name": "tests/test_perf.py::test_query_country_boundary",
+            "value": 46.97940379716797,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00010586323903712032",
+            "extra": "mean: 21.28592359999857 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_foreign_country_boundary",
+            "value": 180.03851442516614,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00007336900679618241",
+            "extra": "mean: 5.554367093023614 msec\nrounds: 43"
+          },
+          {
+            "name": "tests/test_perf.py::test_query_province_boundary",
+            "value": 190.65198522463876,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00012316428920132471",
+            "extra": "mean: 5.245159124998011 msec\nrounds: 16"
+          },
+          {
+            "name": "tests/test_perf.py::test_draw_map_country",
+            "value": 3.0406199607120987,
+            "unit": "iter/sec",
+            "range": "stddev: 0.02041486282556984",
+            "extra": "mean: 328.88029840000286 msec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_clip_contourf_country",
+            "value": 0.15874767891522246,
+            "unit": "iter/sec",
+            "range": "stddev: 0.03980414938831174",
+            "extra": "mean: 6.299304700599999 sec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_maskout_core",
+            "value": 5618.03433962137,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001335644832244279",
+            "extra": "mean: 177.9982000016389 usec\nrounds: 5"
+          },
+          {
+            "name": "tests/test_perf.py::test_make_maskout_array_core",
+            "value": 25864.789233948854,
+            "unit": "iter/sec",
+            "range": "stddev: 0.00001211412007454883",
+            "extra": "mean: 38.662599990857416 usec\nrounds: 5"
           }
         ]
       }
