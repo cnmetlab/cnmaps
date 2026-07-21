@@ -649,6 +649,44 @@ def test_get_extent():
     )
 
 
+def test_get_extent_expands_polygon_and_multipolygon_bounds():
+    polygon = MapPolygon(sgeom.Polygon([(1, 2), (5, 2), (5, 7), (1, 7)]))
+    multipolygon = MapPolygon(
+        [
+            sgeom.Polygon([(1, 2), (5, 2), (5, 7), (1, 7)]),
+            sgeom.Polygon([(-3, -4), (-1, -4), (-1, -2), (-3, -2)]),
+        ]
+    )
+
+    assert polygon.get_extent() == (-1.0, 7.0, 0.0, 9.0)
+    assert polygon.get_extent(buffer=0) == (1.0, 5.0, 2.0, 7.0)
+    assert polygon.get_extent(buffer=0.5) == (0.5, 5.5, 1.5, 7.5)
+    assert multipolygon.get_extent(buffer=1) == (-4.0, 6.0, -5.0, 8.0)
+
+
+def test_get_extent_does_not_call_geometry_buffer(monkeypatch):
+    polygon = MapPolygon(sgeom.Polygon([(1, 2), (5, 2), (5, 7), (1, 7)]))
+
+    def fail_if_called(*args, **kwargs):
+        pytest.fail("get_extent must not call the geometry buffer operation")
+
+    monkeypatch.setattr(MapPolygon, "buffer", fail_if_called, raising=False)
+
+    assert polygon.get_extent(buffer=2) == (-1.0, 7.0, 0.0, 9.0)
+
+
+def test_brazil_extent_uses_bounds_without_geometry_buffer(monkeypatch):
+    brazil = get_adm_maps(country="BRA", level="国", record="first", only_polygon=True)
+
+    def fail_if_called(*args, **kwargs):
+        pytest.fail("get_extent must not call the geometry buffer operation")
+
+    monkeypatch.setattr(MapPolygon, "buffer", fail_if_called, raising=False)
+
+    left, lower, right, upper = brazil.bounds
+    assert brazil.get_extent(buffer=2) == (left - 2, right + 2, lower - 2, upper + 2)
+
+
 def test_only_polygon_and_record():
     """测试only_polygon参数和record参数功能."""
     polygons = get_adm_maps(city="北京市", record="all", level="区县", only_polygon=True)

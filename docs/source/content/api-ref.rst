@@ -41,10 +41,12 @@ maps模块主要存放与地图边界对象相关的类和函数。
     
     .. py:method:: get_extent(buffer=2)
 
-        获取范围坐标
+        获取范围坐标。该方法直接在原始 bounds 上扩展数值边距，
+        不会执行 Shapely 的几何 ``buffer`` 运算。
 
         :param buffer:
-            外扩缓冲边缘, 单位为°, 该值越大, 所取的范围越大. 默认为 2.
+            原始经纬度范围的数值外扩边距，单位为°；不是几何 buffer。
+            该值越大，所取的范围越大。默认为 2.
         
         :type buffer: float or int
 

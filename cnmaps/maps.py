@@ -555,14 +555,16 @@ class MapPolygon:
         获取适合传给 `ax.set_extent(...)` 的范围坐标。
 
         参数:
-            buffer (int | float, 可选): 在几何边界外额外扩展的经纬度缓冲，
-                单位为度。默认为 2。
+            buffer (int | float, 可选): 在原始经纬度 bounds 外额外扩展的
+                数值边距，单位为度。它不是 Shapely 的几何 ``buffer`` 操作。
+                默认为 2。
 
         返回值:
             tuple: `(left, right, lower, upper)`。
         """
-        left, lower, right, upper = self.buffer(buffer).bounds
-        return (left, right, lower, upper)
+        left, lower, right, upper = self.bounds
+        padding = float(buffer)
+        return (left - padding, right + padding, lower - padding, upper + padding)
 
     def to_file(
         self,
