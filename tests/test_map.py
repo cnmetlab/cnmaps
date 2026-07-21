@@ -626,27 +626,10 @@ def test_province_difference():
 
 def test_get_extent():
     """测试get_extent函数的返回结果是否符合预期."""
-    gcj02_extent = (
-        113.42394680348974,
-        119.51379082389037,
-        37.44400605531913,
-        43.060480499941455,
-    )
-
-    wgs84_extent = (
-        113.41739858502812,
-        119.50730212806607,
-        37.44275317420805,
-        43.05884396835136,
-    )
-    assert (
-        get_adm_maps(province="北京市", wgs84=False)[0]["geometry"].get_extent()
-        == gcj02_extent
-    )
-    assert (
-        get_adm_maps(province="北京市", wgs84=True)[0]["geometry"].get_extent()
-        == wgs84_extent
-    )
+    for wgs84 in (False, True):
+        geometry = get_adm_maps(province="北京市", wgs84=wgs84)[0]["geometry"]
+        left, lower, right, upper = geometry.bounds
+        assert geometry.get_extent() == (left - 2, right + 2, lower - 2, upper + 2)
 
 
 def test_get_extent_expands_polygon_and_multipolygon_bounds():
